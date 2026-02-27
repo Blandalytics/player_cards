@@ -1242,8 +1242,6 @@ def load_data(pitcher_id,game_id,vs_past,szn_load):
 
     return game_df, game_group, szn_df, szn_group, szn_comp
 
-game_df, game_group, szn_df, szn_group, szn_comp = load_data(pitcher_id,game_id,vs_past,szn_load)
-
 def gaussian_filter(kernel_size, sigma=1, muu=0):
     # Initializing value of x, y as grid of kernel size in the range of kernel size
     x, y = np.meshgrid(np.linspace(-1, 1, kernel_size),
@@ -1920,4 +1918,5 @@ def generate_chart(pitcher_id,game_id,game_df,game_group,szn_df,szn_comp,vs_past
     sns.despine(left=True,bottom=True)
     st.pyplot(fig, width='content')
 if st.button('Generate Chart'):
-        generate_chart(pitcher_id,game_id,game_df,game_group,szn_df,szn_comp,vs_past)
+    game_df, game_group, szn_df, szn_group, szn_comp = load_data(pitcher_id,game_id,vs_past,szn_load)
+    generate_chart(pitcher_id,game_id,game_df,game_group,szn_df,szn_comp,vs_past)
