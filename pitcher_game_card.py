@@ -1576,7 +1576,7 @@ def letter_grade(val):
                   bins=[-100,60,63,67,70,73,77,80,83,87,90,93,97,300],
                   labels=['F', 'D-', 'D', 'D+', 'C-', 'C', 'C+', 'B-', 'B', 'B+', 'A-', 'A', 'A+'])[0]
 
-def generate_chart(pitcher_id,game_id,game_df,game_group,szn_comp,vs_past):
+def generate_chart(pitcher_id,game_id,game_df,game_group,szn_df,szn_comp,vs_past):
     arm_angle = game_df['armAngle'].mean()
     
     fig = plt.figure(figsize=(15,20))
@@ -1669,7 +1669,7 @@ def generate_chart(pitcher_id,game_id,game_df,game_group,szn_comp,vs_past):
     
     pitch_list = list(game_df['pitchType'].unique())
     if vs_past:
-        sns.kdeplot(test_df.loc[test_df['pitchType'].isin(pitch_list)].assign(HB = lambda x: np.where(x['pitcherHand']=='L',x['HB'].mul(-1),x['HB'])),
+        sns.kdeplot(szn_df.loc[szn_df['pitchType'].isin(pitch_list)].assign(HB = lambda x: np.where(x['pitcherHand']=='L',x['HB'].mul(-1),x['HB'])),
                     x='HB',
                     y='IVB',
                     hue='pitchType',
@@ -1920,4 +1920,4 @@ def generate_chart(pitcher_id,game_id,game_df,game_group,szn_comp,vs_past):
     sns.despine(left=True,bottom=True)
     st.pyplot(fig, width='content')
 
-generate_chart(pitcher_id,game_id,game_df,game_group,szn_comp,vs_past)
+generate_chart(pitcher_id,game_id,game_df,game_group,szn_df,szn_comp,vs_past)
