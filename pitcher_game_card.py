@@ -1183,7 +1183,7 @@ def load_data(pitcher_id,game_id,vs_past,szn_load):
         szn_df['vLHH'] = np.where(szn_df['hitterHand']=='L',1,None)
 
         szn_group = (
-            test_df
+            szn_df
             .groupby(['pitcherId','pitcherName','pitchType'])
             [['isPitch','vRHH','vLHH','armAngle','velo','extension','IVB','HB','HAVAA','zone','chase','whiff','csw',
               # 'xwOBAcon'
