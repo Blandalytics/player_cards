@@ -1152,6 +1152,7 @@ def load_data(pitcher_id,game_id,vs_past,szn_load):
   
     szn_df = None
     szn_group = None
+    szn_comp = None
     if vs_past:
         szn_df = (
             pd.DataFrame(szn_load,
