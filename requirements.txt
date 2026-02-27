@@ -6,3 +6,4 @@ seaborn
 pyfonts
 tqdm
 xgboost
+scikit-learn
