@@ -63,6 +63,19 @@ mpl.rcParams.update({"font.weight": 600})
 chart_red = sns.color_palette('vlag',n_colors=10000)[-1]
 chart_blue = sns.color_palette('vlag',n_colors=10000)[0]
 
+@st.cache_data(ttl=3600)
+def letter_logo():
+    logo_loc = 'https://github.com/Blandalytics/baseball_snippets/blob/main/teal_letter_logo.png?raw=true'
+    logo = Image.open(urllib.request.urlopen(logo_loc))
+    return logo
+
+letter_logo = letter_logo()
+
+st.set_page_config(page_title='PLV Pitcher Game Card', page_icon=letter_logo,layout='wide')
+# st.title("NFBC Draft Data, over Time")
+new_title = '<p style="color:#72CBFD; font-weight: bold; font-size: 42px;">PLV Pitcher Game Card</p>'
+st.markdown(new_title, unsafe_allow_html=True)
+
 pitchtype_map = {
     'FF':'FF',
     'FA':'FF',
