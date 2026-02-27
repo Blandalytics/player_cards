@@ -1240,9 +1240,9 @@ def load_data(pitcher_id,game_id,vs_past,szn_load):
             szn_comp[stat+'_arrow'] = np.where(szn_comp[stat+'_diff'] >0,'↑','↓')
             szn_comp[stat+'_arrow'] = np.where(szn_comp[stat+'_diff']==0,'',szn_comp[stat+'_arrow'])
 
-    return game_df, game_group, szn_group, szn_comp
+    return game_df, game_group, szn_df, szn_group, szn_comp
 
-game_df, game_group, szn_group, szn_comp = load_data(pitcher_id,game_id,vs_past,szn_load)
+game_df, game_group, szn_df, szn_group, szn_comp = load_data(pitcher_id,game_id,vs_past,szn_load)
 
 def gaussian_filter(kernel_size, sigma=1, muu=0):
     # Initializing value of x, y as grid of kernel size in the range of kernel size
