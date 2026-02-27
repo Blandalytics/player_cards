@@ -1002,10 +1002,10 @@ def fastball_differences(dataframe,stat):
                                 right_on=['pitcherId','gameId','pitchType']).drop(columns=['pitchType_y']).rename(columns={'pitchType_x':'pitchType'})
     return dataframe[stat].sub(dataframe['fb_'+stat])
 
-pitcher_id = st.number_input('Enter Pitcher MLBAMID',value=669373)
-game_id = st.number_input('Enter MLB Game ID',value=777780)
-vs_past = st.checkbox("Compare to previous results?",value=True)
-spring_training = st.checkbox("Is Spring Training Game?",value=False)
+pitcher_id = st.number_input('Enter Pitcher MLBAMID',value=694973)
+game_id = st.number_input('Enter MLB Game ID',value=831490)
+vs_past = st.checkbox("Compare to previous results?",value=True,help='If player has no 2025 MLB data, uncheck')
+spring_training = st.checkbox("Is Spring Training Game?",value=True)
 if vs_past:
     if spring_training:
         prev_season = True
