@@ -1919,5 +1919,5 @@ def generate_chart(pitcher_id,game_id,game_df,game_group,szn_df,szn_comp,vs_past
     grid.tight_layout(fig,pad=2)
     sns.despine(left=True,bottom=True)
     st.pyplot(fig, width='content')
-
-generate_chart(pitcher_id,game_id,game_df,game_group,szn_df,szn_comp,vs_past)
+if st.button('Generate Chart'):
+        generate_chart(pitcher_id,game_id,game_df,game_group,szn_df,szn_comp,vs_past)
