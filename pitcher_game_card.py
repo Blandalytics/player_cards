@@ -971,7 +971,7 @@ def pitch_models(data):
         std_plv_runs = 0.048
         model_df['delta_re'] = er_per_pitch
         for stat in outcomes:
-            model_df[stat+'_re'] = stat
+            model_df[stat+'_re'] = stat if stat != 'hit_by_pitch' else 'ball' # Code HBP as Ball REs
             model_df[stat+'_re'] = model_df[[stat+'_re','count']].apply(tuple,axis=1).map(run_expectancies)
             model_df['delta_re'] = model_df['delta_re'].add(model_df[stat+'_pred'].fillna(model_df[stat+'_pred'].median()).mul(model_df[stat+'_re']))
 
