@@ -2034,6 +2034,6 @@ with col3:
         else:
             prev_season = False
             szn_load = []
-    if st.button('Generate Chart'):
-        game_df, game_group, szn_df, szn_group, szn_comp = load_data(pitcher_id,game_id,vs_past,szn_load)
-        generate_chart(pitcher_id,game_id,game_df,game_group,szn_df,szn_comp,vs_past)
+if st.button('Generate Chart'):
+    game_df, game_group, szn_df, szn_group, szn_comp = load_data(pitcher_id,game_id,vs_past,szn_load)
+    generate_chart(pitcher_id,game_id,game_df,game_group,szn_df,szn_comp,vs_past)
