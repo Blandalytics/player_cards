@@ -1002,10 +1002,114 @@ def fastball_differences(dataframe,stat):
                                 right_on=['pitcherId','gameId','pitchType']).drop(columns=['pitchType_y']).rename(columns={'pitchType_x':'pitchType'})
     return dataframe[stat].sub(dataframe['fb_'+stat])
 
-pitcher_id = st.number_input('Enter Pitcher MLBAMID',value=694973)
-game_id = st.number_input('Enter MLB Game ID',value=831490)
-vs_past = st.checkbox("Compare to previous results?",value=True,help='If player has no 2025 MLB data, uncheck')
-spring_training = st.checkbox("Is Spring Training Game?",value=True)
+def pull_game_info(game_id):
+    code_dict = {
+        'F':0,
+        'U':0,
+        'O':1,
+        'I':1,
+        'N':1,
+        'P':2,
+        'S':2,
+        'D':2
+    }
+    r = requests.get(f'https://baseballsavant.mlb.com/gf?game_pk={game_id}')
+    x = r.json()
+    game_hour = int(x['scoreboard']['datetime']['dateTime'][11:13])
+    game_hour = game_hour-4 if game_hour >3 else game_hour+20
+    game_minutes = int(x['scoreboard']['datetime']['dateTime'][14:16])
+    raw_time = game_hour*60+game_minutes
+    am_pm = 'AM' if game_hour <12 else 'PM'
+    game_time = f'{game_hour-12}:{game_minutes:>02}{am_pm}' if (am_pm=='PM') & (game_hour!=12) else f'{game_hour}:{game_minutes:>02}{am_pm}'
+    ppd = 0 if x['scoreboard']['datetime']['originalDate']==x['scoreboard']['datetime']['officialDate'] else 1
+    
+    away_team = x['scoreboard']['teams']['away']['abbreviation']
+    home_team = x['scoreboard']['teams']['home']['abbreviation']
+    game_status_code = x['game_status_code']
+    code_map = code_dict[game_status_code]
+    if game_status_code  in ['P','S','D']:
+        game_info = f'{away_team} @ {home_team}: {game_time}'
+        inning_sort = None
+    else:
+        game_info = f'{away_team} @ {home_team}'
+        home_runs = x['scoreboard']['linescore']['teams']['home']['runs']
+        away_runs = x['scoreboard']['linescore']['teams']['away']['runs']
+        inning = x['scoreboard']['linescore']['currentInning']
+        top_bot = x['scoreboard']['linescore']['inningHalf'][0]
+        inning_sort = int(inning)*2 - (0 if top_bot=='Bottom' else 1)
+        if game_status_code == 'F':
+            if home_runs>away_runs:
+                game_info = f'FINAL: {away_team} {away_runs} @ **:green[{home_team} {home_runs}]**'
+            elif home_runs<away_runs:
+                game_info = f'FINAL: **:green[{away_team} {away_runs}]** @ {home_team} {home_runs}'
+            else:
+                game_info = f'FINAL: {away_team} {away_runs} @ {home_team} {home_runs}'
+        else:
+            game_info = f'{top_bot}{inning}: {away_team} {away_runs} @ {home_team} {home_runs}'
+    return {game_info:[game_id,game_time,raw_time,inning_sort,code_map]}
+
+def generate_games(games_today):
+    game_dict = {}
+    with ThreadPoolExecutor(max_workers=8) as executor:
+        futures = {executor.submit(pull_game_info, game_id): game_id for game_id in games_today}
+        for future in tqdm.tqdm(as_completed(futures), total=len(futures), desc="Processing", unit="games"):
+        # for future in as_completed(futures):
+            game_dict.update(future.result())
+    game_df = pd.DataFrame.from_dict(game_dict, orient='index',columns=['Game ID','Time','Sort Time','Sort Inning','Sort Code'])
+    return game_df.sort_values(['Sort Code','Sort Time','Game ID','Sort Inning'])['Game ID'].to_dict()
+
+st.write('Data (especially pitch types) are subject to change.')
+col1, col2, col3 = st.columns([0.25,0.5,0.25])
+
+with col1:
+    today = (datetime.now(UTC)-timedelta(hours=16)).date()
+    input_date = st.date_input("Select a game date:", today, 
+                               min_value=datetime.date(2026, 2, 20), max_value=today+timedelta(days=2))
+    r = requests.get(f'https://statsapi.mlb.com/api/v1/schedule?sportId=1&date={input_date}')
+    x = r.json()
+    if x['totalGames']==0:
+        print(f'No games on {input_date}')
+    else:
+        games_today = []
+        for game in range(len(x['dates'][0]['games'])):
+            if x['dates'][0]['games'][game]['gamedayType'] in ['E','P']:
+                games_today += [x['dates'][0]['games'][game]['gamePk']]
+        game_list = generate_games(games_today)
+with col2:
+    input_game = st.pills('Choose a game (all times EST):',list(game_list.keys()),default=list(game_list.keys())[0])
+    game_id = game_list[input_game]
+    game_id = int(game_id)
+    r = requests.get(f'https://baseballsavant.mlb.com/gf?game_pk={game_id}')
+    x = r.json()
+    game_code = x['game_status_code']
+    if (len(x['home_pitcher_lineup'])>0) | (len(x['away_pitcher_lineup'])>0):
+        pitcher_lineup = [x['home_pitcher_lineup'][0]]+[x['away_pitcher_lineup'][0]]+([] if len(x['home_pitcher_lineup'])==1 else x['home_pitcher_lineup'][1:])+([] if len(x['away_pitcher_lineup'])==1 else x['away_pitcher_lineup'][1:])
+        home_team = [1]+[0]+([] if len(x['home_pitcher_lineup'])==1 else [1]*(len(x['home_pitcher_lineup'])-1))+([] if len(x['away_pitcher_lineup'])==1 else [0]*(len(x['away_pitcher_lineup'])-1))
+        test_list = {}
+        for home_away_pitcher in ['home','away']:
+            if f'{home_away_pitcher}_pitchers' not in x.keys():
+                continue
+            for pitcher_id in list(x[f'{home_away_pitcher}_pitchers'].keys()):
+                test_list.update({pitcher_id:x[f'{home_away_pitcher}_pitchers'][pitcher_id][0]['pitcher_name']})
+        pitcher_lineup = [x for x in pitcher_lineup if str(x) in test_list.keys()]
+        if len(test_list.keys())>0:
+            pitcher_list = {test_list[str(x)]:[str(x),y] for x,y in zip(pitcher_lineup,home_team)}
+        else:
+            pitcher_list = {}
+    else:
+        pitcher_list = {}
+
+with col3:
+    # Game Line
+    if len(list(pitcher_list.keys()))>0:
+        pitcher_id = st.selectbox('Choose a pitcher:',list(pitcher_list.keys()))
+        pitcher_id = int(pitcher_id)
+        vs_past = st.checkbox("Compare to previous results?",value=True,help='If player has no 2025 MLB data, uncheck')
+        spring_training = st.checkbox("Is Spring Training Game?",value=True)
+
+# pitcher_id = st.number_input('Enter Pitcher MLBAMID',value=694973)
+# game_id = st.number_input('Enter MLB Game ID',value=831490)
+
 if vs_past:
     if spring_training:
         prev_season = True
