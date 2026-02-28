@@ -4,8 +4,9 @@ enableStaticServing = true
 [theme]
 base = 'dark'
 font = "DM Sans:https://fonts.googleapis.com/css2?family=DM Sans:ital,wght@0,400..700;1,400..700&display=swap"
-primaryColor = "#F1C647"
+primaryColor = "#339cff"
 blueColor = '#339cff'
+yellowColor = '#F5A05E'
 backgroundColor = "#101222"
 dataframeBorderColor = "#32344a"
 dataframeHeaderBackgroundColor = "#101222"
