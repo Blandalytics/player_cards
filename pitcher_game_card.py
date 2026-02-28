@@ -2018,14 +2018,17 @@ with col3:
     if len(list(pitcher_list.keys()))>0:
         pitcher_select = st.selectbox('Choose a pitcher:',list(pitcher_list.keys()))
         pitcher_id = int(pitcher_list[pitcher_select][0])
-        response = requests.get(url=f'http://statsapi.mlb.com/api/v1/people/{pitcher_id}?hydrate=stats(group=pitching,type=gameLog,season=2025,sportId=1,gameType=[R]),hydrations').json()
+        response = requests.get(url=f'http://statsapi.mlb.com/api/v1/people/{pitcher_id}?hydrate=stats(group=pitching,type=gameLog,season={input_date.year - 1},endDate={input_date},sportId=1,gameType=[R]),hydrations').json()
         if 'stats' in response['people'][0].keys():
-            vs_past = st.checkbox("Compare to 2025 results?",value=True)
+            vs_past = st.checkbox("Compare to past year's results?",value=True)
         else:
             vs_past = False
-        spring_training = st.checkbox("Is Spring Training Game?",value=True)
+        spring_training = True if requests.get(f"https://statsapi.mlb.com/api/v1.1/game/{game_id}/feed/live").json()['gameData']['game']['type'] in ['E','F','S'] else False
+        # spring_training = st.checkbox("Is Spring Training Game?",value=True)
         if vs_past:
-            if spring_training:
+            response = requests.get('http://statsapi.mlb.com/api/v1/people/519242?hydrate=stats(group=pitching,type=gameLog,season=2025,sportId=1,gameType=[R]),hydrations').json()
+            num_games = len(response['people'][0]['stats'][0]['splits'])
+            if spring_training | (num_games < 5):
                 prev_season = True                    
             else:
                 prev_season = False
