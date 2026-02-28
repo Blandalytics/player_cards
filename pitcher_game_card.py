@@ -1981,10 +1981,18 @@ def generate_chart(pitcher_id,game_id,game_df,game_group,szn_df,szn_comp,vs_past
     grid.tight_layout(fig,pad=2)
     sns.despine(left=True,bottom=True)
     st.pyplot(fig, width='content')
-st.write('Data (especially pitch types) are subject to change.')
-col1, col2, col3 = st.columns([0.25,0.5,0.25])
 
-with col1:
+st.markdown(
+    """
+    <style>
+        section[data-testid="stSidebar"] {
+            width: 310px !important; # Set the width to your desired value
+        }
+    </style>
+    """,
+    unsafe_allow_html=True,
+)
+with st.sidebar:
     today = (datetime.now(UTC)-timedelta(hours=16)).date()
     input_date = st.date_input("Select a game date:", today, 
                                min_value=date(2026, 2, 20), max_value=today+timedelta(days=2))
@@ -1998,7 +2006,8 @@ with col1:
             if x['dates'][0]['games'][game]['gamedayType'] in ['E','P']:
                 games_today += [x['dates'][0]['games'][game]['gamePk']]
         game_list = generate_games(games_today)
-with col2:
+
+    
     input_game = st.pills('Choose a game (all times EST):',list(game_list.keys()),default=list(game_list.keys())[0])
     game_id = game_list[input_game]
     game_id = int(game_id)
@@ -2022,7 +2031,7 @@ with col2:
     else:
         pitcher_list = {}
 
-with col3:
+
     if len(list(pitcher_list.keys()))>0:
         pitcher_select = st.selectbox('Choose a pitcher:',list(pitcher_list.keys()))
         pitcher_id = int(pitcher_list[pitcher_select][0])
@@ -2046,6 +2055,8 @@ with col3:
         else:
             prev_season = False
             szn_load = []
+
+st.write('Data (especially pitch types) are subject to change.')
 if st.button('Generate Chart'):
     game_df, game_group, szn_df, szn_group, szn_comp = load_data(pitcher_id,game_id,vs_past,szn_load)
     generate_chart(pitcher_id,game_id,game_df,game_group,szn_df,szn_comp,vs_past)
