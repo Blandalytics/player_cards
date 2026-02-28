@@ -1058,69 +1058,20 @@ def generate_games(games_today):
     game_df = pd.DataFrame.from_dict(game_dict, orient='index',columns=['Game ID','Time','Sort Time','Sort Inning','Sort Code'])
     return game_df.sort_values(['Sort Code','Sort Time','Game ID','Sort Inning'])['Game ID'].to_dict()
 
-st.write('Data (especially pitch types) are subject to change.')
-col1, col2, col3 = st.columns([0.25,0.5,0.25])
-
-with col1:
-    today = (datetime.now(UTC)-timedelta(hours=16)).date()
-    input_date = st.date_input("Select a game date:", today, 
-                               min_value=date(2026, 2, 20), max_value=today+timedelta(days=2))
-    r = requests.get(f'https://statsapi.mlb.com/api/v1/schedule?sportId=1&date={input_date}')
-    x = r.json()
-    if x['totalGames']==0:
-        print(f'No games on {input_date}')
-    else:
-        games_today = []
-        for game in range(len(x['dates'][0]['games'])):
-            if x['dates'][0]['games'][game]['gamedayType'] in ['E','P']:
-                games_today += [x['dates'][0]['games'][game]['gamePk']]
-        game_list = generate_games(games_today)
-with col2:
-    input_game = st.pills('Choose a game (all times EST):',list(game_list.keys()),default=list(game_list.keys())[0])
-    game_id = game_list[input_game]
-    game_id = int(game_id)
-    r = requests.get(f'https://baseballsavant.mlb.com/gf?game_pk={game_id}')
-    x = r.json()
-    game_code = x['game_status_code']
-    if (len(x['home_pitcher_lineup'])>0) | (len(x['away_pitcher_lineup'])>0):
-        pitcher_lineup = [x['home_pitcher_lineup'][0]]+[x['away_pitcher_lineup'][0]]+([] if len(x['home_pitcher_lineup'])==1 else x['home_pitcher_lineup'][1:])+([] if len(x['away_pitcher_lineup'])==1 else x['away_pitcher_lineup'][1:])
-        home_team = [1]+[0]+([] if len(x['home_pitcher_lineup'])==1 else [1]*(len(x['home_pitcher_lineup'])-1))+([] if len(x['away_pitcher_lineup'])==1 else [0]*(len(x['away_pitcher_lineup'])-1))
-        test_list = {}
-        for home_away_pitcher in ['home','away']:
-            if f'{home_away_pitcher}_pitchers' not in x.keys():
-                continue
-            for pitcher_id in list(x[f'{home_away_pitcher}_pitchers'].keys()):
-                test_list.update({pitcher_id:x[f'{home_away_pitcher}_pitchers'][pitcher_id][0]['pitcher_name']})
-        pitcher_lineup = [x for x in pitcher_lineup if str(x) in test_list.keys()]
-        if len(test_list.keys())>0:
-            pitcher_list = {test_list[str(x)]:[str(x),y] for x,y in zip(pitcher_lineup,home_team)}
-        else:
-            pitcher_list = {}
-    else:
-        pitcher_list = {}
-
-with col3:
-    # Game Line
-    if len(list(pitcher_list.keys()))>0:
-        pitcher_select = st.selectbox('Choose a pitcher:',list(pitcher_list.keys()))
-        pitcher_id = int(pitcher_list[pitcher_select][0])
-        vs_past = st.checkbox("Compare to previous results?",value=True,help='If player has no 2025 MLB data, uncheck')
-        spring_training = st.checkbox("Is Spring Training Game?",value=True)
-
 # pitcher_id = st.number_input('Enter Pitcher MLBAMID',value=694973)
 # game_id = st.number_input('Enter MLB Game ID',value=831490)
 
-if vs_past:
-    if spring_training:
-        prev_season = True
-    else:
-        prev_season = False
-    szn_load = load_prev_pitches(pitcher_id,game_id,
-                                  prev_season=prev_season
-                                  )
-else:
-    prev_season = False
-    szn_load = []
+# if vs_past:
+#     if spring_training:
+#         prev_season = True
+#     else:
+#         prev_season = False
+#     szn_load = load_prev_pitches(pitcher_id,game_id,
+#                                   prev_season=prev_season
+#                                   )
+# else:
+#     prev_season = False
+#     szn_load = []
 
 @st.cache_data(ttl=600)
 def load_data(pitcher_id,game_id,vs_past,szn_load):
@@ -2022,6 +1973,67 @@ def generate_chart(pitcher_id,game_id,game_df,game_group,szn_df,szn_comp,vs_past
     grid.tight_layout(fig,pad=2)
     sns.despine(left=True,bottom=True)
     st.pyplot(fig, width='content')
-if st.button('Generate Chart'):
-    game_df, game_group, szn_df, szn_group, szn_comp = load_data(pitcher_id,game_id,vs_past,szn_load)
-    generate_chart(pitcher_id,game_id,game_df,game_group,szn_df,szn_comp,vs_past)
+st.write('Data (especially pitch types) are subject to change.')
+col1, col2, col3 = st.columns([0.25,0.5,0.25])
+
+with col1:
+    today = (datetime.now(UTC)-timedelta(hours=16)).date()
+    input_date = st.date_input("Select a game date:", today, 
+                               min_value=date(2026, 2, 20), max_value=today+timedelta(days=2))
+    r = requests.get(f'https://statsapi.mlb.com/api/v1/schedule?sportId=1&date={input_date}')
+    x = r.json()
+    if x['totalGames']==0:
+        print(f'No games on {input_date}')
+    else:
+        games_today = []
+        for game in range(len(x['dates'][0]['games'])):
+            if x['dates'][0]['games'][game]['gamedayType'] in ['E','P']:
+                games_today += [x['dates'][0]['games'][game]['gamePk']]
+        game_list = generate_games(games_today)
+with col2:
+    input_game = st.pills('Choose a game (all times EST):',list(game_list.keys()),default=list(game_list.keys())[0])
+    game_id = game_list[input_game]
+    game_id = int(game_id)
+    r = requests.get(f'https://baseballsavant.mlb.com/gf?game_pk={game_id}')
+    x = r.json()
+    game_code = x['game_status_code']
+    if (len(x['home_pitcher_lineup'])>0) | (len(x['away_pitcher_lineup'])>0):
+        pitcher_lineup = [x['home_pitcher_lineup'][0]]+[x['away_pitcher_lineup'][0]]+([] if len(x['home_pitcher_lineup'])==1 else x['home_pitcher_lineup'][1:])+([] if len(x['away_pitcher_lineup'])==1 else x['away_pitcher_lineup'][1:])
+        home_team = [1]+[0]+([] if len(x['home_pitcher_lineup'])==1 else [1]*(len(x['home_pitcher_lineup'])-1))+([] if len(x['away_pitcher_lineup'])==1 else [0]*(len(x['away_pitcher_lineup'])-1))
+        test_list = {}
+        for home_away_pitcher in ['home','away']:
+            if f'{home_away_pitcher}_pitchers' not in x.keys():
+                continue
+            for pitcher_id in list(x[f'{home_away_pitcher}_pitchers'].keys()):
+                test_list.update({pitcher_id:x[f'{home_away_pitcher}_pitchers'][pitcher_id][0]['pitcher_name']})
+        pitcher_lineup = [x for x in pitcher_lineup if str(x) in test_list.keys()]
+        if len(test_list.keys())>0:
+            pitcher_list = {test_list[str(x)]:[str(x),y] for x,y in zip(pitcher_lineup,home_team)}
+        else:
+            pitcher_list = {}
+    else:
+        pitcher_list = {}
+
+with col3:
+    if len(list(pitcher_list.keys()))>0:
+        pitcher_select = st.selectbox('Choose a pitcher:',list(pitcher_list.keys()))
+        pitcher_id = int(pitcher_list[pitcher_select][0])
+        vs_past = st.checkbox("Compare to previous results?",value=True,help='If player has no 2025 MLB data, uncheck')
+        spring_training = st.checkbox("Is Spring Training Game?",value=True)
+        if vs_past:
+            if spring_training:
+                if 'stats' not in requests.get(url=f'http://statsapi.mlb.com/api/v1/people/{pitcher_id}?hydrate=stats(group=pitching,type=gameLog,season=2025,sportId=1,gameType=[R]),hydrations').json().keys():
+                    prev_season = False
+                else:
+                    prev_season = True
+            else:
+                prev_season = False
+            szn_load = load_prev_pitches(pitcher_id,game_id,
+                                          prev_season=prev_season
+                                          )
+        else:
+            prev_season = False
+            szn_load = []
+    if st.button('Generate Chart'):
+        game_df, game_group, szn_df, szn_group, szn_comp = load_data(pitcher_id,game_id,vs_past,szn_load)
+        generate_chart(pitcher_id,game_id,game_df,game_group,szn_df,szn_comp,vs_past)
