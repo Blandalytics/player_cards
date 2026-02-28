@@ -2041,6 +2041,9 @@ with col3:
             vs_past = False
         spring_training = True if requests.get(f"https://statsapi.mlb.com/api/v1.1/game/{game_id}/feed/live").json()['gameData']['game']['type'] in ['E','F','S'] else False
         # spring_training = st.checkbox("Is Spring Training Game?",value=True)
+        
+if len(pitcher_list.keys()) >0:
+    if st.button('Generate Chart'):
         if vs_past:
             response = requests.get('http://statsapi.mlb.com/api/v1/people/519242?hydrate=stats(group=pitching,type=gameLog,season=2025,sportId=1,gameType=[R]),hydrations').json()
             num_games = len(response['people'][0]['stats'][0]['splits'])
@@ -2054,7 +2057,5 @@ with col3:
         else:
             prev_season = False
             szn_load = []
-if len(pitcher_list.keys()) >0:
-    if st.button('Generate Chart'):
         game_df, game_group, szn_df, szn_group, szn_comp = load_data(pitcher_id,game_id,vs_past,szn_load)
         generate_chart(pitcher_id,game_id,game_df,game_group,szn_df,szn_comp,vs_past)
