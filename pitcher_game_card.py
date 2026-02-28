@@ -2018,14 +2018,14 @@ with col3:
     if len(list(pitcher_list.keys()))>0:
         pitcher_select = st.selectbox('Choose a pitcher:',list(pitcher_list.keys()))
         pitcher_id = int(pitcher_list[pitcher_select][0])
-        vs_past = st.checkbox("Compare to previous results?",value=True,help='If player has no 2025 MLB data, uncheck')
+        if 'stats' in requests.get(url=f'http://statsapi.mlb.com/api/v1/people/{pitcher_id}?hydrate=stats(group=pitching,type=gameLog,season=2025,sportId=1,gameType=[R]),hydrations').json().keys():
+            vs_past = st.checkbox("Compare to 2025 results?",value=True)
+        else:
+            vs_past = False
         spring_training = st.checkbox("Is Spring Training Game?",value=True)
         if vs_past:
             if spring_training:
-                if 'stats' not in requests.get(url=f'http://statsapi.mlb.com/api/v1/people/{pitcher_id}?hydrate=stats(group=pitching,type=gameLog,season=2025,sportId=1,gameType=[R]),hydrations').json().keys():
-                    prev_season = False
-                else:
-                    prev_season = True
+                prev_season = True                    
             else:
                 prev_season = False
             szn_load = load_prev_pitches(pitcher_id,game_id,
