@@ -1722,7 +1722,7 @@ def generate_chart(pitcher_id,game_id,game_df,game_group,szn_df,szn_comp,vs_past
                     fill=True,
                     bw_adjust=2.5,
                     cut=2,
-                    alpha=0.5,
+                    alpha=0.25,
                     legend=False,
                     ax=ax1)
     sns.scatterplot(game_df.assign(HB = lambda x: np.where(x['pitcherHand']=='L',x['HB'].mul(-1),x['HB'])),
