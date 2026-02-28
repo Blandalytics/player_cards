@@ -5,7 +5,7 @@ enableStaticServing = true
 base = 'dark'
 font = "DM Sans:https://fonts.googleapis.com/css2?family=DM Sans:ital,wght@0,400..700;1,400..700&display=swap"
 primaryColor = "#F1C647"
-blueColor = '#3c44cd'
+blueColor = '#339cff'
 backgroundColor = "#101222"
 dataframeBorderColor = "#32344a"
 dataframeHeaderBackgroundColor = "#101222"
