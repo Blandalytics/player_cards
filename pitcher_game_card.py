@@ -1102,8 +1102,8 @@ with col2:
 with col3:
     # Game Line
     if len(list(pitcher_list.keys()))>0:
-        pitcher_id = st.selectbox('Choose a pitcher:',list(pitcher_list.keys()))
-        pitcher_id = int(pitcher_id)
+        pitcher_select = st.selectbox('Choose a pitcher:',list(pitcher_list.keys()))
+        pitcher_id = int(pitcher_list[pitcher_select])
         vs_past = st.checkbox("Compare to previous results?",value=True,help='If player has no 2025 MLB data, uncheck')
         spring_training = st.checkbox("Is Spring Training Game?",value=True)
 
