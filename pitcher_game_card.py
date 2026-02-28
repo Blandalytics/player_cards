@@ -1855,21 +1855,23 @@ def generate_chart(pitcher_id,game_id,game_df,game_group,szn_df,szn_comp,vs_past
            ylim=(y_bot,y_lim-1),
            aspect=1)
     ax3.axis('off')
+
+    if game_df.loc[game_df['hitterHand']=='L'].shape[0]>0:
+        l_loc_ax = fig.add_axes([0.435,0.48,0.1,0.1], anchor='SW', zorder=1)
+        l_loc_ax.text(0.5,0.7,'Locations',ha='center',va='center',fontsize=15,color=pl_line_color)
+        l_loc_ax.text(0.5,0.45,vs_l_location_grade,ha='center',va='center',fontsize=50,
+                      color=grade_colors[vs_l_location_grade])
+        l_loc_ax.set(xlim=(0,1),ylim=(0,1))
+        l_loc_ax.axis('off')
     
-    l_loc_ax = fig.add_axes([0.435,0.48,0.1,0.1], anchor='SW', zorder=1)
-    l_loc_ax.text(0.5,0.7,'Locations',ha='center',va='center',fontsize=15,color=pl_line_color)
-    l_loc_ax.text(0.5,0.45,vs_l_location_grade,ha='center',va='center',fontsize=50,
-                  color=grade_colors[vs_l_location_grade])
-    l_loc_ax.set(xlim=(0,1),ylim=(0,1))
-    l_loc_ax.axis('off')
-    
-    r_loc_ax = fig.add_axes([0.7125,0.48,0.1,0.1], anchor='SW', zorder=1)
-    
-    r_loc_ax.text(0.5,0.7,'Locations',ha='center',va='center',fontsize=15,color=pl_line_color)
-    r_loc_ax.text(0.5,0.45,vs_r_location_grade,ha='center',va='center',fontsize=50,
-                  color=grade_colors[vs_r_location_grade])
-    r_loc_ax.set(xlim=(0,1),ylim=(0,1))
-    r_loc_ax.axis('off')
+    if game_df.loc[game_df['hitterHand']=='R'].shape[0]>0:
+        r_loc_ax = fig.add_axes([0.7125,0.48,0.1,0.1], anchor='SW', zorder=1)
+        
+        r_loc_ax.text(0.5,0.7,'Locations',ha='center',va='center',fontsize=15,color=pl_line_color)
+        r_loc_ax.text(0.5,0.45,vs_r_location_grade,ha='center',va='center',fontsize=50,
+                      color=grade_colors[vs_r_location_grade])
+        r_loc_ax.set(xlim=(0,1),ylim=(0,1))
+        r_loc_ax.axis('off')
     
     
     fastball_ax = fig.add_axes([0.01,0.6,.425,0.082], anchor='SW', zorder=1)
