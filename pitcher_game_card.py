@@ -1009,7 +1009,8 @@ def pull_game_info(game_id):
         'N':1,
         'P':2,
         'S':2,
-        'D':2
+        'D':2,
+        'M':2
     }
     r = requests.get(f'https://baseballsavant.mlb.com/gf?game_pk={game_id}')
     x = r.json()
