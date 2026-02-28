@@ -1240,7 +1240,7 @@ def load_data(pitcher_id,game_id,vs_past,szn_load):
         szn_df['IVB_acc'] = szn_df['IVB'].div(szn_df['plate_time']**2)
         szn_df['game_plate_time'] = szn_df['pitchType'].map(game_pate_times)
         szn_df['HB'] = szn_df['HB_acc'].mul(szn_df['game_plate_time']**2)
-        szn_df['IVB'] = szn_df['IVB_acc'].div(szn_df['game_plate_time']**2)
+        szn_df['IVB'] = szn_df['IVB_acc'].mul(szn_df['game_plate_time']**2)
         
         szn_df['usage'] = szn_df['isPitch'].groupby([szn_df['pitcherId'],szn_df['gameId'],szn_df['pitchType']]).transform('count') / szn_df['isPitch'].groupby([szn_df['pitcherId'],szn_df['gameId']]).transform('count')
         szn_df['vRHH'] = np.where(szn_df['hitterHand']=='R',1,None)
