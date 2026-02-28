@@ -1122,7 +1122,7 @@ def load_data(pitcher_id,game_id,vs_past,szn_load):
         .assign(Type = lambda x: x['pitchType'].map(pitch_names),
                 pitches_vR = lambda x: x['vRHH'],
                 vRHH = lambda x: x['vRHH'].div(x['vRHH'].sum()).astype('float')*100,
-                vLHH = lambda x: np.where(x['vLHH'].sum()==0,None,x['vLHH'].div(x['vLHH'].sum())).astype('float')*100,
+                vLHH = lambda x: np.where(x['vLHH'].sum(skipna=False)==0,None,x['vLHH'].div(x['vLHH'].sum())).astype('float')*100,
                 usage = lambda x: x['usage']*100,
                 strike = lambda x: x['strike'].astype('float')*100,
                 whiff = lambda x: x['whiff'].astype('float')*100,
