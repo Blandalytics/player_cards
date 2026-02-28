@@ -1141,6 +1141,8 @@ def load_data(pitcher_id,game_id,vs_past,szn_load):
     for stat in ['HB_acc','IVB_acc','plate_time','velo']:
         game_df[stat+'_diff'] = fastball_differences(game_df,stat)
     game_df['Break_diff'] = (game_df['HB_acc_diff'].astype('float')**2+game_df['IVB_acc_diff'].astype('float')**2)**0.5
+
+    game_pate_times = game_df.groupby('pitchType')['plate_time'].mean().to_dict()
     
     game_df[['plvStuff+','stuffGrade_game','stuffGrade_szn','locGrade_game','locGrade_szn','PLV+','plvGrade_game','plvGrade_szn']] = pitch_models(game_df)
 
@@ -1234,6 +1236,12 @@ def load_data(pitcher_id,game_id,vs_past,szn_load):
                     whiff = lambda x: np.where((x['swing']==1),x['sw_str'],None))
             )
         szn_df[['VAA','HAVAA']] = adjusted_vaa(szn_df[['pZ','vY0','vZ0','aY','aZ']].astype('float'))
+        szn_df['HB_acc'] = szn_df['HB'].div(szn_df['plate_time']**2)
+        szn_df['IVB_acc'] = szn_df['IVB'].div(szn_df['plate_time']**2)
+        szn_df['game_plate_time'] = szn_df['pitchType'].map(game_pate_times)
+        szn_df['HB'] = szn_df['HB_acc'].mul(szn_df['game_plate_time']**2)
+        szn_df['IVB'] = szn_df['IVB_acc'].div(szn_df['game_plate_time']**2)
+        
         szn_df['usage'] = szn_df['isPitch'].groupby([szn_df['pitcherId'],szn_df['gameId'],szn_df['pitchType']]).transform('count') / szn_df['isPitch'].groupby([szn_df['pitcherId'],szn_df['gameId']]).transform('count')
         szn_df['vRHH'] = np.where(szn_df['hitterHand']=='R',1,None)
         szn_df['vLHH'] = np.where(szn_df['hitterHand']=='L',1,None)
