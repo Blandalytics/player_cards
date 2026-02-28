@@ -1985,7 +1985,7 @@ col1, col2, col3 = st.columns([0.25,0.5,0.25])
 with col1:
     today = (datetime.now(UTC)-timedelta(hours=16)).date()
     input_date = st.date_input("Select a game date:", today, 
-                               min_value=date(2026, 2, 20), max_value=today+timedelta(days=2))
+                               min_value=date(2023, 3, 17), max_value=today+timedelta(days=2))
     r = requests.get(f'https://statsapi.mlb.com/api/v1/schedule?sportId=1&date={input_date}')
     x = r.json()
     if x['totalGames']==0:
