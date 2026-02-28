@@ -1664,23 +1664,6 @@ def generate_chart(pitcher_id,game_id,game_df,game_group,szn_df,szn_comp,vs_past
     location_grade = letter_grade(game_df['locGrade_game'].mean())
     plv_grade = letter_grade(game_df['plvGrade_game'].mean())
     
-    # Drop Shadow for Start Grade
-    # if start_grade[0] != 'C':
-    #     kernel_size = 100
-    #     x = np.linspace(0,1,kernel_size)
-    #     y = np.linspace(0,1,kernel_size)
-    #     X, Y = np.meshgrid(x, y)
-    #     start_grade_ax.contourf(X, Y,
-    #                             gaussian_filter(kernel_size,sigma=0.4),
-    #                             200,
-    #                             alpha=1,
-    #                             zorder=0,
-    #                             cmap=sns.blend_palette([pl_background,
-    #                                         sns.blend_palette([pl_background,grade_colors[start_grade]],n_colors=100)[15]],
-    #                                       as_cmap=True),
-    #                             extent=[0,1,
-    #                                     0,1])
-    
     start_grade_ax.text(0.5,0.5,start_grade,ha='center',va='center',fontsize=90,color=grade_colors[start_grade])
     start_grade_ax.set(xlim=(0,1),ylim=(0,1))
     start_grade_ax.axis('off')
@@ -1739,7 +1722,7 @@ def generate_chart(pitcher_id,game_id,game_df,game_group,szn_df,szn_comp,vs_past
                     fill=True,
                     bw_adjust=2.5,
                     cut=2,
-                    alpha=0.25,
+                    alpha=0.5,
                     legend=False,
                     ax=ax1)
     sns.scatterplot(game_df.assign(HB = lambda x: np.where(x['pitcherHand']=='L',x['HB'].mul(-1),x['HB'])),
