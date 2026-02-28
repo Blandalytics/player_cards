@@ -2027,6 +2027,14 @@ with col3:
         pitcher_id = int(pitcher_list[pitcher_select][0])
         response = requests.get(url=f'http://statsapi.mlb.com/api/v1/people/{pitcher_id}?hydrate=stats(group=pitching,type=gameLog,season={input_date.year - 1},endDate={input_date},sportId=1,gameType=[R]),hydrations').json()
         if 'stats' in response['people'][0].keys():
+            st.markdown("""
+                <style>
+                input[type=checkbox] {
+                    accent-color: #339cff; /* Example: Blue */
+                }
+                </style>
+                """, unsafe_allow_html=True
+                       )
             vs_past = st.checkbox("Compare to past year's results?",value=True)
         else:
             vs_past = False
