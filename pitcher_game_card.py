@@ -221,8 +221,6 @@ def get_data(game_id: str):
     return x
 
 def get_game_date(game_id: str):
-    # r = requests.get(f'https://statsapi.mlb.com/api/v1/game/{game_id}/playByPlay')
-    # return datetime.strptime(r.json()['allPlays'][0]['about']['startTime'][:10], '%Y-%m-%d')
     r = requests.get(f'https://statsapi.mlb.com/api/v1.1/game/{game_id}/feed/live')
     return datetime.strptime(r.json()['gameData']['datetime']['originalDate'], '%Y-%m-%d').replace(tzinfo=UTC)
 
@@ -1039,9 +1037,9 @@ def pull_game_info(game_id):
         inning_sort = int(inning)*2 - (0 if top_bot=='Bottom' else 1)
         if game_status_code == 'F':
             if home_runs>away_runs:
-                game_info = f'FINAL: {away_team} {away_runs} @ **:green[{home_team} {home_runs}]**'
+                game_info = f'FINAL: {away_team} {away_runs} @ **:yellow[{home_team} {home_runs}]**'
             elif home_runs<away_runs:
-                game_info = f'FINAL: **:green[{away_team} {away_runs}]** @ {home_team} {home_runs}'
+                game_info = f'FINAL: **:yellow[{away_team} {away_runs}]** @ {home_team} {home_runs}'
             else:
                 game_info = f'FINAL: {away_team} {away_runs} @ {home_team} {home_runs}'
         else:
