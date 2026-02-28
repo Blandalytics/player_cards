@@ -2018,7 +2018,8 @@ with col3:
     if len(list(pitcher_list.keys()))>0:
         pitcher_select = st.selectbox('Choose a pitcher:',list(pitcher_list.keys()))
         pitcher_id = int(pitcher_list[pitcher_select][0])
-        if 'stats' in requests.get(url=f'http://statsapi.mlb.com/api/v1/people/{pitcher_id}?hydrate=stats(group=pitching,type=gameLog,season=2025,sportId=1,gameType=[R]),hydrations').json().keys():
+        response = requests.get(url=f'http://statsapi.mlb.com/api/v1/people/{pitcher_id}?hydrate=stats(group=pitching,type=gameLog,season=2025,sportId=1,gameType=[R]),hydrations').json()
+        if 'stats' in response['people'][0].keys():
             vs_past = st.checkbox("Compare to 2025 results?",value=True)
         else:
             vs_past = False
