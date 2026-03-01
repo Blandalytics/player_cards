@@ -1107,7 +1107,7 @@ def load_data(pitcher_id,game_id,vs_past,szn_load):
         )
 
     missing_feats = []
-    for col in test_df.columns.values:
+    for col in game_df.columns.values:
         if game_df[col].isna().all():
             missing_feats += [col]
     
