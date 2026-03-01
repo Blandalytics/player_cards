@@ -648,7 +648,8 @@ def load_prev_pitches(pitcher_id,game_id=None,prev_season=None):
             data_load += future.result()
     return data_load
 
-def xSLGcon(data):
+def xSLGcon(df):
+    data = df[xSLG_model.feature_names_in_].copy()
     with open('2025_pl_xSLG_model.pkl', 'rb') as f:
         xSLG_model = pickle.load(f)
 
