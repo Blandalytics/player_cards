@@ -1088,6 +1088,15 @@ def load_data(pitcher_id,game_id,vs_past,szn_load):
                               'launch_speed','launch_angle','hitX','hitY'])
         .query('isPitch==1')
         .drop_duplicates('playId')
+    )
+
+    missing_feats = []
+    for col in game_df.columns.values:
+        if game_df[col].isna().all():
+            missing_feats += [col]
+
+    game_df = (
+        game_df
         .dropna(subset=['sz_top','sz_bot','velo','extension','plate_time','HB','IVB','spin_rate',
                         'pX','pZ','x0','z0','vY0','vZ0','aY','aZ'])
         .assign(pitchType = lambda x: x['pitchType'].map(pitchtype_map),
@@ -1105,11 +1114,6 @@ def load_data(pitcher_id,game_id,vs_past,szn_load):
                 'pZ':'float'
             })
         )
-
-    missing_feats = []
-    for col in game_df.columns.values:
-        if game_df[col].isna().all():
-            missing_feats += [col]
     
     if game_df.shape[0]>0:
         game_df['balls'] = np.clip(game_df['balls'],0,3)
