@@ -649,9 +649,10 @@ def load_prev_pitches(pitcher_id,game_id=None,prev_season=None):
     return data_load
 
 def xSLGcon(df):
-    data = df[xSLG_model.feature_names_in_].copy()
     with open('2025_pl_xSLG_model.pkl', 'rb') as f:
         xSLG_model = pickle.load(f)
+        
+    data = df[xSLG_model.feature_names_in_].copy()
 
     # Apply model (only to pitches with launch_speed and launch_angle)
     data[['out_bbe_pred','single_bbe_pred','double_bbe_pred',
