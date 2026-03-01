@@ -1105,185 +1105,97 @@ def load_data(pitcher_id,game_id,vs_past,szn_load):
                 'pZ':'float'
             })
         )
-    game_df['balls'] = np.clip(game_df['balls'],0,3)
-    game_df['strikes'] = np.clip(game_df['strikes'],0,2)
-    game_df[['VAA','HAVAA']] = adjusted_vaa(game_df[['pZ','vY0','vZ0','aY','aZ']].astype('float'))
-    game_df['usage'] = game_df['isPitch'].groupby([game_df['pitcherId'],game_df['gameId'],game_df['pitchType']]).transform('count') / game_df['isPitch'].groupby([game_df['pitcherId'],game_df['gameId']]).transform('count')
-    game_df['vRHH'] = np.where(game_df['hitterHand']=='R',1,None)
-    game_df['vLHH'] = np.where(game_df['hitterHand']=='L',1,None)
-    game_df['xSLGcon'] = xSLGcon(game_df)
-    
-    game_df['HB_acc'] = game_df['HB'].div(game_df['plate_time']**2)
-    game_df['IVB_acc'] = game_df['IVB'].div(game_df['plate_time']**2)
-    game_df['Break_acc'] = (game_df['HB_acc'].astype('float')**2+game_df['IVB_acc'].astype('float')**2)**0.5
-    
-    fastballs = ['FF','FC','FT','SI']
-    fastball_df = (game_df
-                   .loc[game_df['pitchType'].isin(fastballs)]
-                   .groupby(['pitcherId','gameId'], as_index=False)
-                   ['pitchType']
-                   .agg(pd.Series.mode)
-                   .rename(columns={'pitchType':'fastball_type'})
-                   .copy()
-                  )
-    
-    # Add most common Fastball type
-    game_df = game_df.merge(fastball_df,on=['pitcherId','gameId'], how='left')
-    game_df['fastball_type'] = game_df['fastball_type'].fillna('NA').apply(lambda x: x if len(x[0])==1 else x[0])
-    
-    ### Pitch Type Grouping
-    game_df['pitch_type_bucket'] = 'Other'
-    game_df.loc[(game_df['pitchType']==game_df['fastball_type']) |
-                 game_df['pitchType'].isin(['FF','FT','SI']),'pitch_type_bucket'] = 'Fastball'
-    game_df.loc[(game_df['pitchType']!=game_df['fastball_type']) &
-                 game_df['pitchType'].isin(['SL','ST','CU', 'FC']),'pitch_type_bucket'] = 'Breaking Ball'
-    game_df.loc[game_df['pitchType'].isin(['CH', 'FS','KN','SC']),'pitch_type_bucket'] = 'Offspeed'
-    
-    for stat in ['HB_acc','IVB_acc','plate_time','velo']:
-        game_df[stat+'_diff'] = fastball_differences(game_df,stat)
-    game_df['Break_diff'] = (game_df['HB_acc_diff'].astype('float')**2+game_df['IVB_acc_diff'].astype('float')**2)**0.5
 
-    game_pate_times = game_df.groupby('pitchType')['plate_time'].mean().to_dict()
+    missing_feats = []
+    for col in test_df.columns.values:
+        if game_df[col].isna().all():
+            missing_feats += [col]
     
-    game_df[['plvStuff+','stuffGrade_game','stuffGrade_szn','locGrade_game','locGrade_szn','PLV+','plvGrade_game','plvGrade_szn']] = pitch_models(game_df)
-
-    game_group = (
-        game_df
-        .astype({'xSLGcon':'float'})
-        .groupby(['pitcherId','pitcherName','pitchType'])
-        [['isPitch','usage','vRHH','vLHH','armAngle','velo','extension','IVB','HB','HAVAA','strike','whiff','csw',
-          'sw_str','hr','plvStuff+','PLV+','xSLGcon'
-          ]]
-        .agg({
-            'isPitch':'sum',
-            'usage':'mean',
-            'vRHH':'sum',
-            'vLHH':'sum',
-            'armAngle':'mean',
-            'velo':'mean',
-            'extension':'mean',
-            'IVB':'mean',
-            'HB':'mean',
-            'HAVAA':'mean',
-            'strike':'mean',
-            'whiff':'mean',
-            'csw':'mean',
-            'sw_str':'mean',
-            'hr':'sum',
-            'xSLGcon':'mean',
-            'plvStuff+':'mean',
-            'PLV+':'mean'
-            })
-        # .dropna(subset='armAngle')
-        .sort_values('isPitch',ascending=False)
-        .reset_index()
-        .assign(Type = lambda x: x['pitchType'].map(pitch_names),
-                pitches_vR = lambda x: x['vRHH'],
-                vRHH = lambda x: x['vRHH'].div(x['vRHH'].sum()).astype('float')*100,
-                vLHH = lambda x: np.where(x['vLHH'].sum(skipna=False)==0,None,x['vLHH'].div(np.clip(x['vLHH'].sum(),1,100))).astype('float')*100,
-                usage = lambda x: x['usage']*100,
-                strike = lambda x: x['strike'].astype('float')*100,
-                whiff = lambda x: x['whiff'].astype('float')*100,
-                sw_str = lambda x: x['sw_str'].astype('float')*100,
-                csw = lambda x: x['csw']*100)
-        [['pitchType','Type','isPitch','pitches_vR','vLHH','usage','vRHH','armAngle','velo',
-          'extension','IVB','HB','HAVAA','strike','sw_str','csw','hr','xSLGcon','plvStuff+','PLV+']]
-        # .round(1)
-        .rename(columns={
-            'isPitch':'#',
-            'usage':'Usage%',
-            'vRHH':'vsR',
-            'vLHH':'vsL',
-            'armAngle':'Arm Angle',
-            'velo':'Velo',
-            'extension':'Ext',
-            'strike':'Str%',
-            'sw_str':'SwStr%',
-            'csw':'CSW%',
-            'hr':'HR'
-        })
-        .round({'vsL':1,'Usage%':1,'vsR':1,'Velo':1,'Ext':1,'IVB':1,'HB':1,'HAVAA':1,
-                'Str%':1,'SwStr%':1,'CSW%':1,'xSLGcon':3,'plvStuff+':0,'PLV+':0
-                })
-        .astype({'plvStuff+':'int','PLV+':'int','pitches_vR':'int'})
-    )
-  
-    szn_df = None
-    szn_group = None
-    szn_comp = None
-    if vs_past:
-        szn_df = (
-            pd.DataFrame(szn_load,
-                        columns=['gameId','gameDate','playId',
-                                  'pitcherId','pitcherName','pitcherHand','pitcherHeight',
-                                  'hitterId','hitterName','hitterHand',
-                                  'isPitch','pitchType','description','balls','strikes','outs',
-                                  'event','code','zone','sz_top','sz_bot',
-                                  'velo','armAngle','extension','plate_time','HB','IVB','spin_rate','spin_dir',
-                                  'pX','pZ','x0','z0','vY0','vZ0','aY','aZ',
-                                  'launch_speed','launch_angle','hitX','hitY'])
-            .query('isPitch==1')
-            .drop_duplicates('playId')
-            .dropna(subset=['sz_top','sz_bot','velo','extension','plate_time','HB','IVB','spin_rate',
-                            'pX','pZ','x0','z0','vY0','vZ0','aY','aZ'])
-            .assign(pitchType = lambda x: x['pitchType'].map(pitchtype_map),
-                    #HB = lambda x: np.where(x['pitcherHand']=='L',x['HB'].mul(-1),x['HB']),
-                    desc = lambda x: x['code'].map(desc_map),
-                    ca_str = lambda x: np.where(x['desc']=='called_strike',1,0),
-                    sw_str = lambda x: np.where(x['desc']=='swinging_strike',1,0),
-                    csw = lambda x: np.where(x['desc'].isin(['swinging_strike','called_strike']),1,0),
-                    swing = lambda x: np.where(x['desc'].isin(['swinging_strike','foul_strike','in_play']),1,0))
-            .assign(chase = lambda x: np.where((x['zone']==1),None,x['swing']),
-                    whiff = lambda x: np.where((x['swing']==1),x['sw_str'],None))
-            )
-        szn_df[['VAA','HAVAA']] = adjusted_vaa(szn_df[['pZ','vY0','vZ0','aY','aZ']].astype('float'))
-        szn_df['HB_acc'] = szn_df['HB'].div(szn_df['plate_time']**2)
-        szn_df['IVB_acc'] = szn_df['IVB'].div(szn_df['plate_time']**2)
-        szn_df['game_plate_time'] = szn_df['pitchType'].map(game_pate_times)
-        szn_df['HB'] = szn_df['HB_acc'].mul(szn_df['game_plate_time']**2)
-        szn_df['IVB'] = szn_df['IVB_acc'].mul(szn_df['game_plate_time']**2)
+    if game_df.shape[0]>0:
+        game_df['balls'] = np.clip(game_df['balls'],0,3)
+        game_df['strikes'] = np.clip(game_df['strikes'],0,2)
+        game_df[['VAA','HAVAA']] = adjusted_vaa(game_df[['pZ','vY0','vZ0','aY','aZ']].astype('float'))
+        game_df['usage'] = game_df['isPitch'].groupby([game_df['pitcherId'],game_df['gameId'],game_df['pitchType']]).transform('count') / game_df['isPitch'].groupby([game_df['pitcherId'],game_df['gameId']]).transform('count')
+        game_df['vRHH'] = np.where(game_df['hitterHand']=='R',1,None)
+        game_df['vLHH'] = np.where(game_df['hitterHand']=='L',1,None)
+        game_df['xSLGcon'] = xSLGcon(game_df)
         
-        szn_df['usage'] = szn_df['isPitch'].groupby([szn_df['pitcherId'],szn_df['gameId'],szn_df['pitchType']]).transform('count') / szn_df['isPitch'].groupby([szn_df['pitcherId'],szn_df['gameId']]).transform('count')
-        szn_df['vRHH'] = np.where(szn_df['hitterHand']=='R',1,None)
-        szn_df['vLHH'] = np.where(szn_df['hitterHand']=='L',1,None)
-
-        szn_group = (
-            szn_df
+        game_df['HB_acc'] = game_df['HB'].div(game_df['plate_time']**2)
+        game_df['IVB_acc'] = game_df['IVB'].div(game_df['plate_time']**2)
+        game_df['Break_acc'] = (game_df['HB_acc'].astype('float')**2+game_df['IVB_acc'].astype('float')**2)**0.5
+        
+        fastballs = ['FF','FC','FT','SI']
+        fastball_df = (game_df
+                       .loc[game_df['pitchType'].isin(fastballs)]
+                       .groupby(['pitcherId','gameId'], as_index=False)
+                       ['pitchType']
+                       .agg(pd.Series.mode)
+                       .rename(columns={'pitchType':'fastball_type'})
+                       .copy()
+                      )
+        
+        # Add most common Fastball type
+        game_df = game_df.merge(fastball_df,on=['pitcherId','gameId'], how='left')
+        game_df['fastball_type'] = game_df['fastball_type'].fillna('NA').apply(lambda x: x if len(x[0])==1 else x[0])
+        
+        ### Pitch Type Grouping
+        game_df['pitch_type_bucket'] = 'Other'
+        game_df.loc[(game_df['pitchType']==game_df['fastball_type']) |
+                     game_df['pitchType'].isin(['FF','FT','SI']),'pitch_type_bucket'] = 'Fastball'
+        game_df.loc[(game_df['pitchType']!=game_df['fastball_type']) &
+                     game_df['pitchType'].isin(['SL','ST','CU', 'FC']),'pitch_type_bucket'] = 'Breaking Ball'
+        game_df.loc[game_df['pitchType'].isin(['CH', 'FS','KN','SC']),'pitch_type_bucket'] = 'Offspeed'
+        
+        for stat in ['HB_acc','IVB_acc','plate_time','velo']:
+            game_df[stat+'_diff'] = fastball_differences(game_df,stat)
+        game_df['Break_diff'] = (game_df['HB_acc_diff'].astype('float')**2+game_df['IVB_acc_diff'].astype('float')**2)**0.5
+    
+        game_pate_times = game_df.groupby('pitchType')['plate_time'].mean().to_dict()
+        
+        game_df[['plvStuff+','stuffGrade_game','stuffGrade_szn','locGrade_game','locGrade_szn','PLV+','plvGrade_game','plvGrade_szn']] = pitch_models(game_df)
+    
+        game_group = (
+            game_df
+            .astype({'xSLGcon':'float'})
             .groupby(['pitcherId','pitcherName','pitchType'])
-            [['isPitch','vRHH','vLHH','armAngle','velo','extension','IVB','HB','HAVAA','zone','chase','whiff','csw',
-              # 'xwOBAcon'
+            [['isPitch','usage','vRHH','vLHH','armAngle','velo','extension','IVB','HB','HAVAA','strike','whiff','csw',
+              'sw_str','hr','plvStuff+','PLV+','xSLGcon'
               ]]
             .agg({
                 'isPitch':'sum',
+                'usage':'mean',
                 'vRHH':'sum',
                 'vLHH':'sum',
-                'zone':'mean',
                 'armAngle':'mean',
                 'velo':'mean',
                 'extension':'mean',
                 'IVB':'mean',
                 'HB':'mean',
                 'HAVAA':'mean',
-                'chase':'mean',
+                'strike':'mean',
                 'whiff':'mean',
                 'csw':'mean',
-                #'xwOBAcon':'mean'
+                'sw_str':'mean',
+                'hr':'sum',
+                'xSLGcon':'mean',
+                'plvStuff+':'mean',
+                'PLV+':'mean'
                 })
             # .dropna(subset='armAngle')
             .sort_values('isPitch',ascending=False)
             .reset_index()
             .assign(Type = lambda x: x['pitchType'].map(pitch_names),
+                    pitches_vR = lambda x: x['vRHH'],
                     vRHH = lambda x: x['vRHH'].div(x['vRHH'].sum()).astype('float')*100,
-                    vLHH = lambda x: x['vLHH'].div(x['vLHH'].sum()).astype('float')*100,
-                    usage = lambda x: x['isPitch'].div(x['isPitch'].sum())*100,
-                    chase = lambda x: x['chase'].astype('float')*100,
-                    zone = lambda x: x['zone']*100,
+                    vLHH = lambda x: np.where(x['vLHH'].sum(skipna=False)==0,None,x['vLHH'].div(np.clip(x['vLHH'].sum(),1,100))).astype('float')*100,
+                    usage = lambda x: x['usage']*100,
+                    strike = lambda x: x['strike'].astype('float')*100,
                     whiff = lambda x: x['whiff'].astype('float')*100,
+                    sw_str = lambda x: x['sw_str'].astype('float')*100,
                     csw = lambda x: x['csw']*100)
-            [['pitchType','Type','isPitch','vLHH','usage','vRHH','armAngle','velo',
-              'extension','IVB','HB','HAVAA','zone','chase','whiff','csw']]
-            .sort_values('usage',ascending=False)
-            .round(1)
+            [['pitchType','Type','isPitch','pitches_vR','vLHH','usage','vRHH','armAngle','velo',
+              'extension','IVB','HB','HAVAA','strike','sw_str','csw','hr','xSLGcon','plvStuff+','PLV+']]
+            # .round(1)
             .rename(columns={
                 'isPitch':'#',
                 'usage':'Usage%',
@@ -1292,20 +1204,120 @@ def load_data(pitcher_id,game_id,vs_past,szn_load):
                 'armAngle':'Arm Angle',
                 'velo':'Velo',
                 'extension':'Ext',
-                'zone':'Zone%',
-                'chase':'Chase%',
-                'whiff':'Whiff%',
-                'csw':'CSW%'
+                'strike':'Str%',
+                'sw_str':'SwStr%',
+                'csw':'CSW%',
+                'hr':'HR'
             })
+            .round({'vsL':1,'Usage%':1,'vsR':1,'Velo':1,'Ext':1,'IVB':1,'HB':1,'HAVAA':1,
+                    'Str%':1,'SwStr%':1,'CSW%':1,'xSLGcon':3,'plvStuff+':0,'PLV+':0
+                    })
+            .astype({'plvStuff+':'int','PLV+':'int','pitches_vR':'int'})
         )
+      
+        szn_df = None
+        szn_group = None
+        szn_comp = None
+        if vs_past:
+            szn_df = (
+                pd.DataFrame(szn_load,
+                            columns=['gameId','gameDate','playId',
+                                      'pitcherId','pitcherName','pitcherHand','pitcherHeight',
+                                      'hitterId','hitterName','hitterHand',
+                                      'isPitch','pitchType','description','balls','strikes','outs',
+                                      'event','code','zone','sz_top','sz_bot',
+                                      'velo','armAngle','extension','plate_time','HB','IVB','spin_rate','spin_dir',
+                                      'pX','pZ','x0','z0','vY0','vZ0','aY','aZ',
+                                      'launch_speed','launch_angle','hitX','hitY'])
+                .query('isPitch==1')
+                .drop_duplicates('playId')
+                .dropna(subset=['sz_top','sz_bot','velo','extension','plate_time','HB','IVB','spin_rate',
+                                'pX','pZ','x0','z0','vY0','vZ0','aY','aZ'])
+                .assign(pitchType = lambda x: x['pitchType'].map(pitchtype_map),
+                        #HB = lambda x: np.where(x['pitcherHand']=='L',x['HB'].mul(-1),x['HB']),
+                        desc = lambda x: x['code'].map(desc_map),
+                        ca_str = lambda x: np.where(x['desc']=='called_strike',1,0),
+                        sw_str = lambda x: np.where(x['desc']=='swinging_strike',1,0),
+                        csw = lambda x: np.where(x['desc'].isin(['swinging_strike','called_strike']),1,0),
+                        swing = lambda x: np.where(x['desc'].isin(['swinging_strike','foul_strike','in_play']),1,0))
+                .assign(chase = lambda x: np.where((x['zone']==1),None,x['swing']),
+                        whiff = lambda x: np.where((x['swing']==1),x['sw_str'],None))
+                )
+            szn_df[['VAA','HAVAA']] = adjusted_vaa(szn_df[['pZ','vY0','vZ0','aY','aZ']].astype('float'))
+            szn_df['HB_acc'] = szn_df['HB'].div(szn_df['plate_time']**2)
+            szn_df['IVB_acc'] = szn_df['IVB'].div(szn_df['plate_time']**2)
+            szn_df['game_plate_time'] = szn_df['pitchType'].map(game_pate_times)
+            szn_df['HB'] = szn_df['HB_acc'].mul(szn_df['game_plate_time']**2)
+            szn_df['IVB'] = szn_df['IVB_acc'].mul(szn_df['game_plate_time']**2)
+            
+            szn_df['usage'] = szn_df['isPitch'].groupby([szn_df['pitcherId'],szn_df['gameId'],szn_df['pitchType']]).transform('count') / szn_df['isPitch'].groupby([szn_df['pitcherId'],szn_df['gameId']]).transform('count')
+            szn_df['vRHH'] = np.where(szn_df['hitterHand']=='R',1,None)
+            szn_df['vLHH'] = np.where(szn_df['hitterHand']=='L',1,None)
+    
+            szn_group = (
+                szn_df
+                .groupby(['pitcherId','pitcherName','pitchType'])
+                [['isPitch','vRHH','vLHH','armAngle','velo','extension','IVB','HB','HAVAA','zone','chase','whiff','csw',
+                  # 'xwOBAcon'
+                  ]]
+                .agg({
+                    'isPitch':'sum',
+                    'vRHH':'sum',
+                    'vLHH':'sum',
+                    'zone':'mean',
+                    'armAngle':'mean',
+                    'velo':'mean',
+                    'extension':'mean',
+                    'IVB':'mean',
+                    'HB':'mean',
+                    'HAVAA':'mean',
+                    'chase':'mean',
+                    'whiff':'mean',
+                    'csw':'mean',
+                    #'xwOBAcon':'mean'
+                    })
+                # .dropna(subset='armAngle')
+                .sort_values('isPitch',ascending=False)
+                .reset_index()
+                .assign(Type = lambda x: x['pitchType'].map(pitch_names),
+                        vRHH = lambda x: x['vRHH'].div(x['vRHH'].sum()).astype('float')*100,
+                        vLHH = lambda x: x['vLHH'].div(x['vLHH'].sum()).astype('float')*100,
+                        usage = lambda x: x['isPitch'].div(x['isPitch'].sum())*100,
+                        chase = lambda x: x['chase'].astype('float')*100,
+                        zone = lambda x: x['zone']*100,
+                        whiff = lambda x: x['whiff'].astype('float')*100,
+                        csw = lambda x: x['csw']*100)
+                [['pitchType','Type','isPitch','vLHH','usage','vRHH','armAngle','velo',
+                  'extension','IVB','HB','HAVAA','zone','chase','whiff','csw']]
+                .sort_values('usage',ascending=False)
+                .round(1)
+                .rename(columns={
+                    'isPitch':'#',
+                    'usage':'Usage%',
+                    'vRHH':'vsR',
+                    'vLHH':'vsL',
+                    'armAngle':'Arm Angle',
+                    'velo':'Velo',
+                    'extension':'Ext',
+                    'zone':'Zone%',
+                    'chase':'Chase%',
+                    'whiff':'Whiff%',
+                    'csw':'CSW%'
+                })
+            )
+    
+            szn_comp = pd.merge(game_group,szn_group,how='left',on=['pitchType','Type'],suffixes=['','_szn']).sort_values('Usage%',ascending=False)
+            for stat in ['vsL','vsR','Velo']:
+                szn_comp[stat+'_diff'] = szn_comp[stat].sub(szn_comp[stat+'_szn'].fillna(szn_comp[stat]))
+                szn_comp[stat+'_arrow'] = np.where(szn_comp[stat+'_diff'] >0,'↑','↓')
+                szn_comp[stat+'_arrow'] = np.where(szn_comp[stat+'_diff']==0,'',szn_comp[stat+'_arrow'])
+    else:
+        game_group = None
+        szn_df = None
+        szn_group = None
+        szn_comp = None
 
-        szn_comp = pd.merge(game_group,szn_group,how='left',on=['pitchType','Type'],suffixes=['','_szn']).sort_values('Usage%',ascending=False)
-        for stat in ['vsL','vsR','Velo']:
-            szn_comp[stat+'_diff'] = szn_comp[stat].sub(szn_comp[stat+'_szn'].fillna(szn_comp[stat]))
-            szn_comp[stat+'_arrow'] = np.where(szn_comp[stat+'_diff'] >0,'↑','↓')
-            szn_comp[stat+'_arrow'] = np.where(szn_comp[stat+'_diff']==0,'',szn_comp[stat+'_arrow'])
-
-    return game_df, game_group, szn_df, szn_group, szn_comp
+    return game_df, game_group, szn_df, szn_group, szn_comp, missing_feats
 
 def gaussian_filter(kernel_size, sigma=1, muu=0):
     # Initializing value of x, y as grid of kernel size in the range of kernel size
@@ -2044,5 +2056,8 @@ if len(pitcher_list.keys()) >0:
         else:
             prev_season = False
             szn_load = []
-        game_df, game_group, szn_df, szn_group, szn_comp = load_data(pitcher_id,game_id,vs_past,szn_load)
-        generate_chart(pitcher_id,game_id,game_df,game_group,szn_df,szn_comp,vs_past)
+        game_df, game_group, szn_df, szn_group, szn_comp, missing_feats = load_data(pitcher_id,game_id,vs_past,szn_load)
+        if game_df.shape[0]>0:
+            generate_chart(pitcher_id,game_id,game_df,game_group,szn_df,szn_comp,vs_past)
+        else:
+            st.write(f'Game is missing required data: {missing_feats}')
