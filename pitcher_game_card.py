@@ -1170,7 +1170,7 @@ def load_data(pitcher_id,game_id,vs_past,szn_load):
             .astype({'xSLGcon':'float'})
             .groupby(['pitcherId','pitcherName','pitchType'])
             [['isPitch','usage','vRHH','vLHH','armAngle','velo','extension','IVB','HB','HAVAA','strike','whiff','csw',
-              'sw_str','hr','plvStuff+','PLV+','xSLGcon'
+              'sw_str','hr','plvStuff+','PLV+','xSLGcon','IVB_acc','HB_acc'
               ]]
             .agg({
                 'isPitch':'sum',
@@ -1182,6 +1182,8 @@ def load_data(pitcher_id,game_id,vs_past,szn_load):
                 'extension':'mean',
                 'IVB':'mean',
                 'HB':'mean',
+                'IVB_acc':'mean',
+                'HB_acc':'mean',
                 'HAVAA':'mean',
                 'strike':'mean',
                 'whiff':'mean',
