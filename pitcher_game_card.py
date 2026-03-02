@@ -1205,7 +1205,7 @@ def load_data(pitcher_id,game_id,vs_past,szn_load):
                     sw_str = lambda x: x['sw_str'].astype('float')*100,
                     csw = lambda x: x['csw']*100)
             [['pitchType','Type','isPitch','pitches_vR','vLHH','usage','vRHH','armAngle','velo',
-              'extension','IVB','HB','HAVAA','strike','sw_str','csw','hr','xSLGcon','plvStuff+','PLV+']]
+              'extension','IVB','HB','IVB_acc','HB_acc','HAVAA','strike','sw_str','csw','hr','xSLGcon','plvStuff+','PLV+']]
             # .round(1)
             .rename(columns={
                 'isPitch':'#',
