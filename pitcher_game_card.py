@@ -764,7 +764,9 @@ pitchtype_metrics_dict = {
         'Velo':[-10e6,90.2,93.2,95.6,98.2,10e6],
         'Ext':[-10e6,5.75,6.25,6.66,7.13,10e6],
         'IVB':[-10e6,10,14.3,16.9,19.2,10e6],
+        'IVB_acc':[-10e6,66.9,91.7,107.5,121.6,10e6],
         'HB':[-10e6,1.6,5.9,9.6,13.7,10e6],
+        'HB_acc':[-10e6,9.7,36,59,84.7,10e6],
         'HAVAA':[-10e6,0.13,0.72,1.2,1.74,10e6],
         'CSW%':[-10e6,0,20,100/3,100/2,10e6],
         'xSLGcon':[-10e6,0.125,0.390,0.725,1.385,10e6],
@@ -775,7 +777,9 @@ pitchtype_metrics_dict = {
         'Velo':[-10e6,89.1,92.4,95.1,97.7,10e6],
         'Ext':[-10e6,5.75,6.25,6.66,7.13,10e6],
         'IVB':[-10e6,0.5,6.3,10.5,15.1,10e6],
+        'IVB_acc':[-10e6,7.3,37,61.3,88,10e6],
         'HB':[-10e6,9.5,13.9,16.4,18.5,10e6],
+        'HB_acc':[-10e6,62.5,86,100.6,116,10e6],
         'HAVAA':[-10e6,-0.27,0.33,0.83,1.42,10e6],
         'CSW%':[-10e6,0,100/6,100/3,100/2,10e6],
         'xSLGcon':[-10e6,0.15,0.340,0.585,1.095,10e6],
@@ -786,7 +790,9 @@ pitchtype_metrics_dict = {
         'Velo':[-10e6,85,88,90.7,93.8,10e6],
         'Ext':[-10e6,5.75,6.25,6.66,7.13,10e6],
         'IVB':[-10e6,1.95,6.2,9.3,13.2,10e6],
+        'IVB_acc':[-10e6,15.7,36.5,54.5,77.8,10e6],
         'HB':[-10e6,-6.1,-3.6,-0.8,2.7,10e6],
+        'HB_acc':[-10e6,-35.8,-20.8,-7.3,9.9,10e6],
         'HAVAA':[-10e6,-0.9,-0.216,0.41,1.12,10e6],
         'CSW%':[-10e6,0,100/6,100/3,100/2,10e6],
         'xSLGcon':[-10e6,0.115,0.320,0.62,1.29,10e6],
@@ -1349,7 +1355,7 @@ def fastball_stats(table_df,ax):
 
     fastball_comp = (
         table_df
-        .loc[table_df['pitchType'].isin(['FF','SI','FC']),['pitchType','#','Type','Velo','Ext','IVB','HB','HAVAA']]
+        .loc[table_df['pitchType'].isin(['FF','SI','FC']),['pitchType','#','Type','Velo','Ext','IVB','HB','HAVAA','IVB_acc','HB_acc']]
         .head(1)
     )
     fastball_type = fastball_comp['pitchType'].item()
@@ -1357,9 +1363,14 @@ def fastball_stats(table_df,ax):
     for stat in stat_list:
         x_val = stat_list.index(stat)
         stat_val = fastball_comp[stat].item()
-        fastball_comp[stat+'_color'] = pd.cut(fastball_comp[stat],
-                                              bins=pitchtype_metrics_dict[fastball_type][stat],
-                                              labels=range(5))
+        if stat in ['IVB','HB']:
+            fastball_comp[stat+'_color'] = pd.cut(fastball_comp[stat+'_acc'],
+                                                  bins=pitchtype_metrics_dict[fastball_type][stat+'_acc'],
+                                                  labels=range(5))
+        else:
+            fastball_comp[stat+'_color'] = pd.cut(fastball_comp[stat],
+                                                  bins=pitchtype_metrics_dict[fastball_type][stat],
+                                                  labels=range(5))
         color_val = fastball_comp[stat+'_color'].item()
         stat_color = diverge_palette[color_val]
         ax.text(x_val,
