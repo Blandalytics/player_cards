@@ -1496,7 +1496,7 @@ def usage_chunk(table_df,ax,vs_past):
             l_text = ax.annotate(f'{vsL_arrow}', xycoords=l_text, xy=(1, 0.5), va="center",
                                 color=marker_colors[pitch_type],fontsize=20)
 
-    label_adj = -1.5/len(pitch_list)-0.5
+    label_adj = -10/(5*len(pitch_list)-0.5)
     ax.text(fill_width*1.15,label_adj,'vs RHB%',fontsize=20,color=pl_line_color,ha='left',va='bottom',weight='regular')
     ax.text(-fill_width*1.15,label_adj,'vs LHB%',fontsize=20,color=pl_line_color,ha='right',va='bottom',weight='regular')
     x_lim = max(np.abs(np.array(ax.get_xlim()))) * 4/3
@@ -1524,7 +1524,7 @@ def header_chunk(table_df,ax):
         ax.text(0.9,pitch_list.index(pitch_type),f'{num_thrown:,.0f}',
                 ha='center',va='center',fontsize=20)
       
-    label_adj = -2/(len(pitch_list)-0.5)
+    label_adj = -10/(5*len(pitch_list)-0.5)
     ax.text(0.225,label_adj,'Type',fontsize=16,color=pl_line_color,ha='left',va='bottom')
     ax.text(0.9,label_adj,'#',fontsize=16,color=pl_line_color,ha='center',va='bottom')
     ax.set(ylim=(len(pitch_list)-0.5,label_adj))
@@ -1578,7 +1578,7 @@ def stats_chunk(table_df,ax,vs_past):
         'PLV+':''
         }
 
-    label_adj = -2/(len(pitch_list)-0.5)
+    label_adj = -10/(5*len(pitch_list)-0.5)
     for pitch_type in pitch_list:
         x_val = 0.15
         for stat in stat_list:
