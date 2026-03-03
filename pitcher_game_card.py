@@ -646,8 +646,8 @@ def load_prev_pitches(pitcher_id,game_id=None,prev_season=None):
 
     with ThreadPoolExecutor(max_workers=8) as executor:
         futures = {executor.submit(pull_game, game_id, pitcher_id, pitcher_height): game_id for game_id in game_list}
-        for future in tqdm.tqdm(as_completed(futures), total=len(futures), desc="Processing", unit="games"):
-        # for future in as_completed(futures):
+        # for future in tqdm.tqdm(as_completed(futures), total=len(futures), desc="Processing", unit="games"):
+        for future in as_completed(futures):
             data_load += future.result()
     return data_load
 
@@ -1062,8 +1062,8 @@ def generate_games(games_today):
     game_dict = {}
     with ThreadPoolExecutor(max_workers=8) as executor:
         futures = {executor.submit(pull_game_info, game_id): game_id for game_id in games_today}
-        for future in tqdm.tqdm(as_completed(futures), total=len(futures), desc="Processing", unit="games"):
-        # for future in as_completed(futures):
+        # for future in tqdm.tqdm(as_completed(futures), total=len(futures), desc="Processing", unit="games"):
+        for future in as_completed(futures):
             game_dict.update(future.result())
     game_df = pd.DataFrame.from_dict(game_dict, orient='index',columns=['Game ID','Time','Sort Time','Sort Inning','Sort Code'])
     return game_df.sort_values(['Sort Code','Sort Time','Game ID','Sort Inning'])['Game ID'].to_dict()
