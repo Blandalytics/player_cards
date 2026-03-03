@@ -2075,7 +2075,7 @@ with col3:
     if len(list(pitcher_list.keys()))>0:
         st.selectbox('Choose a pitcher:',list(pitcher_list.keys()),key='pitcher')
         pitcher_id = int(pitcher_list[ss['pitcher']][0])
-        response = requests.get(url=f'http://statsapi.mlb.com/api/v1/people/{pitcher_id}?hydrate=stats(group=pitching,type=gameLog,season={input_date.year - 1},endDate={input_date},sportId=1,gameType=[R]),hydrations').json()
+        response = requests.get(url=f'http://statsapi.mlb.com/api/v1/people/{pitcher_id}?hydrate=stats(group=pitching,type=gameLog,season={ss['date'].year - 1},endDate={ss['date']},sportId=1,gameType=[R]),hydrations').json()
         if 'stats' in response['people'][0].keys():
             vs_past = st.checkbox("Compare to past year's results?",value=True)
         else:
