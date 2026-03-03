@@ -2029,7 +2029,7 @@ with col2:
     r = requests.get(f'https://baseballsavant.mlb.com/gf?game_pk={game_id}')
     x = r.json()
     game_code = x['game_status_code']
-    if (len(x['home_pitcher_lineup'])>0) | (len(x['away_pitcher_lineup'])>0):
+    if (len(x['home_pitcher_lineup'])>0) & (len(x['away_pitcher_lineup'])>0):
         pitcher_lineup = [x['home_pitcher_lineup'][0]]+[x['away_pitcher_lineup'][0]]+([] if len(x['home_pitcher_lineup'])==1 else x['home_pitcher_lineup'][1:])+([] if len(x['away_pitcher_lineup'])==1 else x['away_pitcher_lineup'][1:])
         home_team = [1]+[0]+([] if len(x['home_pitcher_lineup'])==1 else [1]*(len(x['home_pitcher_lineup'])-1))+([] if len(x['away_pitcher_lineup'])==1 else [0]*(len(x['away_pitcher_lineup'])-1))
         test_list = {}
