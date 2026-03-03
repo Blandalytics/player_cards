@@ -301,7 +301,7 @@ def name_chunk(pitcher_id,game_id,ax):
 
 def load_logo():
     # logo_loc = 'https://github.com/Blandalytics/PLV_viz/blob/main/data/PL-text-wht.png?raw=true'
-    logo_loc = 'https://github.com/Blandalytics/player_cards/blob/main/PitcherList_Stats_watermark.webp?raw=true'
+    logo_loc = 'https://github.com/Blandalytics/player_cards/blob/main/PitcherList_Stats_watermark_with_logo.webp?raw=true'
     logo = Image.open(urllib.request.urlopen(logo_loc))
     return logo
 
@@ -1684,7 +1684,7 @@ def generate_chart(pitcher_id,game_id,game_df,game_group,szn_df,szn_comp,vs_past
     # Divide card into tiles
     grid = plt.GridSpec(6, 21,height_ratios=[0.9,1.4,1.125,1.225,5,3.25],hspace=0.3,wspace=0)
     
-    logo_ax = fig.add_axes([0.725,0.92,0.25,0.25], anchor='SW', zorder=1)
+    logo_ax = fig.add_axes([0.675,0.92,0.31,0.25], anchor='SW', zorder=1)
     logo_ax.imshow(logo)
     logo_ax.axis('off')
     
