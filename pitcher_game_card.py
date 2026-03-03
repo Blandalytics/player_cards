@@ -562,7 +562,7 @@ def header_stats_chunk(game_id,pitcher_id,ax):
     ax.text(0.5,
             0.5,
             game_text,
-            ha='center',va='center',fontsize=30,color='#8cc6d9'
+            ha='center',va='center',fontsize=30,color='#5cc2d6'
             )
     ax.set(ylim=(0,1))
     ax.axis('off')
