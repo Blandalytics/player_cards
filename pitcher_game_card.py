@@ -2011,9 +2011,10 @@ def generate_chart(pitcher_id,game_id,game_df,game_group,szn_df,szn_comp,vs_past
     st.pyplot(fig, width='content')
 
 st.write('Data (especially pitch types) are subject to change.')
+today = (datetime.now(UTC)-timedelta(hours=16)).date()
 if 'date' not in ss:
-    ss['date'] = (datetime.now(UTC)-timedelta(hours=16)).date()
-
+    ss['date'] = today
+    
 def date_change():
     if 'game' in ss:
         del ss['game']
