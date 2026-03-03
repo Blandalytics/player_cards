@@ -38,7 +38,7 @@ fm.fontManager.addfont(str(font.get_file()))
 # Plot Style
 pl_white = '#FFFFFF'
 pl_background = '#292C42'
-pl_text = '#72CBFD'
+pl_text = '#00D4FF'#'#72CBFD'
 pl_line_color = '#8D96B3'
 pl_highlight = '#F1C647'
 pl_highlight_gradient = ['#F1C647','#F5A05E']
