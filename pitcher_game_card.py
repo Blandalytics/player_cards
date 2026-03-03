@@ -301,7 +301,7 @@ def name_chunk(pitcher_id,game_id,ax):
 
 def load_logo():
     # logo_loc = 'https://github.com/Blandalytics/PLV_viz/blob/main/data/PL-text-wht.png?raw=true'
-    logo_loc = 'https://github.com/Blandalytics/player_cards/blob/main/PitcherList_Stats_watermark.webp'
+    logo_loc = 'https://github.com/Blandalytics/player_cards/blob/main/PitcherList_Stats_watermark.webp?raw=true'
     logo = Image.open(urllib.request.urlopen(logo_loc))
     return logo
 
