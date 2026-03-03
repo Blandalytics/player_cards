@@ -562,7 +562,7 @@ def header_stats_chunk(game_id,pitcher_id,ax):
     ax.text(0.5,
             0.5,
             game_text,
-            ha='center',va='center',fontsize=30,color='#20afdf'
+            ha='center',va='center',fontsize=30,color='#8cc6d9'
             )
     ax.set(ylim=(0,1))
     ax.axis('off')
@@ -1684,7 +1684,7 @@ def generate_chart(pitcher_id,game_id,game_df,game_group,szn_df,szn_comp,vs_past
     # Divide card into tiles
     grid = plt.GridSpec(6, 21,height_ratios=[0.9,1.4,1.125,1.225,5,3.25],hspace=0.3,wspace=0)
     
-    logo_ax = fig.add_axes([0.69,0.925,0.29,0.25], anchor='SW', zorder=1)
+    logo_ax = fig.add_axes([0.69,0.93,0.29,0.25], anchor='SW', zorder=1)
     logo_ax.imshow(logo)
     logo_ax.axis('off')
     
