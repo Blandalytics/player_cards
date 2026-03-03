@@ -277,7 +277,7 @@ def name_chunk(pitcher_id,game_id,ax):
     name_size = len(name)
     font_adj = 10/name_size
 
-    pl_name_gradient = ['#b4e2ff','#3da8ff']
+    pl_name_gradient = ['#65d0fd','#4896ca']
     pl_name_cmap = sns.color_palette(f'blend:{pl_name_gradient[0]},{pl_name_gradient[1]}', as_cmap=True)
 
     sub_text = ax.text(0.1,0,
