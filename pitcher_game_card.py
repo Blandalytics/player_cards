@@ -288,7 +288,7 @@ def name_chunk(pitcher_id,game_id,ax):
     text = mpl.textpath.TextPath((0, 0.4), name, size=font_adj)
     # use text to define imshow extent
     extent = text.get_extents().extents[[0, 2, 1, 3]]
-    im = gradient_image(ax, direction=0.7, extent=extent,
+    im = gradient_image(ax, direction=0, extent=extent,
                         cmap=pl_name_cmap, cmap_range=(0, 1), alpha=1)
 
     # use transData instead of transAxes
@@ -1684,7 +1684,7 @@ def generate_chart(pitcher_id,game_id,game_df,game_group,szn_df,szn_comp,vs_past
     # Divide card into tiles
     grid = plt.GridSpec(6, 21,height_ratios=[0.9,1.4,1.125,1.225,5,3.25],hspace=0.3,wspace=0)
     
-    logo_ax = fig.add_axes([0.7,0.925,0.29,0.25], anchor='SW', zorder=1)
+    logo_ax = fig.add_axes([0.69,0.925,0.29,0.25], anchor='SW', zorder=1)
     logo_ax.imshow(logo)
     logo_ax.axis('off')
     
