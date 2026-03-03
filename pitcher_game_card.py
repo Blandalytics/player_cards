@@ -1927,7 +1927,7 @@ def generate_chart(pitcher_id,game_id,game_df,game_group,szn_df,szn_comp,vs_past
     usage_ax = fig.add_axes([0.445,0.593,.545,0.195], anchor='SW', zorder=1)
     usage_chunk(szn_comp if vs_past else game_group,usage_ax,vs_past)
 
-    line_alpha = 0.5
+    line_alpha = 2/3
     
     if fastball_name=='Four-Seam':
         fig.text(0.06,0.69,f'Primary Fastball:',color='w',fontsize=24,va='center',ha='left')
@@ -1991,8 +1991,8 @@ def generate_chart(pitcher_id,game_id,game_df,game_group,szn_df,szn_comp,vs_past
     fig.add_artist(lines.Line2D([0.435, 0.435], [0.28, 0.563],linewidth=3,color=pl_text,alpha=line_alpha))
     fig.add_artist(lines.Line2D([0.7125, 0.7125], [0.28, 0.563],linewidth=3,color=pl_text,alpha=line_alpha))
     
-    fig.add_artist(lines.Line2D([0.01, 0.01], [0.28, 0.565],linewidth=3,color=pl_text,alpha=line_alpha))
-    fig.add_artist(lines.Line2D([0.99, 0.99], [0.28, 0.565],linewidth=3,color=pl_text,alpha=line_alpha))
+    fig.add_artist(lines.Line2D([0.01, 0.01], [0.28, 0.563],linewidth=3,color=pl_text,alpha=line_alpha))
+    fig.add_artist(lines.Line2D([0.99, 0.99], [0.28, 0.563],linewidth=3,color=pl_text,alpha=line_alpha))
     fig.add_artist(lines.Line2D([0.01, 0.99], [0.278, 0.278],linewidth=3,color=pl_text,alpha=line_alpha))
     
     fig.text(0.5,0.255,'Pitch Type Metrics',color='w',fontsize=30,va='center',ha='center')
