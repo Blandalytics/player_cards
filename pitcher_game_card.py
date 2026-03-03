@@ -1926,35 +1926,37 @@ def generate_chart(pitcher_id,game_id,game_df,game_group,szn_df,szn_comp,vs_past
     
     usage_ax = fig.add_axes([0.445,0.593,.545,0.195], anchor='SW', zorder=1)
     usage_chunk(szn_comp if vs_past else game_group,usage_ax,vs_past)
+
+    line_alpha = 0.5
     
     if fastball_name=='Four-Seam':
         fig.text(0.06,0.69,f'Primary Fastball:',color='w',fontsize=24,va='center',ha='left')
         fig.text(0.25,0.69,fastball_name,color=marker_colors[fastball_code],fontsize=28,va='center',ha='left')
-        fig.add_artist(lines.Line2D([0.01, 0.04], [0.69, 0.69],linewidth=3,color=pl_text,alpha=0.75))
-        fig.add_artist(lines.Line2D([0.41,0.4325], [0.69, 0.69],linewidth=3,color=pl_text,alpha=0.75))
+        fig.add_artist(lines.Line2D([0.01, 0.04], [0.69, 0.69],linewidth=3,color=pl_text,alpha=line_alpha))
+        fig.add_artist(lines.Line2D([0.41,0.4325], [0.69, 0.69],linewidth=3,color=pl_text,alpha=line_alpha))
     else:
         fig.text(0.093,0.69,f'Primary Fastball:',color='w',fontsize=24,va='center',ha='left')
         fig.text(0.283,0.69,fastball_name,color=marker_colors[fastball_code],fontsize=28,va='center',ha='left')
-        fig.add_artist(lines.Line2D([0.01, 0.073], [0.69, 0.69],linewidth=3,color=pl_text,alpha=0.75))
-        fig.add_artist(lines.Line2D([0.375,0.4325], [0.69, 0.69],linewidth=3,color=pl_text,alpha=0.75))
-    fig.add_artist(lines.Line2D([0.01, 0.4325], [0.713, 0.713],linewidth=3,color=pl_text,alpha=0.75))
-    fig.add_artist(lines.Line2D([0.01, 0.01], [0.59, 0.688],linewidth=3,color=pl_text,alpha=0.75))
-    fig.add_artist(lines.Line2D([0.435, 0.435], [0.59, 0.813],linewidth=3,color=pl_text,alpha=0.75))
+        fig.add_artist(lines.Line2D([0.01, 0.073], [0.69, 0.69],linewidth=3,color=pl_text,alpha=line_alpha))
+        fig.add_artist(lines.Line2D([0.375,0.4325], [0.69, 0.69],linewidth=3,color=pl_text,alpha=line_alpha))
+    fig.add_artist(lines.Line2D([0.01, 0.4325], [0.713, 0.713],linewidth=3,color=pl_text,alpha=line_alpha))
+    fig.add_artist(lines.Line2D([0.01, 0.01], [0.59, 0.688],linewidth=3,color=pl_text,alpha=line_alpha))
+    fig.add_artist(lines.Line2D([0.435, 0.435], [0.59, 0.813],linewidth=3,color=pl_text,alpha=line_alpha))
     
     #Grade Only
     fig.text(0.085,0.815,'Start', ha='center',va='center',color='w',fontsize=30)
     fig.text(0.2975,0.815,'Models', ha='center',va='center',color='w',fontsize=30)
-    fig.add_artist(lines.Line2D([0.01, 0.03], [0.815, 0.815],linewidth=3,color=pl_text,alpha=0.75))
-    fig.add_artist(lines.Line2D([0.14, 0.23], [0.815, 0.815],linewidth=3,color=pl_text,alpha=0.75))
-    fig.add_artist(lines.Line2D([0.01, 0.01], [0.715, 0.813],linewidth=3,color=pl_text,alpha=0.75))
-    fig.add_artist(lines.Line2D([0.16, 0.16], [0.715, 0.813],linewidth=3,color=pl_text,alpha=0.75))
+    fig.add_artist(lines.Line2D([0.01, 0.03], [0.815, 0.815],linewidth=3,color=pl_text,alpha=line_alpha))
+    fig.add_artist(lines.Line2D([0.14, 0.23], [0.815, 0.815],linewidth=3,color=pl_text,alpha=line_alpha))
+    fig.add_artist(lines.Line2D([0.01, 0.01], [0.715, 0.813],linewidth=3,color=pl_text,alpha=line_alpha))
+    fig.add_artist(lines.Line2D([0.16, 0.16], [0.715, 0.813],linewidth=3,color=pl_text,alpha=line_alpha))
     
     fig.text(0.5,0.9,game_text,color='w',fontsize=24,va='center',ha='center',font=italic)
     
     fig.add_artist(mpatches.FancyBboxPatch((0.02, 0.85), 0.96, 0.023,
                                            ec=pl_text,
                                            fc=pl_background,
-                                           alpha=0.75,
+                                           alpha=line_alpha,
                                            zorder=0,
                                            linewidth=3,
                                            boxstyle=mpatches.BoxStyle("Round", pad=0.2),
@@ -1963,10 +1965,10 @@ def generate_chart(pitcher_id,game_id,game_df,game_group,szn_df,szn_comp,vs_past
             )
     
     fig.text(0.715,0.815,'Usage',color='w',fontsize=30,va='center',ha='center')
-    fig.add_artist(lines.Line2D([0.775, 0.99], [0.815, 0.815],linewidth=3,color=pl_text,alpha=0.75))
-    fig.add_artist(lines.Line2D([0.365, 0.655], [0.815, 0.815],linewidth=3,color=pl_text,alpha=0.75))
-    fig.add_artist(lines.Line2D([0.99, 0.99], [0.59, 0.813],linewidth=3,color=pl_text,alpha=0.75))
-    fig.add_artist(lines.Line2D([0.01, 0.99], [0.588, 0.588],linewidth=3,color=pl_text,alpha=0.75))
+    fig.add_artist(lines.Line2D([0.775, 0.99], [0.815, 0.815],linewidth=3,color=pl_text,alpha=line_alpha))
+    fig.add_artist(lines.Line2D([0.365, 0.655], [0.815, 0.815],linewidth=3,color=pl_text,alpha=line_alpha))
+    fig.add_artist(lines.Line2D([0.99, 0.99], [0.59, 0.813],linewidth=3,color=pl_text,alpha=line_alpha))
+    fig.add_artist(lines.Line2D([0.01, 0.99], [0.588, 0.588],linewidth=3,color=pl_text,alpha=line_alpha))
     if vs_past:
         if prev_season:
             fig.text(0.98,0.595,'Arrows are vs\n2025 Usage',alpha=0.5,ha='right')
@@ -1982,23 +1984,23 @@ def generate_chart(pitcher_id,game_id,game_df,game_group,szn_df,szn_comp,vs_past
             fig.text(0.02,0.285,'Shaded Regions\nare 2025 Shapes',alpha=0.5)
         else:
             fig.text(0.02,0.285,'Shaded Regions are\nprior 2025 Shapes',alpha=0.5)
-    fig.add_artist(lines.Line2D([0.01, 0.12], [0.565, 0.565],linewidth=3,color=pl_text,alpha=0.75))
-    fig.add_artist(lines.Line2D([0.325, 0.505], [0.565, 0.565],linewidth=3,color=pl_text,alpha=0.75))
-    fig.add_artist(lines.Line2D([0.6425, 0.7825], [0.565, 0.565],linewidth=3,color=pl_text,alpha=0.75))
-    fig.add_artist(lines.Line2D([0.92, 0.99], [0.565, 0.565],linewidth=3,color=pl_text,alpha=0.75))
-    fig.add_artist(lines.Line2D([0.435, 0.435], [0.28, 0.563],linewidth=3,color=pl_text,alpha=0.75))
-    fig.add_artist(lines.Line2D([0.7125, 0.7125], [0.28, 0.563],linewidth=3,color=pl_text,alpha=0.75))
+    fig.add_artist(lines.Line2D([0.01, 0.12], [0.565, 0.565],linewidth=3,color=pl_text,alpha=line_alpha))
+    fig.add_artist(lines.Line2D([0.325, 0.505], [0.565, 0.565],linewidth=3,color=pl_text,alpha=line_alpha))
+    fig.add_artist(lines.Line2D([0.6425, 0.7825], [0.565, 0.565],linewidth=3,color=pl_text,alpha=line_alpha))
+    fig.add_artist(lines.Line2D([0.92, 0.99], [0.565, 0.565],linewidth=3,color=pl_text,alpha=line_alpha))
+    fig.add_artist(lines.Line2D([0.435, 0.435], [0.28, 0.563],linewidth=3,color=pl_text,alpha=line_alpha))
+    fig.add_artist(lines.Line2D([0.7125, 0.7125], [0.28, 0.563],linewidth=3,color=pl_text,alpha=line_alpha))
     
-    fig.add_artist(lines.Line2D([0.01, 0.01], [0.28, 0.565],linewidth=3,color=pl_text,alpha=0.75))
-    fig.add_artist(lines.Line2D([0.99, 0.99], [0.28, 0.565],linewidth=3,color=pl_text,alpha=0.75))
-    fig.add_artist(lines.Line2D([0.01, 0.99], [0.278, 0.278],linewidth=3,color=pl_text,alpha=0.75))
+    fig.add_artist(lines.Line2D([0.01, 0.01], [0.28, 0.565],linewidth=3,color=pl_text,alpha=line_alpha))
+    fig.add_artist(lines.Line2D([0.99, 0.99], [0.28, 0.565],linewidth=3,color=pl_text,alpha=line_alpha))
+    fig.add_artist(lines.Line2D([0.01, 0.99], [0.278, 0.278],linewidth=3,color=pl_text,alpha=line_alpha))
     
     fig.text(0.5,0.255,'Pitch Type Metrics',color='w',fontsize=30,va='center',ha='center')
-    fig.add_artist(lines.Line2D([0.01, 0.35], [0.255, 0.255],linewidth=3,color=pl_text,alpha=0.75))
-    fig.add_artist(lines.Line2D([0.65, 0.99], [0.255, 0.255],linewidth=3,color=pl_text,alpha=0.75))
-    fig.add_artist(lines.Line2D([0.01, 0.01], [0.017, 0.253],linewidth=3,color=pl_text,alpha=0.75))
-    fig.add_artist(lines.Line2D([0.99, 0.99], [0.017, 0.253],linewidth=3,color=pl_text,alpha=0.75))
-    fig.add_artist(lines.Line2D([0.01, 0.99], [0.015, 0.015],linewidth=3,color=pl_text,alpha=0.75))
+    fig.add_artist(lines.Line2D([0.01, 0.35], [0.255, 0.255],linewidth=3,color=pl_text,alpha=line_alpha))
+    fig.add_artist(lines.Line2D([0.65, 0.99], [0.255, 0.255],linewidth=3,color=pl_text,alpha=line_alpha))
+    fig.add_artist(lines.Line2D([0.01, 0.01], [0.017, 0.253],linewidth=3,color=pl_text,alpha=line_alpha))
+    fig.add_artist(lines.Line2D([0.99, 0.99], [0.017, 0.253],linewidth=3,color=pl_text,alpha=line_alpha))
+    fig.add_artist(lines.Line2D([0.01, 0.99], [0.015, 0.015],linewidth=3,color=pl_text,alpha=line_alpha))
     
     fig.add_artist(lines.Line2D([0, 1, 1, 0], [1, 1, 0, 0],linewidth=3,color='w',alpha=0))
     
