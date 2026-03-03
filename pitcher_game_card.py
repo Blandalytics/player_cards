@@ -1684,7 +1684,7 @@ def generate_chart(pitcher_id,game_id,game_df,game_group,szn_df,szn_comp,vs_past
     # Divide card into tiles
     grid = plt.GridSpec(6, 21,height_ratios=[0.9,1.4,1.125,1.225,5,3.25],hspace=0.3,wspace=0)
     
-    logo_ax = fig.add_axes([0.725,0.93,0.25,0.25], anchor='SW', zorder=1)
+    logo_ax = fig.add_axes([0.725,0.92,0.25,0.25], anchor='SW', zorder=1)
     logo_ax.imshow(logo)
     logo_ax.axis('off')
     
