@@ -1,4 +1,6 @@
 import streamlit as st
+from streamlit import session_state as ss
+
 from datetime import datetime, timedelta, UTC, date
 import pandas as pd
 import numpy as np
@@ -2009,15 +2011,27 @@ def generate_chart(pitcher_id,game_id,game_df,game_group,szn_df,szn_comp,vs_past
     st.pyplot(fig, width='content')
 
 st.write('Data (especially pitch types) are subject to change.')
+if 'date' not in ss:
+    ss['date'] = (datetime.now(UTC)-timedelta(hours=16)).date()
+
+def date_change():
+    if 'game' in ss:
+        del ss['game']
+    if 'player' in ss:
+        del ss['player']
+def game_change():
+    if 'player' in ss:
+        del ss['player']
+    
 col1, col2, col3 = st.columns([0.25,0.5,0.25])
 with col1:
-    today = (datetime.now(UTC)-timedelta(hours=16)).date()
-    input_date = st.date_input("Select a game date:", today, 
-                               min_value=date(2023, 3, 17), max_value=today+timedelta(days=2))
-    r = requests.get(f'https://statsapi.mlb.com/api/v1/schedule?sportId=1&date={input_date}')
+    st.date_input("Select a game date:", ss['date'], 
+                  min_value=date(2023, 3, 17), max_value=today+timedelta(days=2),
+                  key='date',on_change=date_change)
+    r = requests.get(f'https://statsapi.mlb.com/api/v1/schedule?sportId=1&date={ss['date']}')
     x = r.json()
     if x['totalGames']==0:
-        print(f'No games on {input_date}')
+        print(f'No games on {ss['date']}')
     else:
         games_today = []
         for game in range(len(x['dates'][0]['games'])):
@@ -2025,9 +2039,13 @@ with col1:
                 games_today += [x['dates'][0]['games'][game]['gamePk']]
         game_list = generate_games(games_today)
 
+if 'game' not in ss:
+    ss['game'] = list(game_list.keys())[0]
+
 with col2:
-    input_game = st.pills('Choose a game (all times EST):',list(game_list.keys()),default=list(game_list.keys())[0])
-    game_id = game_list[input_game]
+    st.pills('Choose a game (all times EST):',list(game_list.keys()),default=ss['game'],
+                          key='game',on_change=game_change)
+    game_id = game_list[ss['game']]
     game_id = int(game_id)
     r = requests.get(f'https://baseballsavant.mlb.com/gf?game_pk={game_id}')
     x = r.json()
@@ -2049,10 +2067,13 @@ with col2:
     else:
         pitcher_list = {}
 
+if 'pitcher' not in ss:
+    ss['pitcher'] = list(pitcher_list.keys())[0]
+
 with col3:
     if len(list(pitcher_list.keys()))>0:
-        pitcher_select = st.selectbox('Choose a pitcher:',list(pitcher_list.keys()))
-        pitcher_id = int(pitcher_list[pitcher_select][0])
+        st.selectbox('Choose a pitcher:',list(pitcher_list.keys()),key='pitcher')
+        pitcher_id = int(pitcher_list[ss['pitcher']][0])
         response = requests.get(url=f'http://statsapi.mlb.com/api/v1/people/{pitcher_id}?hydrate=stats(group=pitching,type=gameLog,season={input_date.year - 1},endDate={input_date},sportId=1,gameType=[R]),hydrations').json()
         if 'stats' in response['people'][0].keys():
             vs_past = st.checkbox("Compare to past year's results?",value=True)
