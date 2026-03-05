@@ -1183,8 +1183,6 @@ def load_data(pitcher_id,game_id,vs_past,szn_load):
         game_df['Break_acc'] = (game_df['HB_acc'].astype('float')**2+game_df['IVB_acc'].astype('float')**2)**0.5
 
         game_df['adj_spin_dir'] = np.where(game_df['pitcherHand']=='L',game_df['spin_dir'],360-game_df['spin_dir'])
-        game_df['obs_dir'] = ((np.degrees(np.arctan2(game_df['IVB'],game_df['HB'])) + 90) % 360).astype('float')
-        game_df['ssw'] = ((game_df['adj_spin_dir'].sub(game_df['obs_dir'])+180) % 360 - 180).astype('float')
         
         fastballs = ['FF','FC','FT','SI']
         fastball_df = (game_df
