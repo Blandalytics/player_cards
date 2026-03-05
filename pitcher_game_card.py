@@ -1131,7 +1131,7 @@ def generate_games(games_today):
 #     prev_season = False
 #     szn_load = []
 
-@st.cache_data(ttl=600)
+@st.cache_data(ttl=600, show_spinner='Loading game data')
 def load_data(pitcher_id,game_id,vs_past,szn_load):
     game_df = (
         pd.DataFrame(pull_game(game_id, pitcher_id, 6.25),
