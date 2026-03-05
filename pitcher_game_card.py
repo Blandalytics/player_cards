@@ -1182,7 +1182,7 @@ def load_data(pitcher_id,game_id,vs_past,szn_load):
         )
     
     if game_df.shape[0]>0:
-        game_df['sz_z','sz_plot_z'] = strikezone_z(game_df,'sz_top','sz_bot')
+        game_df[['sz_z','sz_plot_z']] = strikezone_z(game_df,'sz_top','sz_bot')
         game_df['balls'] = np.clip(game_df['balls'],0,3)
         game_df['strikes'] = np.clip(game_df['strikes'],0,2)
         game_df[['VAA','HAVAA']] = adjusted_vaa(game_df[['pZ','vY0','vZ0','aY','aZ']].astype('float'))
