@@ -756,12 +756,12 @@ model_constant_dict = {
         'szn_stdev':0.002871
     },
     'plv':{
-        'game_mean':0.026163,
-        'type_mean':0.025922,
-        'szn_mean':0.025552,
-        'game_stdev':0.006583,
-        'type_stdev':0.013552,
-        'szn_stdev':0.003531
+        'game_mean':0.026026814369463608,
+        'type_mean':0.025848696619494765,
+        'szn_mean':0.02543913688168283,
+        'game_stdev':0.0066423118920167805,
+        'type_stdev':0.013552982352747826,
+        'szn_stdev':0.003558267976141012
     },
 }
 
