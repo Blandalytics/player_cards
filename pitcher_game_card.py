@@ -1046,7 +1046,7 @@ def strikezone_z(dataframe,top_column,bottom_column):
     dataframe['sz_mid'] = dataframe[[top_column,bottom_column]].mean(axis=1)
     dataframe['sz_height'] = dataframe[top_column].sub(dataframe[bottom_column])
 
-    dataframe{'sz_z'] = dataframe['pZ'].sub(dataframe['sz_mid']).div(dataframe['sz_height'])
+    dataframe['sz_z'] = dataframe['pZ'].sub(dataframe['sz_mid']).div(dataframe['sz_height'])
     dataframe['sz_plot_z'] = np.where(
         (dataframe['pZ'] <= dataframe['sz_bot'].add(0.25)),
         dataframe['pZ'].sub(dataframe['sz_bot']).add(1.5),
