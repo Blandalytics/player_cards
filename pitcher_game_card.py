@@ -1181,7 +1181,8 @@ def load_data(pitcher_id,game_id,vs_past,szn_load):
         game_df['vRHH'] = np.where(game_df['hitterHand']=='R',1,None)
         game_df['vLHH'] = np.where(game_df['hitterHand']=='L',1,None)
         game_df['xSLGcon'] = xSLGcon(game_df)
-        
+
+        game_df['Break'] = (game_df['HB'].astype('float')**2+game_df['IVB'].astype('float')**2)**0.5
         game_df['HB_acc'] = game_df['HB'].div(game_df['plate_time']**2)
         game_df['IVB_acc'] = game_df['IVB'].div(game_df['plate_time']**2)
         game_df['Break_acc'] = (game_df['HB_acc'].astype('float')**2+game_df['IVB_acc'].astype('float')**2)**0.5
