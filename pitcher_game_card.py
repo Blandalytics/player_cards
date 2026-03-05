@@ -1865,7 +1865,8 @@ def generate_chart(pitcher_id,game_id,game_df,game_group,szn_df,szn_comp,vs_past
     alpha_val = 0.5
     
     ax2 = fig.add_axes([0.445,0.275,0.2675,0.287], anchor='SW', zorder=1)
-    sns.scatterplot(data=(game_df.loc[(game_df['hitterHand']=='L')].assign(pX = lambda x: np.clip(x['pX']*-1,-2,2))),
+    sns.scatterplot(data=(game_df.loc[(game_df['hitterHand']=='L')].assign(pX = lambda x: np.clip(x['pX']*-1,-2,2),
+                                                                           sz_plot_z = lambda x: np.clip(x['sz_plot_z'],-0.5,5.5)),
                     x='pX',
                     y='sz_plot_z',
                     hue='pitchType',
@@ -1926,7 +1927,8 @@ def generate_chart(pitcher_id,game_id,game_df,game_group,szn_df,szn_comp,vs_past
     ax3.add_patch(zone_outline)
     
     
-    sns.scatterplot(data=(game_df.loc[(game_df['hitterHand']=='R')].assign(pX = lambda x: np.clip(x['pX']*-1,-2,2))),
+    sns.scatterplot(data=(game_df.loc[(game_df['hitterHand']=='R')].assign(pX = lambda x: np.clip(x['pX']*-1,-2,2),
+                                                                           sz_plot_z = lambda x: np.clip(x['sz_plot_z'],-0.5,5.5))),
                     x='pX',
                     y='sz_plot_z',
                     hue='pitchType',
