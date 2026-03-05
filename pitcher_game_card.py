@@ -1025,7 +1025,7 @@ def pitch_models(data):
         model_df['delta_re'] = er_per_pitch
         for stat in outcomes:
             model_df[stat+'_re'] = stat if stat != 'hit_by_pitch' else 'ball' # Code HBP as Ball REs
-            if model_name !='stuff':
+            if model_type !='stuff':
                 model_df[stat+'_re'] = model_df[[stat+'_re','count']].apply(tuple,axis=1).map(run_expectancies)
             else:
                 model_df[stat+'_re'] = model_df[['pitch_type_bucket',stat+'_re']].apply(tuple,axis=1).map(stuff_expectancies)
