@@ -740,12 +740,12 @@ def get_player_heights(player_ids: List[int]) -> pd.DataFrame:
 
 model_constant_dict = {
     'stuff':{
-        'game_mean':-0.032034,
-        'type_mean':-0.034058,
-        'szn_mean':-0.033370,
-        'game_stdev':0.008800,
-        'type_stdev':0.019083,
-        'szn_stdev':0.006730
+        'game_mean':-0.029244,
+        'type_mean':-0.030638,
+        'szn_mean':-0.030800,
+        'game_stdev':0.006707,
+        'type_stdev':0.015297,
+        'szn_stdev':0.005814
     },
     'loc':{
         'game_mean':0.025448,
@@ -857,46 +857,46 @@ pitchtype_metrics_dict = {
         },
 }
 
-stuff_expectancies = {('Breaking Ball', 'ball'): 0.0648877620436635,
- ('Breaking Ball', 'called_strike'): -0.1065791761105314,
- ('Breaking Ball', 'double'): 0.7915059527706834,
- ('Breaking Ball', 'foul_strike'): -0.0415817168207625,
- ('Breaking Ball', 'hit_by_pitch'): 0.3722232218302899,
- ('Breaking Ball', 'home_run'): 1.408225696082421,
- ('Breaking Ball', 'out'): -0.2510512875153005,
- ('Breaking Ball', 'single'): 0.4831374745410123,
- ('Breaking Ball', 'swinging_strike'): -0.1104294629502583,
- ('Breaking Ball', 'triple'): 1.0624772769819786,
- ('Fastball', 'ball'): 0.0734447024094229,
- ('Fastball', 'called_strike'): -0.1015825592617233,
- ('Fastball', 'double'): 0.7752674971052853,
- ('Fastball', 'foul_strike'): -0.0462358869309888,
- ('Fastball', 'hit_by_pitch'): 0.3533678722783105,
- ('Fastball', 'home_run'): 1.393364450031403,
- ('Fastball', 'out'): -0.2687136850263563,
- ('Fastball', 'single'): 0.4674182465013806,
- ('Fastball', 'swinging_strike'): -0.1053816776214667,
- ('Fastball', 'triple'): 1.0478666618298544,
- ('Offspeed', 'ball'): 0.0657309558681534,
- ('Offspeed', 'called_strike'): -0.1108582010799238,
- ('Offspeed', 'double'): 0.7929970553006612,
- ('Offspeed', 'foul_strike'): -0.041552965284757,
- ('Offspeed', 'hit_by_pitch'): 0.3744787229364207,
- ('Offspeed', 'home_run'): 1.409938096530925,
- ('Offspeed', 'out'): -0.2470153766610978,
- ('Offspeed', 'single'): 0.485457193565765,
- ('Offspeed', 'swinging_strike'): -0.1145434865213509,
- ('Offspeed', 'triple'): 1.0664648543019073,
- ('Other', 'ball'): 0.064552527589902,
- ('Other', 'called_strike'): -0.0725914072686963,
- ('Other', 'double'): 0.7644002699518011,
- ('Other', 'foul_strike'): -0.0561339275163919,
- ('Other', 'hit_by_pitch'): 0.3402036537803858,
- ('Other', 'home_run'): 1.384001239176722,
- ('Other', 'out'): -0.2839746673166726,
- ('Other', 'single'): 0.456160602901288,
- ('Other', 'swinging_strike'): -0.0759445640051743,
- ('Other', 'triple'): 1.0398224522981012}
+stuff_expectancies = {('Breaking Ball', 'ball'): 0.0648899556362042,
+ ('Breaking Ball', 'called_strike'): -0.1065815321758906,
+ ('Breaking Ball', 'double'): 0.7915046342126995,
+ ('Breaking Ball', 'foul_strike'): -0.0415816524014541,
+ ('Breaking Ball', 'hit_by_pitch'): 0.372222251590394,
+ ('Breaking Ball', 'home_run'): 1.4082245958731214,
+ ('Breaking Ball', 'out'): -0.2510515555787339,
+ ('Breaking Ball', 'single'): 0.4831367119447007,
+ ('Breaking Ball', 'swinging_strike'): -0.1104318190294043,
+ ('Breaking Ball', 'triple'): 1.0624764710745118,
+ ('Fastball', 'ball'): 0.0734455501653943,
+ ('Fastball', 'called_strike'): -0.1015822249660868,
+ ('Fastball', 'double'): 0.7752658636798753,
+ ('Fastball', 'foul_strike'): -0.0462360894289398,
+ ('Fastball', 'hit_by_pitch'): 0.3533658111442512,
+ ('Fastball', 'home_run'): 1.3933632222762573,
+ ('Fastball', 'out'): -0.2687157273447406,
+ ('Fastball', 'single'): 0.4674164837545079,
+ ('Fastball', 'swinging_strike'): -0.1053813621864279,
+ ('Fastball', 'triple'): 1.0478652816999288,
+ ('Offspeed', 'ball'): 0.0657315512840987,
+ ('Offspeed', 'called_strike'): -0.110858268121292,
+ ('Offspeed', 'double'): 0.7929954112089747,
+ ('Offspeed', 'foul_strike'): -0.0415531830483154,
+ ('Offspeed', 'hit_by_pitch'): 0.3744764552053236,
+ ('Offspeed', 'home_run'): 1.4099360454039978,
+ ('Offspeed', 'out'): -0.2470170992679954,
+ ('Offspeed', 'single'): 0.4854555297927654,
+ ('Offspeed', 'swinging_strike'): -0.1145435791680625,
+ ('Offspeed', 'triple'): 1.0664637712213845,
+ ('Other', 'ball'): 0.0644771188527789,
+ ('Other', 'called_strike'): -0.0726561002047213,
+ ('Other', 'double'): 0.7646084231502644,
+ ('Other', 'foul_strike'): -0.0560926896377042,
+ ('Other', 'hit_by_pitch'): 0.3404396275188116,
+ ('Other', 'home_run'): 1.384199438932331,
+ ('Other', 'out'): -0.2837690854680377,
+ ('Other', 'single'): 0.4563555172520269,
+ ('Other', 'swinging_strike'): -0.0760078083199719,
+ ('Other', 'triple'): 1.0399900834408449}
 
 def pitch_models(data):
     category_feats = ['pitcherHand','hitterHand',
@@ -1025,7 +1025,11 @@ def pitch_models(data):
         model_df['delta_re'] = er_per_pitch
         for stat in outcomes:
             model_df[stat+'_re'] = stat if stat != 'hit_by_pitch' else 'ball' # Code HBP as Ball REs
-            model_df[stat+'_re'] = model_df[[stat+'_re','count']].apply(tuple,axis=1).map(run_expectancies)
+            if model_type !='stuff':
+                model_df[stat+'_re'] = model_df[[stat+'_re','count']].apply(tuple,axis=1).map(run_expectancies)
+            else:
+                model_df[stat+'_re'] = model_df[['pitch_type_bucket',stat+'_re']].apply(tuple,axis=1).map(stuff_expectancies)
+            # model_df[stat+'_re'] = model_df[[stat+'_re','count']].apply(tuple,axis=1).map(run_expectancies)
             model_df['delta_re'] = model_df['delta_re'].add(model_df[stat+'_pred'].fillna(model_df[stat+'_pred'].median()).mul(model_df[stat+'_re']))
 
         model_df[model_type+'Grade_game'] = -((model_df['delta_re'] - model_constant_dict[model_type]['game_mean']) / model_constant_dict[model_type]['game_stdev']) * 10 + 75
