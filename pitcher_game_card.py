@@ -748,12 +748,12 @@ model_constant_dict = {
         'szn_stdev':0.005608963951932856
     },
     'loc':{
-        'game_mean':0.025448,
-        'type_mean':0.025882,
-        'szn_mean':0.025643,
-        'game_stdev':0.005888,
-        'type_stdev':0.012447,
-        'szn_stdev':0.002871
+        'game_mean':0.02548073942085139,
+        'type_mean':0.02593135122044948,
+        'szn_mean':0.02568416733608393,
+        'game_stdev':0.005903751642468741,
+        'type_stdev':0.012494648951960926,
+        'szn_stdev':0.002885174051109245
     },
     'plv':{
         'game_mean':0.026026814369463608,
@@ -911,8 +911,6 @@ def pitch_models(data):
     model_df['strikes_before_pitch'] = model_df['strikes'].copy()
     model_df['count'] = model_df['balls'].astype('str')+'_'+model_df['strikes'].astype('str')
 
-    model_df['sz_z'] = strikezone_z(model_df,'sz_top','sz_bot')
-
     model_df['pitcherHeight'] = model_df['pitcherId'].map(get_player_heights(model_df['pitcherId'].unique()))
     for stat in ['extension','x0','z0']:
         model_df[stat+'_ratio'] = model_df[stat].astype('float').div(model_df['pitcherHeight'].astype('float'))
@@ -1048,7 +1046,17 @@ def strikezone_z(dataframe,top_column,bottom_column):
     dataframe['sz_mid'] = dataframe[[top_column,bottom_column]].mean(axis=1)
     dataframe['sz_height'] = dataframe[top_column].sub(dataframe[bottom_column])
 
-    return dataframe['pZ'].sub(dataframe['sz_mid']).div(dataframe['sz_height'])
+    dataframe{'sz_z'] = dataframe['pZ'].sub(dataframe['sz_mid']).div(dataframe['sz_height'])
+    dataframe['sz_plot_z'] = np.where(
+        (dataframe['pZ'] <= dataframe['sz_bot'].add(0.25)),
+        dataframe['pZ'].sub(dataframe['sz_bot']).add(1.5),
+        np.where(
+            (dataframe['pZ'] >= dataframe['sz_top'].sub(0.25)),
+            dataframe['pZ'].sub(dataframe['sz_top']).add(3.5),
+            dataframe['sz_z'].mul(2).add(2.5)
+            )
+    )
+    return dataframe[['sz_z','sz_plot_z']]
 
 ### Calculate the differences between each pitch and their avg fastball
 def fastball_differences(dataframe,stat):
@@ -1174,6 +1182,7 @@ def load_data(pitcher_id,game_id,vs_past,szn_load):
         )
     
     if game_df.shape[0]>0:
+        game_df['sz_z','sz_plot_z'] = strikezone_z(game_df,'sz_top','sz_bot')
         game_df['balls'] = np.clip(game_df['balls'],0,3)
         game_df['strikes'] = np.clip(game_df['strikes'],0,2)
         game_df[['VAA','HAVAA']] = adjusted_vaa(game_df[['pZ','vY0','vZ0','aY','aZ']].astype('float'))
@@ -1858,7 +1867,7 @@ def generate_chart(pitcher_id,game_id,game_df,game_group,szn_df,szn_comp,vs_past
     ax2 = fig.add_axes([0.445,0.275,0.2675,0.287], anchor='SW', zorder=1)
     sns.scatterplot(data=(game_df.loc[(game_df['hitterHand']=='L')].assign(pX = lambda x: np.clip(x['pX']*-1,-2,2))),
                     x='pX',
-                    y='pZ',
+                    y='sz_plot_z',
                     hue='pitchType',
                     palette=marker_colors,
                     edgecolor=pl_background,
@@ -1919,7 +1928,7 @@ def generate_chart(pitcher_id,game_id,game_df,game_group,szn_df,szn_comp,vs_past
     
     sns.scatterplot(data=(game_df.loc[(game_df['hitterHand']=='R')].assign(pX = lambda x: np.clip(x['pX']*-1,-2,2))),
                     x='pX',
-                    y='pZ',
+                    y='sz_plot_z',
                     hue='pitchType',
                     palette=marker_colors,
                     edgecolor=pl_background,
