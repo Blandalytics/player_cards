@@ -1,5 +1,7 @@
 import streamlit as st
-from datetime import datetime, timedelta, UTC
+from streamlit import session_state as ss
+
+from datetime import datetime, timedelta, UTC, date
 import pandas as pd
 import numpy as np
 import seaborn as sns
@@ -38,7 +40,7 @@ fm.fontManager.addfont(str(font.get_file()))
 # Plot Style
 pl_white = '#FFFFFF'
 pl_background = '#292C42'
-pl_text = '#72CBFD'
+pl_text = '#00D4FF'#'#72CBFD'
 pl_line_color = '#8D96B3'
 pl_highlight = '#F1C647'
 pl_highlight_gradient = ['#F1C647','#F5A05E']
@@ -221,8 +223,6 @@ def get_data(game_id: str):
     return x
 
 def get_game_date(game_id: str):
-    # r = requests.get(f'https://statsapi.mlb.com/api/v1/game/{game_id}/playByPlay')
-    # return datetime.strptime(r.json()['allPlays'][0]['about']['startTime'][:10], '%Y-%m-%d')
     r = requests.get(f'https://statsapi.mlb.com/api/v1.1/game/{game_id}/feed/live')
     return datetime.strptime(r.json()['gameData']['datetime']['originalDate'], '%Y-%m-%d').replace(tzinfo=UTC)
 
@@ -279,7 +279,7 @@ def name_chunk(pitcher_id,game_id,ax):
     name_size = len(name)
     font_adj = 10/name_size
 
-    pl_name_gradient = ['#b4e2ff','#3da8ff']
+    pl_name_gradient = ['#00D4FF','#0099CC']
     pl_name_cmap = sns.color_palette(f'blend:{pl_name_gradient[0]},{pl_name_gradient[1]}', as_cmap=True)
 
     sub_text = ax.text(0.1,0,
@@ -290,7 +290,7 @@ def name_chunk(pitcher_id,game_id,ax):
     text = mpl.textpath.TextPath((0, 0.4), name, size=font_adj)
     # use text to define imshow extent
     extent = text.get_extents().extents[[0, 2, 1, 3]]
-    im = gradient_image(ax, direction=0.7, extent=extent,
+    im = gradient_image(ax, direction=0, extent=extent,
                         cmap=pl_name_cmap, cmap_range=(0, 1), alpha=1)
 
     # use transData instead of transAxes
@@ -302,7 +302,8 @@ def name_chunk(pitcher_id,game_id,ax):
     return f'Pitcher Performance: {x['gameDate']} {home_away} {opp_abbr}'
 
 def load_logo():
-    logo_loc = 'https://github.com/Blandalytics/PLV_viz/blob/main/data/PL-text-wht.png?raw=true'
+    # logo_loc = 'https://github.com/Blandalytics/PLV_viz/blob/main/data/PL-text-wht.png?raw=true'
+    logo_loc = 'https://github.com/Blandalytics/player_cards/blob/main/PitcherList_Stats_watermark_with_logo.webp?raw=true'
     logo = Image.open(urllib.request.urlopen(logo_loc))
     return logo
 
@@ -563,7 +564,7 @@ def header_stats_chunk(game_id,pitcher_id,ax):
     ax.text(0.5,
             0.5,
             game_text,
-            ha='center',va='center',fontsize=30,color='#b4e2ff'
+            ha='center',va='center',fontsize=30,color='#bae2ff' #'#a6d0d9'#'#99eeff'
             )
     ax.set(ylim=(0,1))
     ax.axis('off')
@@ -589,10 +590,13 @@ def pull_game(game_id,pitcher_id,pitcher_height):
     top_bot = 'top'
     base_outs = 0
     for play in game['liveData']['plays']['allPlays']:
-        base_outs = play['playEvents'][-1]['count'].get('outs')
-        play_data = pull_play(play, rel_dict,base_outs)
-        if play_data:
-            game_data+=play_data
+        if len(play['playEvents'])==0:
+            continue
+        else:
+            base_outs = play['playEvents'][-1]['count'].get('outs')
+            play_data = pull_play(play, rel_dict,base_outs)
+            if play_data:
+                game_data+=play_data
 
     return game_data
 
@@ -645,14 +649,16 @@ def load_prev_pitches(pitcher_id,game_id=None,prev_season=None):
 
     with ThreadPoolExecutor(max_workers=8) as executor:
         futures = {executor.submit(pull_game, game_id, pitcher_id, pitcher_height): game_id for game_id in game_list}
-        for future in tqdm.tqdm(as_completed(futures), total=len(futures), desc="Processing", unit="games"):
-        # for future in as_completed(futures):
+        # for future in tqdm.tqdm(as_completed(futures), total=len(futures), desc="Processing", unit="games"):
+        for future in as_completed(futures):
             data_load += future.result()
     return data_load
 
-def xSLGcon(data):
+def xSLGcon(df):
     with open('2025_pl_xSLG_model.pkl', 'rb') as f:
         xSLG_model = pickle.load(f)
+        
+    data = df[xSLG_model.feature_names_in_].copy()
 
     # Apply model (only to pitches with launch_speed and launch_angle)
     data[['out_bbe_pred','single_bbe_pred','double_bbe_pred',
@@ -764,7 +770,9 @@ pitchtype_metrics_dict = {
         'Velo':[-10e6,90.2,93.2,95.6,98.2,10e6],
         'Ext':[-10e6,5.75,6.25,6.66,7.13,10e6],
         'IVB':[-10e6,10,14.3,16.9,19.2,10e6],
+        'IVB_acc':[-10e6,66.9,91.7,107.5,121.6,10e6],
         'HB':[-10e6,1.6,5.9,9.6,13.7,10e6],
+        'HB_acc':[-10e6,9.7,36,59,84.7,10e6],
         'HAVAA':[-10e6,0.13,0.72,1.2,1.74,10e6],
         'CSW%':[-10e6,0,20,100/3,100/2,10e6],
         'xSLGcon':[-10e6,0.125,0.390,0.725,1.385,10e6],
@@ -775,7 +783,9 @@ pitchtype_metrics_dict = {
         'Velo':[-10e6,89.1,92.4,95.1,97.7,10e6],
         'Ext':[-10e6,5.75,6.25,6.66,7.13,10e6],
         'IVB':[-10e6,0.5,6.3,10.5,15.1,10e6],
+        'IVB_acc':[-10e6,7.3,37,61.3,88,10e6],
         'HB':[-10e6,9.5,13.9,16.4,18.5,10e6],
+        'HB_acc':[-10e6,62.5,86,100.6,116,10e6],
         'HAVAA':[-10e6,-0.27,0.33,0.83,1.42,10e6],
         'CSW%':[-10e6,0,100/6,100/3,100/2,10e6],
         'xSLGcon':[-10e6,0.15,0.340,0.585,1.095,10e6],
@@ -786,7 +796,9 @@ pitchtype_metrics_dict = {
         'Velo':[-10e6,85,88,90.7,93.8,10e6],
         'Ext':[-10e6,5.75,6.25,6.66,7.13,10e6],
         'IVB':[-10e6,1.95,6.2,9.3,13.2,10e6],
+        'IVB_acc':[-10e6,15.7,36.5,54.5,77.8,10e6],
         'HB':[-10e6,-6.1,-3.6,-0.8,2.7,10e6],
+        'HB_acc':[-10e6,-35.8,-20.8,-7.3,9.9,10e6],
         'HAVAA':[-10e6,-0.9,-0.216,0.41,1.12,10e6],
         'CSW%':[-10e6,0,100/6,100/3,100/2,10e6],
         'xSLGcon':[-10e6,0.115,0.320,0.62,1.29,10e6],
@@ -844,6 +856,47 @@ pitchtype_metrics_dict = {
         'PLV+':[-10e6,75,90,105,120,10e6]
         },
 }
+
+stuff_expectancies = {('Breaking Ball', 'ball'): 0.0648877620436635,
+ ('Breaking Ball', 'called_strike'): -0.1065791761105314,
+ ('Breaking Ball', 'double'): 0.7915059527706834,
+ ('Breaking Ball', 'foul_strike'): -0.0415817168207625,
+ ('Breaking Ball', 'hit_by_pitch'): 0.3722232218302899,
+ ('Breaking Ball', 'home_run'): 1.408225696082421,
+ ('Breaking Ball', 'out'): -0.2510512875153005,
+ ('Breaking Ball', 'single'): 0.4831374745410123,
+ ('Breaking Ball', 'swinging_strike'): -0.1104294629502583,
+ ('Breaking Ball', 'triple'): 1.0624772769819786,
+ ('Fastball', 'ball'): 0.0734447024094229,
+ ('Fastball', 'called_strike'): -0.1015825592617233,
+ ('Fastball', 'double'): 0.7752674971052853,
+ ('Fastball', 'foul_strike'): -0.0462358869309888,
+ ('Fastball', 'hit_by_pitch'): 0.3533678722783105,
+ ('Fastball', 'home_run'): 1.393364450031403,
+ ('Fastball', 'out'): -0.2687136850263563,
+ ('Fastball', 'single'): 0.4674182465013806,
+ ('Fastball', 'swinging_strike'): -0.1053816776214667,
+ ('Fastball', 'triple'): 1.0478666618298544,
+ ('Offspeed', 'ball'): 0.0657309558681534,
+ ('Offspeed', 'called_strike'): -0.1108582010799238,
+ ('Offspeed', 'double'): 0.7929970553006612,
+ ('Offspeed', 'foul_strike'): -0.041552965284757,
+ ('Offspeed', 'hit_by_pitch'): 0.3744787229364207,
+ ('Offspeed', 'home_run'): 1.409938096530925,
+ ('Offspeed', 'out'): -0.2470153766610978,
+ ('Offspeed', 'single'): 0.485457193565765,
+ ('Offspeed', 'swinging_strike'): -0.1145434865213509,
+ ('Offspeed', 'triple'): 1.0664648543019073,
+ ('Other', 'ball'): 0.064552527589902,
+ ('Other', 'called_strike'): -0.0725914072686963,
+ ('Other', 'double'): 0.7644002699518011,
+ ('Other', 'foul_strike'): -0.0561339275163919,
+ ('Other', 'hit_by_pitch'): 0.3402036537803858,
+ ('Other', 'home_run'): 1.384001239176722,
+ ('Other', 'out'): -0.2839746673166726,
+ ('Other', 'single'): 0.456160602901288,
+ ('Other', 'swinging_strike'): -0.0759445640051743,
+ ('Other', 'triple'): 1.0398224522981012}
 
 def pitch_models(data):
     category_feats = ['pitcherHand','hitterHand',
@@ -971,7 +1024,7 @@ def pitch_models(data):
         std_plv_runs = 0.048
         model_df['delta_re'] = er_per_pitch
         for stat in outcomes:
-            model_df[stat+'_re'] = stat
+            model_df[stat+'_re'] = stat if stat != 'hit_by_pitch' else 'ball' # Code HBP as Ball REs
             model_df[stat+'_re'] = model_df[[stat+'_re','count']].apply(tuple,axis=1).map(run_expectancies)
             model_df['delta_re'] = model_df['delta_re'].add(model_df[stat+'_pred'].fillna(model_df[stat+'_pred'].median()).mul(model_df[stat+'_re']))
 
@@ -1002,21 +1055,77 @@ def fastball_differences(dataframe,stat):
                                 right_on=['pitcherId','gameId','pitchType']).drop(columns=['pitchType_y']).rename(columns={'pitchType_x':'pitchType'})
     return dataframe[stat].sub(dataframe['fb_'+stat])
 
-pitcher_id = st.number_input('Enter Pitcher MLBAMID',value=694973)
-game_id = st.number_input('Enter MLB Game ID',value=831490)
-vs_past = st.checkbox("Compare to previous results?",value=True,help='If player has no 2025 MLB data, uncheck')
-spring_training = st.checkbox("Is Spring Training Game?",value=True)
-if vs_past:
-    if spring_training:
-        prev_season = True
+def pull_game_info(game_id):
+    code_dict = {
+        'F':0,
+        'U':0,
+        'O':1,
+        'I':1,
+        'N':1,
+        'P':2,
+        'S':2,
+        'D':2,
+        'M':2
+    }
+    r = requests.get(f'https://baseballsavant.mlb.com/gf?game_pk={game_id}')
+    x = r.json()
+    game_hour = int(x['scoreboard']['datetime']['dateTime'][11:13])
+    game_hour = game_hour-4 if game_hour >3 else game_hour+20
+    game_minutes = int(x['scoreboard']['datetime']['dateTime'][14:16])
+    raw_time = game_hour*60+game_minutes
+    am_pm = 'AM' if game_hour <12 else 'PM'
+    game_time = f'{game_hour-12}:{game_minutes:>02}{am_pm}' if (am_pm=='PM') & (game_hour!=12) else f'{game_hour}:{game_minutes:>02}{am_pm}'
+    ppd = 0 if x['scoreboard']['datetime']['originalDate']==x['scoreboard']['datetime']['officialDate'] else 1
+    
+    away_team = x['scoreboard']['teams']['away']['abbreviation']
+    home_team = x['scoreboard']['teams']['home']['abbreviation']
+    game_status_code = x['game_status_code']
+    code_map = code_dict[game_status_code]
+    if game_status_code  in ['P','S','D']:
+        game_info = f'{away_team} @ {home_team}: {game_time}'
+        inning_sort = None
     else:
-        prev_season = False
-    szn_load = load_prev_pitches(pitcher_id,game_id,
-                                  prev_season=prev_season
-                                  )
-else:
-    prev_season = False
-    szn_load = []
+        game_info = f'{away_team} @ {home_team}'
+        home_runs = x['scoreboard']['linescore']['teams']['home']['runs']
+        away_runs = x['scoreboard']['linescore']['teams']['away']['runs']
+        inning = x['scoreboard']['linescore']['currentInning']
+        top_bot = x['scoreboard']['linescore']['inningHalf'][0]
+        inning_sort = int(inning)*2 - (0 if top_bot=='Bottom' else 1)
+        if game_status_code == 'F':
+            if home_runs>away_runs:
+                game_info = f'FINAL: {away_team} {away_runs} @ **:blue[{home_team} {home_runs}]**'
+            elif home_runs<away_runs:
+                game_info = f'FINAL: **:blue[{away_team} {away_runs}]** @ {home_team} {home_runs}'
+            else:
+                game_info = f'FINAL: {away_team} {away_runs} @ {home_team} {home_runs}'
+        else:
+            game_info = f'{top_bot}{inning}: {away_team} {away_runs} @ {home_team} {home_runs}'
+    return {game_info:[game_id,game_time,raw_time,inning_sort,code_map]}
+
+def generate_games(games_today):
+    game_dict = {}
+    with ThreadPoolExecutor(max_workers=8) as executor:
+        futures = {executor.submit(pull_game_info, game_id): game_id for game_id in games_today}
+        # for future in tqdm.tqdm(as_completed(futures), total=len(futures), desc="Processing", unit="games"):
+        for future in as_completed(futures):
+            game_dict.update(future.result())
+    game_df = pd.DataFrame.from_dict(game_dict, orient='index',columns=['Game ID','Time','Sort Time','Sort Inning','Sort Code'])
+    return game_df.sort_values(['Sort Code','Sort Time','Game ID','Sort Inning'])['Game ID'].to_dict()
+
+# pitcher_id = st.number_input('Enter Pitcher MLBAMID',value=694973)
+# game_id = st.number_input('Enter MLB Game ID',value=831490)
+
+# if vs_past:
+#     if spring_training:
+#         prev_season = True
+#     else:
+#         prev_season = False
+#     szn_load = load_prev_pitches(pitcher_id,game_id,
+#                                   prev_season=prev_season
+#                                   )
+# else:
+#     prev_season = False
+#     szn_load = []
 
 @st.cache_data(ttl=600)
 def load_data(pitcher_id,game_id,vs_past,szn_load):
@@ -1032,8 +1141,18 @@ def load_data(pitcher_id,game_id,vs_past,szn_load):
                               'launch_speed','launch_angle','hitX','hitY'])
         .query('isPitch==1')
         .drop_duplicates('playId')
+    )
+
+    missing_feats = []
+    for col in ['sz_top','sz_bot','velo','extension','plate_time',
+                'HB','IVB','spin_rate','spin_dir','pX','pZ','x0','z0','vY0','vZ0','aY','aZ']:
+        if game_df[col].isna().all():
+            missing_feats += [col]
+
+    game_df = (
+        game_df
         .dropna(subset=['sz_top','sz_bot','velo','extension','plate_time','HB','IVB','spin_rate',
-                        'pX','pZ','x0','z0','vY0','vZ0','aY','aZ'])
+                        'spin_dir','pX','pZ','x0','z0','vY0','vZ0','aY','aZ'])
         .assign(pitchType = lambda x: x['pitchType'].map(pitchtype_map),
                 desc = lambda x: x['code'].map(desc_map),
                 ca_str = lambda x: np.where(x['desc']=='called_strike',1,0),
@@ -1049,176 +1168,96 @@ def load_data(pitcher_id,game_id,vs_past,szn_load):
                 'pZ':'float'
             })
         )
-    game_df['balls'] = np.clip(game_df['balls'],0,3)
-    game_df['strikes'] = np.clip(game_df['strikes'],0,2)
-    game_df[['VAA','HAVAA']] = adjusted_vaa(game_df[['pZ','vY0','vZ0','aY','aZ']].astype('float'))
-    game_df['usage'] = game_df['isPitch'].groupby([game_df['pitcherId'],game_df['gameId'],game_df['pitchType']]).transform('count') / game_df['isPitch'].groupby([game_df['pitcherId'],game_df['gameId']]).transform('count')
-    game_df['vRHH'] = np.where(game_df['hitterHand']=='R',1,None)
-    game_df['vLHH'] = np.where(game_df['hitterHand']=='L',1,None)
-    game_df['xSLGcon'] = xSLGcon(game_df)
     
-    game_df['HB_acc'] = game_df['HB'].div(game_df['plate_time']**2)
-    game_df['IVB_acc'] = game_df['IVB'].div(game_df['plate_time']**2)
-    game_df['Break_acc'] = (game_df['HB_acc'].astype('float')**2+game_df['IVB_acc'].astype('float')**2)**0.5
-    
-    fastballs = ['FF','FC','FT','SI']
-    fastball_df = (game_df
-                   .loc[game_df['pitchType'].isin(fastballs)]
-                   .groupby(['pitcherId','gameId'], as_index=False)
-                   ['pitchType']
-                   .agg(pd.Series.mode)
-                   .rename(columns={'pitchType':'fastball_type'})
-                   .copy()
-                  )
-    
-    # Add most common Fastball type
-    game_df = game_df.merge(fastball_df,on=['pitcherId','gameId'], how='left')
-    game_df['fastball_type'] = game_df['fastball_type'].fillna('NA').apply(lambda x: x if len(x[0])==1 else x[0])
-    
-    ### Pitch Type Grouping
-    game_df['pitch_type_bucket'] = 'Other'
-    game_df.loc[(game_df['pitchType']==game_df['fastball_type']) |
-                 game_df['pitchType'].isin(['FF','FT','SI']),'pitch_type_bucket'] = 'Fastball'
-    game_df.loc[(game_df['pitchType']!=game_df['fastball_type']) &
-                 game_df['pitchType'].isin(['SL','ST','CU', 'FC']),'pitch_type_bucket'] = 'Breaking Ball'
-    game_df.loc[game_df['pitchType'].isin(['CH', 'FS','KN','SC']),'pitch_type_bucket'] = 'Offspeed'
-    
-    for stat in ['HB_acc','IVB_acc','plate_time','velo']:
-        game_df[stat+'_diff'] = fastball_differences(game_df,stat)
-    game_df['Break_diff'] = (game_df['HB_acc_diff'].astype('float')**2+game_df['IVB_acc_diff'].astype('float')**2)**0.5
-    
-    game_df[['plvStuff+','stuffGrade_game','stuffGrade_szn','locGrade_game','locGrade_szn','PLV+','plvGrade_game','plvGrade_szn']] = pitch_models(game_df)
+    if game_df.shape[0]>0:
+        game_df['balls'] = np.clip(game_df['balls'],0,3)
+        game_df['strikes'] = np.clip(game_df['strikes'],0,2)
+        game_df[['VAA','HAVAA']] = adjusted_vaa(game_df[['pZ','vY0','vZ0','aY','aZ']].astype('float'))
+        game_df['usage'] = game_df['isPitch'].groupby([game_df['pitcherId'],game_df['gameId'],game_df['pitchType']]).transform('count') / game_df['isPitch'].groupby([game_df['pitcherId'],game_df['gameId']]).transform('count')
+        game_df['vRHH'] = np.where(game_df['hitterHand']=='R',1,None)
+        game_df['vLHH'] = np.where(game_df['hitterHand']=='L',1,None)
+        game_df['xSLGcon'] = xSLGcon(game_df)
+        
+        game_df['HB_acc'] = game_df['HB'].div(game_df['plate_time']**2)
+        game_df['IVB_acc'] = game_df['IVB'].div(game_df['plate_time']**2)
+        game_df['Break_acc'] = (game_df['HB_acc'].astype('float')**2+game_df['IVB_acc'].astype('float')**2)**0.5
 
-    game_group = (
-        game_df
-        .astype({'xSLGcon':'float'})
-        .groupby(['pitcherId','pitcherName','pitchType'])
-        [['isPitch','usage','vRHH','vLHH','armAngle','velo','extension','IVB','HB','HAVAA','strike','whiff','csw',
-          'sw_str','hr','plvStuff+','PLV+','xSLGcon'
-          ]]
-        .agg({
-            'isPitch':'sum',
-            'usage':'mean',
-            'vRHH':'sum',
-            'vLHH':'sum',
-            'armAngle':'mean',
-            'velo':'mean',
-            'extension':'mean',
-            'IVB':'mean',
-            'HB':'mean',
-            'HAVAA':'mean',
-            'strike':'mean',
-            'whiff':'mean',
-            'csw':'mean',
-            'sw_str':'mean',
-            'hr':'sum',
-            'xSLGcon':'mean',
-            'plvStuff+':'mean',
-            'PLV+':'mean'
-            })
-        # .dropna(subset='armAngle')
-        .sort_values('isPitch',ascending=False)
-        .reset_index()
-        .assign(Type = lambda x: x['pitchType'].map(pitch_names),
-                pitches_vR = lambda x: x['vRHH'],
-                vRHH = lambda x: x['vRHH'].div(x['vRHH'].sum()).astype('float')*100,
-                vLHH = lambda x: np.where(x['vLHH'].sum()==0,None,x['vLHH'].div(x['vLHH'].sum())).astype('float')*100,
-                usage = lambda x: x['usage']*100,
-                strike = lambda x: x['strike'].astype('float')*100,
-                whiff = lambda x: x['whiff'].astype('float')*100,
-                sw_str = lambda x: x['sw_str'].astype('float')*100,
-                csw = lambda x: x['csw']*100)
-        [['pitchType','Type','isPitch','pitches_vR','vLHH','usage','vRHH','armAngle','velo',
-          'extension','IVB','HB','HAVAA','strike','sw_str','csw','hr','xSLGcon','plvStuff+','PLV+']]
-        # .round(1)
-        .rename(columns={
-            'isPitch':'#',
-            'usage':'Usage%',
-            'vRHH':'vsR',
-            'vLHH':'vsL',
-            'armAngle':'Arm Angle',
-            'velo':'Velo',
-            'extension':'Ext',
-            'strike':'Str%',
-            'sw_str':'SwStr%',
-            'csw':'CSW%',
-            'hr':'HR'
-        })
-        .round({'vsL':1,'Usage%':1,'vsR':1,'Velo':1,'Ext':1,'IVB':1,'HB':1,'HAVAA':1,
-                'Str%':1,'SwStr%':1,'CSW%':1,'xSLGcon':3,'plvStuff+':0,'PLV+':0
-                })
-        .astype({'plvStuff+':'int','PLV+':'int','pitches_vR':'int'})
-    )
-  
-    szn_df = None
-    szn_group = None
-    if vs_past:
-        szn_df = (
-            pd.DataFrame(szn_load,
-                        columns=['gameId','gameDate','playId',
-                                  'pitcherId','pitcherName','pitcherHand','pitcherHeight',
-                                  'hitterId','hitterName','hitterHand',
-                                  'isPitch','pitchType','description','balls','strikes','outs',
-                                  'event','code','zone','sz_top','sz_bot',
-                                  'velo','armAngle','extension','plate_time','HB','IVB','spin_rate','spin_dir',
-                                  'pX','pZ','x0','z0','vY0','vZ0','aY','aZ',
-                                  'launch_speed','launch_angle','hitX','hitY'])
-            .query('isPitch==1')
-            .drop_duplicates('playId')
-            .dropna(subset=['sz_top','sz_bot','velo','extension','plate_time','HB','IVB','spin_rate',
-                            'pX','pZ','x0','z0','vY0','vZ0','aY','aZ'])
-            .assign(pitchType = lambda x: x['pitchType'].map(pitchtype_map),
-                    #HB = lambda x: np.where(x['pitcherHand']=='L',x['HB'].mul(-1),x['HB']),
-                    desc = lambda x: x['code'].map(desc_map),
-                    ca_str = lambda x: np.where(x['desc']=='called_strike',1,0),
-                    sw_str = lambda x: np.where(x['desc']=='swinging_strike',1,0),
-                    csw = lambda x: np.where(x['desc'].isin(['swinging_strike','called_strike']),1,0),
-                    swing = lambda x: np.where(x['desc'].isin(['swinging_strike','foul_strike','in_play']),1,0))
-            .assign(chase = lambda x: np.where((x['zone']==1),None,x['swing']),
-                    whiff = lambda x: np.where((x['swing']==1),x['sw_str'],None))
-            )
-        szn_df[['VAA','HAVAA']] = adjusted_vaa(szn_df[['pZ','vY0','vZ0','aY','aZ']].astype('float'))
-        szn_df['usage'] = szn_df['isPitch'].groupby([szn_df['pitcherId'],szn_df['gameId'],szn_df['pitchType']]).transform('count') / szn_df['isPitch'].groupby([szn_df['pitcherId'],szn_df['gameId']]).transform('count')
-        szn_df['vRHH'] = np.where(szn_df['hitterHand']=='R',1,None)
-        szn_df['vLHH'] = np.where(szn_df['hitterHand']=='L',1,None)
-
-        szn_group = (
-            szn_df
+        game_df['adj_spin_dir'] = np.where(game_df['pitcherHand']=='L',game_df['spin_dir'],360-game_df['spin_dir'])
+        
+        fastballs = ['FF','FC','FT','SI']
+        fastball_df = (game_df
+                       .loc[game_df['pitchType'].isin(fastballs)]
+                       .groupby(['pitcherId','gameId'], as_index=False)
+                       ['pitchType']
+                       .agg(pd.Series.mode)
+                       .rename(columns={'pitchType':'fastball_type'})
+                       .copy()
+                      )
+        
+        # Add most common Fastball type
+        game_df = game_df.merge(fastball_df,on=['pitcherId','gameId'], how='left')
+        game_df['fastball_type'] = game_df['fastball_type'].fillna('NA').apply(lambda x: x if len(x[0])==1 else x[0])
+        
+        ### Pitch Type Grouping
+        game_df['pitch_type_bucket'] = 'Other'
+        game_df.loc[(game_df['pitchType']==game_df['fastball_type']) |
+                     game_df['pitchType'].isin(['FF','FT','SI']),'pitch_type_bucket'] = 'Fastball'
+        game_df.loc[(game_df['pitchType']!=game_df['fastball_type']) &
+                     game_df['pitchType'].isin(['SL','ST','CU', 'FC']),'pitch_type_bucket'] = 'Breaking Ball'
+        game_df.loc[game_df['pitchType'].isin(['CH', 'FS','KN','SC']),'pitch_type_bucket'] = 'Offspeed'
+        
+        for stat in ['HB_acc','IVB_acc','plate_time','velo']:
+            game_df[stat+'_diff'] = fastball_differences(game_df,stat)
+        game_df['Break_diff'] = (game_df['HB_acc_diff'].astype('float')**2+game_df['IVB_acc_diff'].astype('float')**2)**0.5
+    
+        game_pate_times = game_df.groupby('pitchType')['plate_time'].mean().to_dict()
+        
+        game_df[['plvStuff+','stuffGrade_game','stuffGrade_szn','locGrade_game','locGrade_szn','PLV+','plvGrade_game','plvGrade_szn']] = pitch_models(game_df)
+    
+        game_group = (
+            game_df
+            .astype({'xSLGcon':'float'})
             .groupby(['pitcherId','pitcherName','pitchType'])
-            [['isPitch','vRHH','vLHH','armAngle','velo','extension','IVB','HB','HAVAA','zone','chase','whiff','csw',
-              # 'xwOBAcon'
+            [['isPitch','usage','vRHH','vLHH','armAngle','velo','extension','IVB','HB','HAVAA','strike','whiff','csw',
+              'sw_str','hr','plvStuff+','PLV+','xSLGcon','IVB_acc','HB_acc'
               ]]
             .agg({
                 'isPitch':'sum',
+                'usage':'mean',
                 'vRHH':'sum',
                 'vLHH':'sum',
-                'zone':'mean',
                 'armAngle':'mean',
                 'velo':'mean',
                 'extension':'mean',
                 'IVB':'mean',
                 'HB':'mean',
+                'IVB_acc':'mean',
+                'HB_acc':'mean',
                 'HAVAA':'mean',
-                'chase':'mean',
+                'strike':'mean',
                 'whiff':'mean',
                 'csw':'mean',
-                #'xwOBAcon':'mean'
+                'sw_str':'mean',
+                'hr':'sum',
+                'xSLGcon':'mean',
+                'plvStuff+':'mean',
+                'PLV+':'mean'
                 })
             # .dropna(subset='armAngle')
             .sort_values('isPitch',ascending=False)
             .reset_index()
             .assign(Type = lambda x: x['pitchType'].map(pitch_names),
+                    pitches_vR = lambda x: x['vRHH'],
                     vRHH = lambda x: x['vRHH'].div(x['vRHH'].sum()).astype('float')*100,
-                    vLHH = lambda x: x['vLHH'].div(x['vLHH'].sum()).astype('float')*100,
-                    usage = lambda x: x['isPitch'].div(x['isPitch'].sum())*100,
-                    chase = lambda x: x['chase'].astype('float')*100,
-                    zone = lambda x: x['zone']*100,
+                    vLHH = lambda x: np.where(x['vLHH'].sum(skipna=False)==0,None,x['vLHH'].div(np.clip(x['vLHH'].sum(),1,100))).astype('float')*100,
+                    usage = lambda x: x['usage']*100,
+                    strike = lambda x: x['strike'].astype('float')*100,
                     whiff = lambda x: x['whiff'].astype('float')*100,
+                    sw_str = lambda x: x['sw_str'].astype('float')*100,
                     csw = lambda x: x['csw']*100)
-            [['pitchType','Type','isPitch','vLHH','usage','vRHH','armAngle','velo',
-              'extension','IVB','HB','HAVAA','zone','chase','whiff','csw']]
-            .sort_values('usage',ascending=False)
-            .round(1)
+            [['pitchType','Type','isPitch','pitches_vR','vLHH','usage','vRHH','armAngle','velo',
+              'extension','IVB','HB','IVB_acc','HB_acc','HAVAA','strike','sw_str','csw','hr','xSLGcon','plvStuff+','PLV+']]
+            # .round(1)
             .rename(columns={
                 'isPitch':'#',
                 'usage':'Usage%',
@@ -1227,20 +1266,120 @@ def load_data(pitcher_id,game_id,vs_past,szn_load):
                 'armAngle':'Arm Angle',
                 'velo':'Velo',
                 'extension':'Ext',
-                'zone':'Zone%',
-                'chase':'Chase%',
-                'whiff':'Whiff%',
-                'csw':'CSW%'
+                'strike':'Str%',
+                'sw_str':'SwStr%',
+                'csw':'CSW%',
+                'hr':'HR'
             })
+            .round({'vsL':1,'Usage%':1,'vsR':1,'Velo':1,'Ext':1,'IVB':1,'HB':1,'HAVAA':1,
+                    'Str%':1,'SwStr%':1,'CSW%':1,'xSLGcon':3,'plvStuff+':0,'PLV+':0
+                    })
+            .astype({'plvStuff+':'int','PLV+':'int','pitches_vR':'int'})
         )
+      
+        szn_df = None
+        szn_group = None
+        szn_comp = None
+        if vs_past:
+            szn_df = (
+                pd.DataFrame(szn_load,
+                            columns=['gameId','gameDate','playId',
+                                      'pitcherId','pitcherName','pitcherHand','pitcherHeight',
+                                      'hitterId','hitterName','hitterHand',
+                                      'isPitch','pitchType','description','balls','strikes','outs',
+                                      'event','code','zone','sz_top','sz_bot',
+                                      'velo','armAngle','extension','plate_time','HB','IVB','spin_rate','spin_dir',
+                                      'pX','pZ','x0','z0','vY0','vZ0','aY','aZ',
+                                      'launch_speed','launch_angle','hitX','hitY'])
+                .query('isPitch==1')
+                .drop_duplicates('playId')
+                .dropna(subset=['sz_top','sz_bot','velo','extension','plate_time','HB','IVB','spin_rate',
+                                'pX','pZ','x0','z0','vY0','vZ0','aY','aZ'])
+                .assign(pitchType = lambda x: x['pitchType'].map(pitchtype_map),
+                        #HB = lambda x: np.where(x['pitcherHand']=='L',x['HB'].mul(-1),x['HB']),
+                        desc = lambda x: x['code'].map(desc_map),
+                        ca_str = lambda x: np.where(x['desc']=='called_strike',1,0),
+                        sw_str = lambda x: np.where(x['desc']=='swinging_strike',1,0),
+                        csw = lambda x: np.where(x['desc'].isin(['swinging_strike','called_strike']),1,0),
+                        swing = lambda x: np.where(x['desc'].isin(['swinging_strike','foul_strike','in_play']),1,0))
+                .assign(chase = lambda x: np.where((x['zone']==1),None,x['swing']),
+                        whiff = lambda x: np.where((x['swing']==1),x['sw_str'],None))
+                )
+            szn_df[['VAA','HAVAA']] = adjusted_vaa(szn_df[['pZ','vY0','vZ0','aY','aZ']].astype('float'))
+            szn_df['HB_acc'] = szn_df['HB'].div(szn_df['plate_time']**2)
+            szn_df['IVB_acc'] = szn_df['IVB'].div(szn_df['plate_time']**2)
+            szn_df['game_plate_time'] = szn_df['pitchType'].map(game_pate_times)
+            szn_df['HB'] = szn_df['HB_acc'].mul(szn_df['game_plate_time']**2)
+            szn_df['IVB'] = szn_df['IVB_acc'].mul(szn_df['game_plate_time']**2)
+            
+            szn_df['usage'] = szn_df['isPitch'].groupby([szn_df['pitcherId'],szn_df['gameId'],szn_df['pitchType']]).transform('count') / szn_df['isPitch'].groupby([szn_df['pitcherId'],szn_df['gameId']]).transform('count')
+            szn_df['vRHH'] = np.where(szn_df['hitterHand']=='R',1,None)
+            szn_df['vLHH'] = np.where(szn_df['hitterHand']=='L',1,None)
+    
+            szn_group = (
+                szn_df
+                .groupby(['pitcherId','pitcherName','pitchType'])
+                [['isPitch','vRHH','vLHH','armAngle','velo','extension','IVB','HB','HAVAA','zone','chase','whiff','csw',
+                  # 'xwOBAcon'
+                  ]]
+                .agg({
+                    'isPitch':'sum',
+                    'vRHH':'sum',
+                    'vLHH':'sum',
+                    'zone':'mean',
+                    'armAngle':'mean',
+                    'velo':'mean',
+                    'extension':'mean',
+                    'IVB':'mean',
+                    'HB':'mean',
+                    'HAVAA':'mean',
+                    'chase':'mean',
+                    'whiff':'mean',
+                    'csw':'mean',
+                    #'xwOBAcon':'mean'
+                    })
+                # .dropna(subset='armAngle')
+                .sort_values('isPitch',ascending=False)
+                .reset_index()
+                .assign(Type = lambda x: x['pitchType'].map(pitch_names),
+                        vRHH = lambda x: x['vRHH'].div(x['vRHH'].sum()).astype('float')*100,
+                        vLHH = lambda x: x['vLHH'].div(x['vLHH'].sum()).astype('float')*100,
+                        usage = lambda x: x['isPitch'].div(x['isPitch'].sum())*100,
+                        chase = lambda x: x['chase'].astype('float')*100,
+                        zone = lambda x: x['zone']*100,
+                        whiff = lambda x: x['whiff'].astype('float')*100,
+                        csw = lambda x: x['csw']*100)
+                [['pitchType','Type','isPitch','vLHH','usage','vRHH','armAngle','velo',
+                  'extension','IVB','HB','HAVAA','zone','chase','whiff','csw']]
+                .sort_values('usage',ascending=False)
+                .round(1)
+                .rename(columns={
+                    'isPitch':'#',
+                    'usage':'Usage%',
+                    'vRHH':'vsR',
+                    'vLHH':'vsL',
+                    'armAngle':'Arm Angle',
+                    'velo':'Velo',
+                    'extension':'Ext',
+                    'zone':'Zone%',
+                    'chase':'Chase%',
+                    'whiff':'Whiff%',
+                    'csw':'CSW%'
+                })
+            )
+    
+            szn_comp = pd.merge(game_group,szn_group,how='left',on=['pitchType','Type'],suffixes=['','_szn']).sort_values('Usage%',ascending=False)
+            for stat in ['vsL','vsR','Velo']:
+                szn_comp[stat+'_diff'] = szn_comp[stat].sub(szn_comp[stat+'_szn'].fillna(szn_comp[stat]))
+                szn_comp[stat+'_arrow'] = np.where(szn_comp[stat+'_diff'] >0,'↑','↓')
+                szn_comp[stat+'_arrow'] = np.where(szn_comp[stat+'_diff']==0,'',szn_comp[stat+'_arrow'])
+    else:
+        game_group = None
+        szn_df = None
+        szn_group = None
+        szn_comp = None
 
-        szn_comp = pd.merge(game_group,szn_group,how='left',on=['pitchType','Type'],suffixes=['','_szn']).sort_values('Usage%',ascending=False)
-        for stat in ['vsL','vsR','Velo']:
-            szn_comp[stat+'_diff'] = szn_comp[stat].sub(szn_comp[stat+'_szn'].fillna(szn_comp[stat]))
-            szn_comp[stat+'_arrow'] = np.where(szn_comp[stat+'_diff'] >0,'↑','↓')
-            szn_comp[stat+'_arrow'] = np.where(szn_comp[stat+'_diff']==0,'',szn_comp[stat+'_arrow'])
-
-    return game_df, game_group, szn_df, szn_group, szn_comp
+    return game_df, game_group, szn_df, szn_group, szn_comp, missing_feats
 
 def gaussian_filter(kernel_size, sigma=1, muu=0):
     # Initializing value of x, y as grid of kernel size in the range of kernel size
@@ -1267,7 +1406,7 @@ def fastball_stats(table_df,ax):
 
     fastball_comp = (
         table_df
-        .loc[table_df['pitchType'].isin(['FF','SI','FC']),['pitchType','#','Type','Velo','Ext','IVB','HB','HAVAA']]
+        .loc[table_df['pitchType'].isin(['FF','SI','FC']),['pitchType','#','Type','Velo','Ext','IVB','HB','HAVAA','IVB_acc','HB_acc']]
         .head(1)
     )
     fastball_type = fastball_comp['pitchType'].item()
@@ -1275,9 +1414,14 @@ def fastball_stats(table_df,ax):
     for stat in stat_list:
         x_val = stat_list.index(stat)
         stat_val = fastball_comp[stat].item()
-        fastball_comp[stat+'_color'] = pd.cut(fastball_comp[stat],
-                                              bins=pitchtype_metrics_dict[fastball_type][stat],
-                                              labels=range(5))
+        if stat in ['IVB','HB']:
+            fastball_comp[stat+'_color'] = pd.cut(fastball_comp[stat+'_acc'],
+                                                  bins=pitchtype_metrics_dict[fastball_type][stat+'_acc'],
+                                                  labels=range(5))
+        else:
+            fastball_comp[stat+'_color'] = pd.cut(fastball_comp[stat],
+                                                  bins=pitchtype_metrics_dict[fastball_type][stat],
+                                                  labels=range(5))
         color_val = fastball_comp[stat+'_color'].item()
         stat_color = diverge_palette[color_val]
         ax.text(x_val,
@@ -1393,7 +1537,7 @@ def usage_chunk(table_df,ax,vs_past):
             l_text = ax.annotate(f'{vsL_arrow}', xycoords=l_text, xy=(1, 0.5), va="center",
                                 color=marker_colors[pitch_type],fontsize=20)
 
-    label_adj = -1.5/len(pitch_list)-0.5
+    label_adj = -10/(5*len(pitch_list)-0.5)
     ax.text(fill_width*1.15,label_adj,'vs RHB%',fontsize=20,color=pl_line_color,ha='left',va='bottom',weight='regular')
     ax.text(-fill_width*1.15,label_adj,'vs LHB%',fontsize=20,color=pl_line_color,ha='right',va='bottom',weight='regular')
     x_lim = max(np.abs(np.array(ax.get_xlim()))) * 4/3
@@ -1421,7 +1565,7 @@ def header_chunk(table_df,ax):
         ax.text(0.9,pitch_list.index(pitch_type),f'{num_thrown:,.0f}',
                 ha='center',va='center',fontsize=20)
       
-    label_adj = -2/(len(pitch_list)-0.5)
+    label_adj = -10/(5*len(pitch_list)-0.5)
     ax.text(0.225,label_adj,'Type',fontsize=16,color=pl_line_color,ha='left',va='bottom')
     ax.text(0.9,label_adj,'#',fontsize=16,color=pl_line_color,ha='center',va='bottom')
     ax.set(ylim=(len(pitch_list)-0.5,label_adj))
@@ -1475,7 +1619,7 @@ def stats_chunk(table_df,ax,vs_past):
         'PLV+':''
         }
 
-    label_adj = -2/(len(pitch_list)-0.5)
+    label_adj = -10/(5*len(pitch_list)-0.5)
     for pitch_type in pitch_list:
         x_val = 0.15
         for stat in stat_list:
@@ -1581,7 +1725,7 @@ def generate_chart(pitcher_id,game_id,game_df,game_group,szn_df,szn_comp,vs_past
     # Divide card into tiles
     grid = plt.GridSpec(6, 21,height_ratios=[0.9,1.4,1.125,1.225,5,3.25],hspace=0.3,wspace=0)
     
-    logo_ax = fig.add_axes([0.725,0.91,0.25,0.25], anchor='SW', zorder=1)
+    logo_ax = fig.add_axes([0.69,0.93,0.29,0.25], anchor='SW', zorder=1)
     logo_ax.imshow(logo)
     logo_ax.axis('off')
     
@@ -1600,23 +1744,6 @@ def generate_chart(pitcher_id,game_id,game_df,game_group,szn_df,szn_comp,vs_past
     vs_l_location_grade = letter_grade(game_df.loc[game_df['hitterHand']=='L','locGrade_game'].mean())
     location_grade = letter_grade(game_df['locGrade_game'].mean())
     plv_grade = letter_grade(game_df['plvGrade_game'].mean())
-    
-    # Drop Shadow for Start Grade
-    # if start_grade[0] != 'C':
-    #     kernel_size = 100
-    #     x = np.linspace(0,1,kernel_size)
-    #     y = np.linspace(0,1,kernel_size)
-    #     X, Y = np.meshgrid(x, y)
-    #     start_grade_ax.contourf(X, Y,
-    #                             gaussian_filter(kernel_size,sigma=0.4),
-    #                             200,
-    #                             alpha=1,
-    #                             zorder=0,
-    #                             cmap=sns.blend_palette([pl_background,
-    #                                         sns.blend_palette([pl_background,grade_colors[start_grade]],n_colors=100)[15]],
-    #                                       as_cmap=True),
-    #                             extent=[0,1,
-    #                                     0,1])
     
     start_grade_ax.text(0.5,0.5,start_grade,ha='center',va='center',fontsize=90,color=grade_colors[start_grade])
     start_grade_ax.set(xlim=(0,1),ylim=(0,1))
@@ -1809,21 +1936,23 @@ def generate_chart(pitcher_id,game_id,game_df,game_group,szn_df,szn_comp,vs_past
            ylim=(y_bot,y_lim-1),
            aspect=1)
     ax3.axis('off')
+
+    if game_df.loc[game_df['hitterHand']=='L'].shape[0]>0:
+        l_loc_ax = fig.add_axes([0.435,0.48,0.1,0.1], anchor='SW', zorder=1)
+        l_loc_ax.text(0.5,0.7,'Locations',ha='center',va='center',fontsize=15,color=pl_line_color)
+        l_loc_ax.text(0.5,0.45,vs_l_location_grade,ha='center',va='center',fontsize=50,
+                      color=grade_colors[vs_l_location_grade])
+        l_loc_ax.set(xlim=(0,1),ylim=(0,1))
+        l_loc_ax.axis('off')
     
-    l_loc_ax = fig.add_axes([0.435,0.48,0.1,0.1], anchor='SW', zorder=1)
-    l_loc_ax.text(0.5,0.7,'Locations',ha='center',va='center',fontsize=15,color=pl_line_color)
-    l_loc_ax.text(0.5,0.45,vs_l_location_grade,ha='center',va='center',fontsize=50,
-                  color=grade_colors[vs_l_location_grade])
-    l_loc_ax.set(xlim=(0,1),ylim=(0,1))
-    l_loc_ax.axis('off')
-    
-    r_loc_ax = fig.add_axes([0.7125,0.48,0.1,0.1], anchor='SW', zorder=1)
-    
-    r_loc_ax.text(0.5,0.7,'Locations',ha='center',va='center',fontsize=15,color=pl_line_color)
-    r_loc_ax.text(0.5,0.45,vs_r_location_grade,ha='center',va='center',fontsize=50,
-                  color=grade_colors[vs_r_location_grade])
-    r_loc_ax.set(xlim=(0,1),ylim=(0,1))
-    r_loc_ax.axis('off')
+    if game_df.loc[game_df['hitterHand']=='R'].shape[0]>0:
+        r_loc_ax = fig.add_axes([0.7125,0.48,0.1,0.1], anchor='SW', zorder=1)
+        
+        r_loc_ax.text(0.5,0.7,'Locations',ha='center',va='center',fontsize=15,color=pl_line_color)
+        r_loc_ax.text(0.5,0.45,vs_r_location_grade,ha='center',va='center',fontsize=50,
+                      color=grade_colors[vs_r_location_grade])
+        r_loc_ax.set(xlim=(0,1),ylim=(0,1))
+        r_loc_ax.axis('off')
     
     
     fastball_ax = fig.add_axes([0.01,0.6,.425,0.082], anchor='SW', zorder=1)
@@ -1838,35 +1967,37 @@ def generate_chart(pitcher_id,game_id,game_df,game_group,szn_df,szn_comp,vs_past
     
     usage_ax = fig.add_axes([0.445,0.593,.545,0.195], anchor='SW', zorder=1)
     usage_chunk(szn_comp if vs_past else game_group,usage_ax,vs_past)
+
+    line_alpha = 2/3
     
     if fastball_name=='Four-Seam':
         fig.text(0.06,0.69,f'Primary Fastball:',color='w',fontsize=24,va='center',ha='left')
         fig.text(0.25,0.69,fastball_name,color=marker_colors[fastball_code],fontsize=28,va='center',ha='left')
-        fig.add_artist(lines.Line2D([0.01, 0.04], [0.69, 0.69],linewidth=3,color=pl_text,alpha=0.75))
-        fig.add_artist(lines.Line2D([0.41,0.4325], [0.69, 0.69],linewidth=3,color=pl_text,alpha=0.75))
+        fig.add_artist(lines.Line2D([0.01, 0.04], [0.69, 0.69],linewidth=3,color=pl_text,alpha=line_alpha))
+        fig.add_artist(lines.Line2D([0.41,0.4325], [0.69, 0.69],linewidth=3,color=pl_text,alpha=line_alpha))
     else:
         fig.text(0.093,0.69,f'Primary Fastball:',color='w',fontsize=24,va='center',ha='left')
         fig.text(0.283,0.69,fastball_name,color=marker_colors[fastball_code],fontsize=28,va='center',ha='left')
-        fig.add_artist(lines.Line2D([0.01, 0.073], [0.69, 0.69],linewidth=3,color=pl_text,alpha=0.75))
-        fig.add_artist(lines.Line2D([0.375,0.4325], [0.69, 0.69],linewidth=3,color=pl_text,alpha=0.75))
-    fig.add_artist(lines.Line2D([0.01, 0.4325], [0.713, 0.713],linewidth=3,color=pl_text,alpha=0.75))
-    fig.add_artist(lines.Line2D([0.01, 0.01], [0.59, 0.688],linewidth=3,color=pl_text,alpha=0.75))
-    fig.add_artist(lines.Line2D([0.435, 0.435], [0.59, 0.813],linewidth=3,color=pl_text,alpha=0.75))
+        fig.add_artist(lines.Line2D([0.01, 0.073], [0.69, 0.69],linewidth=3,color=pl_text,alpha=line_alpha))
+        fig.add_artist(lines.Line2D([0.375,0.4325], [0.69, 0.69],linewidth=3,color=pl_text,alpha=line_alpha))
+    fig.add_artist(lines.Line2D([0.01, 0.4325], [0.713, 0.713],linewidth=3,color=pl_text,alpha=line_alpha))
+    fig.add_artist(lines.Line2D([0.01, 0.01], [0.59, 0.688],linewidth=3,color=pl_text,alpha=line_alpha))
+    fig.add_artist(lines.Line2D([0.435, 0.435], [0.59, 0.813],linewidth=3,color=pl_text,alpha=line_alpha))
     
     #Grade Only
     fig.text(0.085,0.815,'Start', ha='center',va='center',color='w',fontsize=30)
     fig.text(0.2975,0.815,'Models', ha='center',va='center',color='w',fontsize=30)
-    fig.add_artist(lines.Line2D([0.01, 0.03], [0.815, 0.815],linewidth=3,color=pl_text,alpha=0.75))
-    fig.add_artist(lines.Line2D([0.14, 0.23], [0.815, 0.815],linewidth=3,color=pl_text,alpha=0.75))
-    fig.add_artist(lines.Line2D([0.01, 0.01], [0.715, 0.813],linewidth=3,color=pl_text,alpha=0.75))
-    fig.add_artist(lines.Line2D([0.16, 0.16], [0.715, 0.813],linewidth=3,color=pl_text,alpha=0.75))
+    fig.add_artist(lines.Line2D([0.01, 0.03], [0.815, 0.815],linewidth=3,color=pl_text,alpha=line_alpha))
+    fig.add_artist(lines.Line2D([0.14, 0.23], [0.815, 0.815],linewidth=3,color=pl_text,alpha=line_alpha))
+    fig.add_artist(lines.Line2D([0.01, 0.01], [0.715, 0.813],linewidth=3,color=pl_text,alpha=line_alpha))
+    fig.add_artist(lines.Line2D([0.16, 0.16], [0.715, 0.813],linewidth=3,color=pl_text,alpha=line_alpha))
     
     fig.text(0.5,0.9,game_text,color='w',fontsize=24,va='center',ha='center',font=italic)
     
     fig.add_artist(mpatches.FancyBboxPatch((0.02, 0.85), 0.96, 0.023,
                                            ec=pl_text,
                                            fc=pl_background,
-                                           alpha=0.75,
+                                           alpha=line_alpha,
                                            zorder=0,
                                            linewidth=3,
                                            boxstyle=mpatches.BoxStyle("Round", pad=0.2),
@@ -1875,10 +2006,10 @@ def generate_chart(pitcher_id,game_id,game_df,game_group,szn_df,szn_comp,vs_past
             )
     
     fig.text(0.715,0.815,'Usage',color='w',fontsize=30,va='center',ha='center')
-    fig.add_artist(lines.Line2D([0.775, 0.99], [0.815, 0.815],linewidth=3,color=pl_text,alpha=0.75))
-    fig.add_artist(lines.Line2D([0.365, 0.655], [0.815, 0.815],linewidth=3,color=pl_text,alpha=0.75))
-    fig.add_artist(lines.Line2D([0.99, 0.99], [0.59, 0.813],linewidth=3,color=pl_text,alpha=0.75))
-    fig.add_artist(lines.Line2D([0.01, 0.99], [0.588, 0.588],linewidth=3,color=pl_text,alpha=0.75))
+    fig.add_artist(lines.Line2D([0.775, 0.99], [0.815, 0.815],linewidth=3,color=pl_text,alpha=line_alpha))
+    fig.add_artist(lines.Line2D([0.365, 0.655], [0.815, 0.815],linewidth=3,color=pl_text,alpha=line_alpha))
+    fig.add_artist(lines.Line2D([0.99, 0.99], [0.59, 0.813],linewidth=3,color=pl_text,alpha=line_alpha))
+    fig.add_artist(lines.Line2D([0.01, 0.99], [0.588, 0.588],linewidth=3,color=pl_text,alpha=line_alpha))
     if vs_past:
         if prev_season:
             fig.text(0.98,0.595,'Arrows are vs\n2025 Usage',alpha=0.5,ha='right')
@@ -1894,29 +2025,120 @@ def generate_chart(pitcher_id,game_id,game_df,game_group,szn_df,szn_comp,vs_past
             fig.text(0.02,0.285,'Shaded Regions\nare 2025 Shapes',alpha=0.5)
         else:
             fig.text(0.02,0.285,'Shaded Regions are\nprior 2025 Shapes',alpha=0.5)
-    fig.add_artist(lines.Line2D([0.01, 0.12], [0.565, 0.565],linewidth=3,color=pl_text,alpha=0.75))
-    fig.add_artist(lines.Line2D([0.325, 0.505], [0.565, 0.565],linewidth=3,color=pl_text,alpha=0.75))
-    fig.add_artist(lines.Line2D([0.6425, 0.7825], [0.565, 0.565],linewidth=3,color=pl_text,alpha=0.75))
-    fig.add_artist(lines.Line2D([0.92, 0.99], [0.565, 0.565],linewidth=3,color=pl_text,alpha=0.75))
-    fig.add_artist(lines.Line2D([0.435, 0.435], [0.28, 0.563],linewidth=3,color=pl_text,alpha=0.75))
-    fig.add_artist(lines.Line2D([0.7125, 0.7125], [0.28, 0.563],linewidth=3,color=pl_text,alpha=0.75))
+    fig.add_artist(lines.Line2D([0.01, 0.12], [0.565, 0.565],linewidth=3,color=pl_text,alpha=line_alpha))
+    fig.add_artist(lines.Line2D([0.325, 0.505], [0.565, 0.565],linewidth=3,color=pl_text,alpha=line_alpha))
+    fig.add_artist(lines.Line2D([0.6425, 0.7825], [0.565, 0.565],linewidth=3,color=pl_text,alpha=line_alpha))
+    fig.add_artist(lines.Line2D([0.92, 0.99], [0.565, 0.565],linewidth=3,color=pl_text,alpha=line_alpha))
+    fig.add_artist(lines.Line2D([0.435, 0.435], [0.28, 0.563],linewidth=3,color=pl_text,alpha=line_alpha))
+    fig.add_artist(lines.Line2D([0.7125, 0.7125], [0.28, 0.563],linewidth=3,color=pl_text,alpha=line_alpha))
     
-    fig.add_artist(lines.Line2D([0.01, 0.01], [0.28, 0.565],linewidth=3,color=pl_text,alpha=0.75))
-    fig.add_artist(lines.Line2D([0.99, 0.99], [0.28, 0.565],linewidth=3,color=pl_text,alpha=0.75))
-    fig.add_artist(lines.Line2D([0.01, 0.99], [0.278, 0.278],linewidth=3,color=pl_text,alpha=0.75))
+    fig.add_artist(lines.Line2D([0.01, 0.01], [0.28, 0.563],linewidth=3,color=pl_text,alpha=line_alpha))
+    fig.add_artist(lines.Line2D([0.99, 0.99], [0.28, 0.563],linewidth=3,color=pl_text,alpha=line_alpha))
+    fig.add_artist(lines.Line2D([0.01, 0.99], [0.278, 0.278],linewidth=3,color=pl_text,alpha=line_alpha))
     
     fig.text(0.5,0.255,'Pitch Type Metrics',color='w',fontsize=30,va='center',ha='center')
-    fig.add_artist(lines.Line2D([0.01, 0.35], [0.255, 0.255],linewidth=3,color=pl_text,alpha=0.75))
-    fig.add_artist(lines.Line2D([0.65, 0.99], [0.255, 0.255],linewidth=3,color=pl_text,alpha=0.75))
-    fig.add_artist(lines.Line2D([0.01, 0.01], [0.017, 0.253],linewidth=3,color=pl_text,alpha=0.75))
-    fig.add_artist(lines.Line2D([0.99, 0.99], [0.017, 0.253],linewidth=3,color=pl_text,alpha=0.75))
-    fig.add_artist(lines.Line2D([0.01, 0.99], [0.015, 0.015],linewidth=3,color=pl_text,alpha=0.75))
+    fig.add_artist(lines.Line2D([0.01, 0.35], [0.255, 0.255],linewidth=3,color=pl_text,alpha=line_alpha))
+    fig.add_artist(lines.Line2D([0.65, 0.99], [0.255, 0.255],linewidth=3,color=pl_text,alpha=line_alpha))
+    fig.add_artist(lines.Line2D([0.01, 0.01], [0.017, 0.253],linewidth=3,color=pl_text,alpha=line_alpha))
+    fig.add_artist(lines.Line2D([0.99, 0.99], [0.017, 0.253],linewidth=3,color=pl_text,alpha=line_alpha))
+    fig.add_artist(lines.Line2D([0.01, 0.99], [0.015, 0.015],linewidth=3,color=pl_text,alpha=line_alpha))
     
     fig.add_artist(lines.Line2D([0, 1, 1, 0], [1, 1, 0, 0],linewidth=3,color='w',alpha=0))
     
     grid.tight_layout(fig,pad=2)
     sns.despine(left=True,bottom=True)
     st.pyplot(fig, width='content')
-if st.button('Generate Chart'):
-    game_df, game_group, szn_df, szn_group, szn_comp = load_data(pitcher_id,game_id,vs_past,szn_load)
-    generate_chart(pitcher_id,game_id,game_df,game_group,szn_df,szn_comp,vs_past)
+
+st.write('Data (especially pitch types) are subject to change.')
+today = (datetime.now(UTC)-timedelta(hours=16)).date()
+if 'date' not in ss:
+    ss['date'] = today
+    
+def date_change():
+    if 'game' in ss:
+        del ss['game']
+    if 'player' in ss:
+        del ss['player']
+def game_change():
+    if 'player' in ss:
+        del ss['player']
+    
+col1, col2, col3 = st.columns([0.25,0.5,0.25])
+with col1:
+    st.date_input("Select a game date:", ss['date'], 
+                  min_value=date(2023, 3, 17), max_value=today+timedelta(days=2),
+                  key='date',on_change=date_change)
+    r = requests.get(f'https://statsapi.mlb.com/api/v1/schedule?sportId=1&date={ss['date']}')
+    x = r.json()
+    if x['totalGames']==0:
+        print(f'No games on {ss['date']}')
+    else:
+        games_today = []
+        for game in range(len(x['dates'][0]['games'])):
+            if x['dates'][0]['games'][game]['gamedayType'] in ['E','P']:
+                games_today += [x['dates'][0]['games'][game]['gamePk']]
+        game_list = generate_games(games_today)
+
+if 'game' not in ss:
+    ss['game'] = list(game_list.keys())[0]
+
+with col2:
+    st.pills('Choose a game (all times EST):',list(game_list.keys()),default=ss['game'],
+                          key='game',on_change=game_change)
+    game_id = game_list[ss['game']]
+    game_id = int(game_id)
+    r = requests.get(f'https://baseballsavant.mlb.com/gf?game_pk={game_id}')
+    x = r.json()
+    game_code = x['game_status_code']
+    if (len(x['home_pitcher_lineup'])>0) & (len(x['away_pitcher_lineup'])>0):
+        pitcher_lineup = [x['home_pitcher_lineup'][0]]+[x['away_pitcher_lineup'][0]]+([] if len(x['home_pitcher_lineup'])==1 else x['home_pitcher_lineup'][1:])+([] if len(x['away_pitcher_lineup'])==1 else x['away_pitcher_lineup'][1:])
+        home_team = [1]+[0]+([] if len(x['home_pitcher_lineup'])==1 else [1]*(len(x['home_pitcher_lineup'])-1))+([] if len(x['away_pitcher_lineup'])==1 else [0]*(len(x['away_pitcher_lineup'])-1))
+        test_list = {}
+        for home_away_pitcher in ['home','away']:
+            if f'{home_away_pitcher}_pitchers' not in x.keys():
+                continue
+            for pitcher_id in list(x[f'{home_away_pitcher}_pitchers'].keys()):
+                test_list.update({pitcher_id:x[f'{home_away_pitcher}_pitchers'][pitcher_id][0]['pitcher_name']})
+        pitcher_lineup = [x for x in pitcher_lineup if str(x) in test_list.keys()]
+        if len(test_list.keys())>0:
+            pitcher_list = {test_list[str(x)]:[str(x),y] for x,y in zip(pitcher_lineup,home_team)}
+        else:
+            pitcher_list = {}
+    else:
+        pitcher_list = {}
+
+if 'pitcher' not in ss:
+    ss['pitcher'] = list(pitcher_list.keys())[0]
+
+with col3:
+    if len(list(pitcher_list.keys()))>0:
+        st.selectbox('Choose a pitcher:',list(pitcher_list.keys()),key='pitcher')
+        pitcher_id = int(pitcher_list[ss['pitcher']][0])
+        response = requests.get(url=f'http://statsapi.mlb.com/api/v1/people/{pitcher_id}?hydrate=stats(group=pitching,type=gameLog,season={ss['date'].year - 1},endDate={ss['date']},sportId=1,gameType=[R]),hydrations').json()
+        if 'stats' in response['people'][0].keys():
+            vs_past = st.checkbox("Compare to past year's results?",value=True)
+        else:
+            vs_past = False
+        spring_training = True if requests.get(f"https://statsapi.mlb.com/api/v1.1/game/{game_id}/feed/live").json()['gameData']['game']['type'] in ['E','F','S'] else False
+        # spring_training = st.checkbox("Is Spring Training Game?",value=True)
+        
+if len(pitcher_list.keys()) >0:
+    if st.button('Generate Chart'):
+        if vs_past:
+            response = requests.get('http://statsapi.mlb.com/api/v1/people/519242?hydrate=stats(group=pitching,type=gameLog,season=2025,sportId=1,gameType=[R]),hydrations').json()
+            num_games = len(response['people'][0]['stats'][0]['splits'])
+            if spring_training | (num_games < 5):
+                prev_season = True                    
+            else:
+                prev_season = False
+            szn_load = load_prev_pitches(pitcher_id,game_id,
+                                          prev_season=prev_season
+                                          )
+        else:
+            prev_season = False
+            szn_load = []
+        game_df, game_group, szn_df, szn_group, szn_comp, missing_feats = load_data(pitcher_id,game_id,vs_past,szn_load)
+        if game_df.shape[0]>0:
+            generate_chart(pitcher_id,game_id,game_df,game_group,szn_df,szn_comp,vs_past)
+        else:
+            st.write(f'ERROR: Game is missing required data ({', '.join(missing_feats)})')
