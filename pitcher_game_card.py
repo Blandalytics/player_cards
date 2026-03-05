@@ -740,12 +740,12 @@ def get_player_heights(player_ids: List[int]) -> pd.DataFrame:
 
 model_constant_dict = {
     'stuff':{
-        'game_mean':-0.029244,
-        'type_mean':-0.030638,
-        'szn_mean':-0.030800,
-        'game_stdev':0.006707,
-        'type_stdev':0.015297,
-        'szn_stdev':0.005814
+        'game_mean':-0.02747813136823752,
+        'type_mean':-0.028738238949820687,
+        'szn_mean':-0.028884648178475955,
+        'game_stdev':0.005869834959077604,
+        'type_stdev':0.011430978492415197,
+        'szn_stdev':0.005608963951932856
     },
     'loc':{
         'game_mean':0.025448,
@@ -1131,7 +1131,7 @@ def generate_games(games_today):
 #     prev_season = False
 #     szn_load = []
 
-@st.cache_data(ttl=600)
+@st.cache_data(ttl=600, show_spinner='Loading game data')
 def load_data(pitcher_id,game_id,vs_past,szn_load):
     game_df = (
         pd.DataFrame(pull_game(game_id, pitcher_id, 6.25),
@@ -1181,7 +1181,8 @@ def load_data(pitcher_id,game_id,vs_past,szn_load):
         game_df['vRHH'] = np.where(game_df['hitterHand']=='R',1,None)
         game_df['vLHH'] = np.where(game_df['hitterHand']=='L',1,None)
         game_df['xSLGcon'] = xSLGcon(game_df)
-        
+
+        game_df['Break'] = (game_df['HB'].astype('float')**2+game_df['IVB'].astype('float')**2)**0.5
         game_df['HB_acc'] = game_df['HB'].div(game_df['plate_time']**2)
         game_df['IVB_acc'] = game_df['IVB'].div(game_df['plate_time']**2)
         game_df['Break_acc'] = (game_df['HB_acc'].astype('float')**2+game_df['IVB_acc'].astype('float')**2)**0.5
