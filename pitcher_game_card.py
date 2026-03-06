@@ -2057,7 +2057,7 @@ def generate_chart(pitcher_id,game_id,game_df,game_group,szn_df,szn_comp,vs_past
     
     if game_df.shape[0] != game_group['#'].sum():
         fig.text(0.5,0.255,'Pitch Type Metrics*',color='w',fontsize=30,va='center',ha='center')
-        fig.text(0.94,0.25,'*Pitches w Complete Data',va='center',ha='right',alpha=0.5)
+        fig.text(0.97,0.235,'*Pitches w Complete Data',va='center',ha='right',alpha=0.5)
     else:
         fig.text(0.5,0.255,'Pitch Type Metrics',color='w',fontsize=30,va='center',ha='center')
     fig.add_artist(lines.Line2D([0.01, 0.35], [0.255, 0.255],linewidth=3,color=pl_text,alpha=line_alpha))
