@@ -204,16 +204,16 @@ def bio_text(pitcher_id: str):
 
     # Extract player information from the JSON data
     player_name = player_data['fullName']
-    player_number = player_data['primaryNumber']
-    current_team = player_data['currentTeam']['name']
+    # player_number = player_data['primaryNumber']
+    # current_team = player_data['currentTeam']['name']
     p_hand = player_data['pitchHand']['code']
-    dob = player_data['birthDate']
-    dob = datetime.strptime(dob, '%Y-%m-%d')#.strftime("%m/%d/%Y")
+    # dob = player_data['birthDate']
+    # dob = datetime.strptime(dob, '%Y-%m-%d')#.strftime("%m/%d/%Y")
     age = player_data['currentAge']
-    height = player_data['height'].replace(' ','')
-    weight = player_data['weight']
-    home_city = player_data['birthCity']
-    home_state = player_data['birthStateProvince'] if 'birthStateProvince' in player_data.keys() else player_data['birthCountry']
+    # height = player_data['height'].replace(' ','')
+    # weight = player_data['weight']
+    # home_city = player_data['birthCity']
+    # home_state = player_data['birthStateProvince'] if 'birthStateProvince' in player_data.keys() else player_data['birthCountry']
     return player_name, (f'{p_hand}',f'Age: {age}'), p_hand
 
 def get_data(game_id: str):
