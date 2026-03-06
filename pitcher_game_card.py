@@ -2017,7 +2017,7 @@ def generate_chart(pitcher_id,game_id,game_df,game_group,szn_df,szn_comp,vs_past
     stats_chunk(game_group.merge(szn_comp[['pitchType','Velo_diff']],how='left',on='pitchType') if vs_past else game_group,
                 stat_table_ax,vs_past)
     
-    usage_ax = fig.add_axes([0.445,0.593,.545,0.195], anchor='SW', zorder=1)
+    usage_ax = fig.add_axes([0.445,0.593,.535,0.195], anchor='SW', zorder=1)
     usage_chunk(szn_comp if vs_past else game_group,usage_ax,vs_past)
 
     line_alpha = 2/3
@@ -2057,11 +2057,11 @@ def generate_chart(pitcher_id,game_id,game_df,game_group,szn_df,szn_comp,vs_past
                                                   )
             )
     
-    fig.text(0.7175,0.815,'Usage',color='w',fontsize=30,va='center',ha='center')
-    fig.text(0.66,0.798,'vs LHB%',fontsize=20,color=pl_line_color,ha='right',va='center',weight='regular')
-    fig.text(0.7775,0.798,'vs RHB%',fontsize=20,color=pl_line_color,ha='left',va='center',weight='regular')
-    fig.add_artist(lines.Line2D([0.7775, 0.99], [0.815, 0.815],linewidth=3,color=pl_text,alpha=line_alpha))
-    fig.add_artist(lines.Line2D([0.4225, 0.66], [0.815, 0.815],linewidth=3,color=pl_text,alpha=line_alpha))
+    fig.text(0.715,0.815,'Usage',color='w',fontsize=30,va='center',ha='center')
+    fig.text(0.6575,0.798,'vs LHB%',fontsize=20,color=pl_line_color,ha='right',va='center',weight='regular')
+    fig.text(0.775,0.798,'vs RHB%',fontsize=20,color=pl_line_color,ha='left',va='center',weight='regular')
+    fig.add_artist(lines.Line2D([0.775, 0.99], [0.815, 0.815],linewidth=3,color=pl_text,alpha=line_alpha))
+    fig.add_artist(lines.Line2D([0.42, 0.66], [0.815, 0.815],linewidth=3,color=pl_text,alpha=line_alpha))
     fig.add_artist(lines.Line2D([0.99, 0.99], [0.59, 0.813],linewidth=3,color=pl_text,alpha=line_alpha))
     fig.add_artist(lines.Line2D([0.01, 0.99], [0.588, 0.588],linewidth=3,color=pl_text,alpha=line_alpha))
     if vs_past:
