@@ -1771,18 +1771,18 @@ def generate_chart(pitcher_id,game_id,game_df,game_group,szn_df,szn_comp,vs_past
     plv_grade = letter_grade(game_df['plvGrade_game'].mean())
     
     start_grade_ax.text(0.5,0.8,'Start',ha='center',va='center',fontsize=22,color=pl_line_color)
-    start_grade_ax.text(0.5,0.35,start_grade,ha='center',va='center',fontsize=60,color=grade_colors[start_grade])
+    start_grade_ax.text(0.5,0.4,start_grade,ha='center',va='center',fontsize=60,color=grade_colors[start_grade])
     start_grade_ax.set(xlim=(0,1),ylim=(0,1))
     start_grade_ax.axis('off')
     
     pitch_model_ax.text(0.175,0.8,'Stuff',ha='center',va='center',fontsize=22,color=pl_line_color)
-    pitch_model_ax.text(0.175,0.35,stuff_grade,ha='center',va='center',fontsize=60,color=grade_colors[stuff_grade])
+    pitch_model_ax.text(0.175,0.4,stuff_grade,ha='center',va='center',fontsize=60,color=grade_colors[stuff_grade])
     
     pitch_model_ax.text(0.5,0.8,'Locations',ha='center',va='center',fontsize=20,color=pl_line_color)
-    pitch_model_ax.text(0.5,0.35,location_grade,ha='center',va='center',fontsize=60,color=grade_colors[location_grade])
+    pitch_model_ax.text(0.5,0.4,location_grade,ha='center',va='center',fontsize=60,color=grade_colors[location_grade])
     
     pitch_model_ax.text(0.825,0.8,'PLV',ha='center',va='center',fontsize=22,color=pl_line_color)
-    pitch_model_ax.text(0.825,0.35,plv_grade,ha='center',va='center',fontsize=60,color=grade_colors[plv_grade])
+    pitch_model_ax.text(0.825,0.4,plv_grade,ha='center',va='center',fontsize=60,color=grade_colors[plv_grade])
     
     pitch_model_ax.set(xlim=(0,1))
     pitch_model_ax.axis('off')
