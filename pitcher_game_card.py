@@ -1446,7 +1446,7 @@ def fastball_stats(table_df,ax):
     if table_df.loc[table_df['pitchType'].isin(['FF','SI','FC'])].shape[0]==0:
         ax.axis('off')
         sns.despine()
-        return 'No Fastball','UN'
+        return 'None','UN'
     else:
         fastball_comp = (
             table_df
