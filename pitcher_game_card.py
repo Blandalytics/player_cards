@@ -2015,8 +2015,8 @@ def generate_chart(pitcher_id,game_id,game_df,game_group,szn_df,szn_comp,vs_past
     #Grade Only
     fig.text(0.36,0.815,'Results', ha='center',va='center',color='w',fontsize=30) # .075 over from 0.01
     fig.text(0.1475,0.815,'Skills', ha='center',va='center',color='w',fontsize=30) # 0.1375 over from 0.435
-    fig.add_artist(lines.Line2D([0.01, 0.08], [0.815, 0.815],linewidth=3,color=pl_text,alpha=line_alpha))
-    fig.add_artist(lines.Line2D([0.215, 0.305], [0.815, 0.815],linewidth=3,color=pl_text,alpha=line_alpha))
+    fig.add_artist(lines.Line2D([0.01, 0.09], [0.815, 0.815],linewidth=3,color=pl_text,alpha=line_alpha))
+    fig.add_artist(lines.Line2D([0.205, 0.3], [0.815, 0.815],linewidth=3,color=pl_text,alpha=line_alpha))
     fig.add_artist(lines.Line2D([0.01, 0.01], [0.715, 0.813],linewidth=3,color=pl_text,alpha=line_alpha))
     fig.add_artist(lines.Line2D([0.285, 0.285], [0.715, 0.813],linewidth=3,color=pl_text,alpha=line_alpha))
     
@@ -2035,7 +2035,7 @@ def generate_chart(pitcher_id,game_id,game_df,game_group,szn_df,szn_comp,vs_past
     
     fig.text(0.715,0.815,'Usage',color='w',fontsize=30,va='center',ha='center')
     fig.add_artist(lines.Line2D([0.775, 0.99], [0.815, 0.815],linewidth=3,color=pl_text,alpha=line_alpha))
-    fig.add_artist(lines.Line2D([0.415, 0.655], [0.815, 0.815],linewidth=3,color=pl_text,alpha=line_alpha))
+    fig.add_artist(lines.Line2D([0.42, 0.655], [0.815, 0.815],linewidth=3,color=pl_text,alpha=line_alpha))
     fig.add_artist(lines.Line2D([0.99, 0.99], [0.59, 0.813],linewidth=3,color=pl_text,alpha=line_alpha))
     fig.add_artist(lines.Line2D([0.01, 0.99], [0.588, 0.588],linewidth=3,color=pl_text,alpha=line_alpha))
     if vs_past:
