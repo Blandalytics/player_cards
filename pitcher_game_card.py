@@ -1297,7 +1297,8 @@ def load_data(pitcher_id,game_id,vs_past,szn_load):
             .round({'vsL':1,'Usage%':1,'vsR':1,'Velo':1,'Ext':1,'IVB':1,'HB':1,'HAVAA':1,
                     'Str%':1,'SwStr%':1,'CSW%':1,'xSLGcon':3,'plvStuff+':0,'PLV+':0
                     })
-            .astype({'plvStuff+':'int','PLV+':'int','pitches_vR':'int'})
+            .astype({#'plvStuff+':'int','PLV+':'int',
+                     'pitches_vR':'int'})
         )
       
         szn_df = None
@@ -1682,7 +1683,8 @@ def stats_chunk(table_df,ax,vs_past):
                 if np.isnan(stat_val):
                     stat_val = '-'
                 else:
-                    stat_val = int(stat_val) if abs(stat_val-50)==50 else stat_val
+                    if (stat in ['PLV+','plvStuff+']) | (abs(stat_val-50)==50):
+                        stat_val = int(stat_val)
                 ax.text(x_val,
                         y_val,
                         f'{stat_val}{suffix_dict[stat]}',
