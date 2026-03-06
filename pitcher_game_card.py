@@ -1546,7 +1546,10 @@ def usage_chunk(table_df,ax,vs_past):
     for pitch_type in pitch_list:
         usage_val = table_df.loc[table_df['pitchType']==pitch_type,'Usage%'].item()
         usage_adjust = np.clip(usage_val,0,33) / 33
-        font_size = usage_adjust * 15 + 16
+        if len(pitch_list)>1:
+            font_size = usage_adjust * 15 + 16
+        else:
+            font_size = 28
 
         ax.text(0,
                 pitch_list.index(pitch_type)+0.05,
