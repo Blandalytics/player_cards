@@ -1760,8 +1760,8 @@ def generate_chart(pitcher_id,game_id,game_df,game_group,szn_df,szn_comp,vs_past
     game_stats_ax = fig.add_axes([0.02,0.8425,.96,0.037], anchor='SW', zorder=1)
     start_grade = header_stats_chunk(game_id,pitcher_id,game_stats_ax)
     
-    start_grade_ax = fig.add_axes([0.01,0.705,.15,0.1], anchor='SW', zorder=1)
-    pitch_model_ax = fig.add_axes([0.16,0.705,.275,0.1], anchor='SW', zorder=1)
+    start_grade_ax = fig.add_axes([0.285,0.705,.15,0.1], anchor='SW', zorder=1)
+    pitch_model_ax = fig.add_axes([0.01,0.705,.275,0.1], anchor='SW', zorder=1)
     
     # Grade only
     stuff_grade = letter_grade(game_df['stuffGrade_game'].mean())
@@ -1770,7 +1770,8 @@ def generate_chart(pitcher_id,game_id,game_df,game_group,szn_df,szn_comp,vs_past
     location_grade = letter_grade(game_df['locGrade_game'].mean())
     plv_grade = letter_grade(game_df['plvGrade_game'].mean())
     
-    start_grade_ax.text(0.5,0.5,start_grade,ha='center',va='center',fontsize=90,color=grade_colors[start_grade])
+    start_grade_ax.text(0.5,0.8,'Stuff',ha='center',va='center',fontsize=22,color=pl_line_color)
+    start_grade_ax.text(0.5,0.45,start_grade,ha='center',va='center',fontsize=50,color=grade_colors[start_grade])
     start_grade_ax.set(xlim=(0,1),ylim=(0,1))
     start_grade_ax.axis('off')
     
@@ -2012,8 +2013,8 @@ def generate_chart(pitcher_id,game_id,game_df,game_group,szn_df,szn_comp,vs_past
     fig.add_artist(lines.Line2D([0.435, 0.435], [0.59, 0.813],linewidth=3,color=pl_text,alpha=line_alpha))
     
     #Grade Only
-    fig.text(0.085,0.815,'Start', ha='center',va='center',color='w',fontsize=30)
-    fig.text(0.2975,0.815,'Models', ha='center',va='center',color='w',fontsize=30)
+    fig.text(0.36,0.815,'Results', ha='center',va='center',color='w',fontsize=30) # .075 over from 0.01
+    fig.text(0.1475,0.815,'Skills', ha='center',va='center',color='w',fontsize=30) # 0.1375 over from 0.435
     fig.add_artist(lines.Line2D([0.01, 0.03], [0.815, 0.815],linewidth=3,color=pl_text,alpha=line_alpha))
     fig.add_artist(lines.Line2D([0.14, 0.23], [0.815, 0.815],linewidth=3,color=pl_text,alpha=line_alpha))
     fig.add_artist(lines.Line2D([0.01, 0.01], [0.715, 0.813],linewidth=3,color=pl_text,alpha=line_alpha))
