@@ -2162,8 +2162,8 @@ with col1:
     else:
         games_today = []
         for game in range(len(x['dates'][0]['games'])):
-            if x['dates'][0]['games'][game]['gamedayType'] in ['E','P']:
-                games_today += [x['dates'][0]['games'][game]['gamePk']]
+            # if x['dates'][0]['games'][game]['gamedayType'] in ['E','P']:
+            games_today += [x['dates'][0]['games'][game]['gamePk']]
         game_list = generate_games(games_today)
 
 if 'game' not in ss:
