@@ -2061,7 +2061,7 @@ def generate_chart(pitcher_id,game_id,game_df,game_group,szn_df,szn_comp,vs_past
                             'plate_time','HB','IVB','spin_rate',
                             'spin_dir','pX','pZ','x0','z0','vY0',
                             'vZ0','aY','aZ']].isnull().values.any(axis=1)].shape[0] > 0:
-        fig.text(0.97,0.245,'*Some pitches missing data',va='center',ha='right',alpha=0.5)
+        fig.text(0.97,0.0025,'*Some pitches missing data',va='center',ha='right',alpha=0.5)
     fig.add_artist(lines.Line2D([0.01, 0.35], [0.255, 0.255],linewidth=3,color=pl_text,alpha=line_alpha))
     fig.add_artist(lines.Line2D([0.65, 0.99], [0.255, 0.255],linewidth=3,color=pl_text,alpha=line_alpha))
     fig.add_artist(lines.Line2D([0.01, 0.01], [0.017, 0.253],linewidth=3,color=pl_text,alpha=line_alpha))
