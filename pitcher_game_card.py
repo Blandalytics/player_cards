@@ -2073,7 +2073,7 @@ def generate_chart(pitcher_id,game_id,game_df,game_group,szn_df,szn_comp,vs_past
                             'spin_dir','pX','pZ','x0','z0','vY0',
                             'vZ0','aY','aZ']].isnull().values.any(axis=1)].shape[0] > 0:
         fig.text(0.97,0.005,'*Some pitches missing data',va='center',ha='right',alpha=0.5)
-    fig.text(0.08,0.23,'Type',color=pl_line_color,fontsize=16,va='center',ha='center')
+    fig.text(0.085,0.23,'Type',color=pl_line_color,fontsize=16,va='center',ha='center')
     fig.text(0.235,0.23,'#',color=pl_line_color,fontsize=16,va='center',ha='center')
     fig.text(0.335,0.23,'Velo',color=pl_line_color,fontsize=16,va='center',ha='center')
     fig.text(0.42,0.23,'IVB',color=pl_line_color,fontsize=16,va='center',ha='center')
@@ -2082,8 +2082,8 @@ def generate_chart(pitcher_id,game_id,game_df,game_group,szn_df,szn_comp,vs_past
     fig.text(0.645,0.23,'SwStr%',color=pl_line_color,fontsize=16,va='center',ha='center')
     fig.text(0.7225,0.23,'CSW%',color=pl_line_color,fontsize=16,va='center',ha='center')
     fig.text(0.8025,0.23,'xSLGcon',color=pl_line_color,fontsize=16,va='center',ha='center')
-    fig.text(0.88,0.23,'plvStuff+',color=pl_line_color,fontsize=16,va='center',ha='center')
-    fig.text(0.95,0.23,'PLV+',color=pl_line_color,fontsize=16,va='center',ha='center')
+    fig.text(0.8825,0.23,'plvStuff+',color=pl_line_color,fontsize=16,va='center',ha='center')
+    fig.text(0.955,0.23,'PLV+',color=pl_line_color,fontsize=16,va='center',ha='center')
     fig.add_artist(lines.Line2D([0.01, 0.35], [0.255, 0.255],linewidth=3,color=pl_text,alpha=line_alpha))
     fig.add_artist(lines.Line2D([0.65, 0.99], [0.255, 0.255],linewidth=3,color=pl_text,alpha=line_alpha))
     fig.add_artist(lines.Line2D([0.01, 0.01], [0.017, 0.253],linewidth=3,color=pl_text,alpha=line_alpha))
