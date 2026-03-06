@@ -1235,7 +1235,7 @@ def load_data(pitcher_id,game_id,vs_past,szn_load):
             if has_fastball:
                 game_df[stat+'_diff'] = fastball_differences(game_df,stat)
             else:
-                game_df[stat+'_diff'] = game_df[stat] - fastball_defaults[stat]
+                game_df[stat+'_diff'] = game_df[stat].sub(float(fastball_defaults[stat]))
         game_df['Break_diff'] = (game_df['HB_acc_diff'].astype('float')**2+game_df['IVB_acc_diff'].astype('float')**2)**0.5
     
         game_plate_times = game_df.groupby('pitchType')['plate_time'].mean().to_dict()
