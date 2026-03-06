@@ -1810,7 +1810,7 @@ def generate_chart(pitcher_id,game_id,game_df,game_group,szn_df,szn_comp,vs_past
         'L':'Playoffs',
         'W':'World\nSeries',
     }
-    start_grade_ax.text(0.5,0.8,code_map[game_code],ha='center',va='center',fontsize=22,color=pl_line_color)
+    start_grade_ax.text(0.5,0.8,code_map[game_code],ha='center',va='center',fontsize=18,color=pl_line_color)
     start_grade_ax.text(0.5,0.4,start_grade,ha='center',va='center',fontsize=60,color=grade_colors[start_grade])
     start_grade_ax.set(xlim=(0,1),ylim=(0,1))
     start_grade_ax.axis('off')
