@@ -2136,7 +2136,7 @@ def generate_chart(pitcher_id,game_id,game_df,game_group,szn_df,szn_comp,vs_past
     sns.despine(left=True,bottom=True)
     st.pyplot(fig, width='content')
 
-st.write('Data (especially pitch types) are subject to change.')
+st.write('Data (especially pitch types) are subject to change. Please send any feedback to Kyle Bland, on [Bluesky](https://bsky.app/profile/blandalytics.pitcherlist.com) or [Twitter](https://x.com/blandalytics).')
 today = (datetime.now(UTC)-timedelta(hours=16)).date()
 if 'date' not in ss:
     ss['date'] = today
