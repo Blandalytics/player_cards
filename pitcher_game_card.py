@@ -535,8 +535,14 @@ def header_stats_chunk(game_id,pitcher_id,ax):
     whiffs_text = f'{whiffs} Whiffs' if whiffs!=1 else f'{whiffs} Whiff'
     csw = x[f'{home_text}_pitchers'][f'{pitcher_id}'][0]['avg_pitch_speed'][-1]['csw_percent']
 
-    game_score = 40 + (2 * int(outs) + int(strikeouts) - 2 * int(walks) - 2 * int(hits) - 3 * int(earned_runs) - 6 * int(home_runs))
-    game_score = (game_score-51)/17*10+75
+    ## Actual Game Score
+    # game_score = 40 + (2 * int(outs) + int(strikeouts) - 2 * int(walks) - 2 * int(hits) - 3 * int(earned_runs) - 6 * int(home_runs))
+    # game_score = (game_score-51)/17*10+75
+
+    # Per-PA Game Score
+    game_score = (2 * int(outs) + int(strikeouts) - 2 * int(walks) - 2 * int(hits) - 3 * int(earned_runs) - 6 * int(home_runs)) / tbf
+    game_score = (game_score-0.481)/0.875*10+75
+    
     if game_score<60:
         game_grade = 'F'
     elif game_score<70:
@@ -1794,7 +1800,7 @@ def generate_chart(pitcher_id,game_id,game_df,game_group,szn_df,szn_comp,vs_past
     location_grade = letter_grade(game_df['locGrade_game'].mean())
     plv_grade = letter_grade(game_df['plvGrade_game'].mean())
     
-    start_grade_ax.text(0.5,0.8,'Start',ha='center',va='center',fontsize=22,color=pl_line_color)
+    start_grade_ax.text(0.5,0.8,'',ha='center',va='center',fontsize=22,color=pl_line_color)
     start_grade_ax.text(0.5,0.4,start_grade,ha='center',va='center',fontsize=60,color=grade_colors[start_grade])
     start_grade_ax.set(xlim=(0,1),ylim=(0,1))
     start_grade_ax.axis('off')
