@@ -1231,6 +1231,11 @@ def load_data(pitcher_id,game_id,vs_past,szn_load):
                                      None,
                                      game_df[stat]
                                     )
+
+        game_df['locGrade_game'] = np.where(game_df[['sz_top','sz_bot','pX','pZ']].isnull().values.any(axis=1),
+                                            None,
+                                            game_df['locGrade_game']
+                                            )
      
         game_group = (
             game_df
