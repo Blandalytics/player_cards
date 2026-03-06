@@ -1164,8 +1164,8 @@ def load_data(pitcher_id,game_id,vs_past,szn_load):
 
     game_df = (
         game_df
-        .dropna(subset=['sz_top','sz_bot','velo','extension','plate_time','HB','IVB','spin_rate',
-                        'spin_dir','pX','pZ','x0','z0','vY0','vZ0','aY','aZ'])
+        # .dropna(subset=['sz_top','sz_bot','velo','extension','plate_time','HB','IVB','spin_rate',
+        #                 'spin_dir','pX','pZ','x0','z0','vY0','vZ0','aY','aZ'])
         .assign(pitchType = lambda x: x['pitchType'].map(pitchtype_map),
                 desc = lambda x: x['code'].map(desc_map),
                 ca_str = lambda x: np.where(x['desc']=='called_strike',1,0),
@@ -1231,6 +1231,8 @@ def load_data(pitcher_id,game_id,vs_past,szn_load):
     
         game_group = (
             game_df
+            .dropna(subset=['sz_top','sz_bot','velo','extension','plate_time','HB','IVB','spin_rate',
+                            'spin_dir','pX','pZ','x0','z0','vY0','vZ0','aY','aZ'])
             .astype({'xSLGcon':'float'})
             .groupby(['pitcherId','pitcherName','pitchType'])
             [['isPitch','usage','vRHH','vLHH','armAngle','velo','extension','IVB','HB','HAVAA','strike','whiff','csw',
