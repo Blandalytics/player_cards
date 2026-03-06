@@ -71,9 +71,10 @@ def letter_logo():
     logo = Image.open(urllib.request.urlopen(logo_loc))
     return logo
 
-letter_logo = letter_logo()
+# letter_logo = letter_logo()
 
-st.set_page_config(page_title='PLV Pitcher Game Card', page_icon=letter_logo,layout='wide')
+st.set_page_config(page_title='PLV Pitcher Game Card', page_icon='⚾',#letter_logo,
+                   layout='wide')
 # st.title("NFBC Draft Data, over Time")
 new_title = '<p style="color:#72CBFD; font-weight: bold; font-size: 42px;">PLV Pitcher Game Card</p>'
 st.markdown(new_title, unsafe_allow_html=True)
