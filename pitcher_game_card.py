@@ -1200,7 +1200,7 @@ def load_data(pitcher_id,game_id,vs_past,szn_load):
         fastballs = ['FF','FC','FT','SI']
         if game_df.loc[game_df['pitchType'].isin(fastballs)].shape[0]==0:
             has_fastball = False
-            fastball_df = pd.DataFrame(data={'pitcherId':[pitcher_id],'gameId':[gameId],'fastball_type':['NA']})
+            fastball_df = pd.DataFrame(data={'pitcherId':[pitcher_id],'gameId':[game_id],'fastball_type':['NA']})
         else:
             has_fastball = True
             fastball_df = (game_df
