@@ -597,13 +597,13 @@ def pull_game(game_id,pitcher_id,pitcher_height):
     top_bot = 'top'
     base_outs = 0
     for play in game['liveData']['plays']['allPlays']:
-        # if len(play['playEvents'])==0:
-        #     continue
-        # else:
-        base_outs = play['playEvents'][-1]['count'].get('outs')
-        play_data = pull_play(play, rel_dict,base_outs)
-        if play_data:
-            game_data+=play_data
+        if len(play['playEvents'])==0:
+            continue
+        else:
+            base_outs = play['playEvents'][-1]['count'].get('outs')
+            play_data = pull_play(play, rel_dict,base_outs)
+            if play_data:
+                game_data+=play_data
 
     return game_data
 
