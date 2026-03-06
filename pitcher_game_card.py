@@ -1198,14 +1198,17 @@ def load_data(pitcher_id,game_id,vs_past,szn_load):
         game_df['adj_spin_dir'] = np.where(game_df['pitcherHand']=='L',game_df['spin_dir'],360-game_df['spin_dir'])
         
         fastballs = ['FF','FC','FT','SI']
-        fastball_df = (game_df
-                       .loc[game_df['pitchType'].isin(fastballs)]
-                       .groupby(['pitcherId','gameId'], as_index=False)
-                       ['pitchType']
-                       .agg(pd.Series.mode)
-                       .rename(columns={'pitchType':'fastball_type'})
-                       .copy()
-                      )
+        if (ame_df.loc[game_df['pitchType'].isin(fastballs)].shape[0]==0:
+            fastball_df = pd.DataFrame()
+        else:
+            fastball_df = (game_df
+                           .loc[game_df['pitchType'].isin(fastballs)]
+                           .groupby(['pitcherId','gameId'], as_index=False)
+                           ['pitchType']
+                           .agg(pd.Series.mode)
+                           .rename(columns={'pitchType':'fastball_type'})
+                           .copy()
+                          )
         
         # Add most common Fastball type
         game_df = game_df.merge(fastball_df,on=['pitcherId','gameId'], how='left')
@@ -1218,12 +1221,22 @@ def load_data(pitcher_id,game_id,vs_past,szn_load):
         game_df.loc[(game_df['pitchType']!=game_df['fastball_type']) &
                      game_df['pitchType'].isin(['SL','ST','CU', 'FC']),'pitch_type_bucket'] = 'Breaking Ball'
         game_df.loc[game_df['pitchType'].isin(['CH', 'FS','KN','SC']),'pitch_type_bucket'] = 'Offspeed'
+
+        fastball_defaults = {
+            'velo':93.7335476546171,
+            'plate_time':0.40236545056109085,
+            'IVB_acc':79.74860324535513,
+            'HB_acc':'57.48809633155189'
+        }
         
         for stat in ['HB_acc','IVB_acc','plate_time','velo']:
-            game_df[stat+'_diff'] = fastball_differences(game_df,stat)
+            if fastball_df.shape[0]==0:
+                game_df[stat+'_diff'] = game_df[stat].sub(fastball_defaults[stat])
+            else:
+                game_df[stat+'_diff'] = fastball_differences(game_df,stat)
         game_df['Break_diff'] = (game_df['HB_acc_diff'].astype('float')**2+game_df['IVB_acc_diff'].astype('float')**2)**0.5
     
-        game_pate_times = game_df.groupby('pitchType')['plate_time'].mean().to_dict()
+        game_plate_times = game_df.groupby('pitchType')['plate_time'].mean().to_dict()
         
         game_df[['plvStuff+','stuffGrade_game','stuffGrade_szn','locGrade_game','locGrade_szn','PLV+','plvGrade_game','plvGrade_szn']] = pitch_models(game_df)
         for stat in ['stuffGrade_game','plvStuff+','plvGrade_game','PLV+']:
@@ -1332,7 +1345,7 @@ def load_data(pitcher_id,game_id,vs_past,szn_load):
             szn_df[['VAA','HAVAA']] = adjusted_vaa(szn_df[['pZ','vY0','vZ0','aY','aZ']].astype('float'))
             szn_df['HB_acc'] = szn_df['HB'].div(szn_df['plate_time']**2)
             szn_df['IVB_acc'] = szn_df['IVB'].div(szn_df['plate_time']**2)
-            szn_df['game_plate_time'] = szn_df['pitchType'].map(game_pate_times)
+            szn_df['game_plate_time'] = szn_df['pitchType'].map(game_plate_times)
             szn_df['HB'] = szn_df['HB_acc'].mul(szn_df['game_plate_time']**2)
             szn_df['IVB'] = szn_df['IVB_acc'].mul(szn_df['game_plate_time']**2)
             
