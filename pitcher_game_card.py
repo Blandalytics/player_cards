@@ -2073,7 +2073,7 @@ def generate_chart(pitcher_id,game_id,game_df,game_group,szn_df,szn_comp,vs_past
                             'spin_dir','pX','pZ','x0','z0','vY0',
                             'vZ0','aY','aZ']].isnull().values.any(axis=1)].shape[0] > 0:
         fig.text(0.97,0.005,'*Some pitches missing data',va='center',ha='right',alpha=0.5)
-    fig.text(0.1,0.23,'Type',color=pl_line_color,fontsize=16,va='center',ha='center')
+    fig.text(0.08,0.23,'Type',color=pl_line_color,fontsize=16,va='center',ha='center')
     fig.text(0.235,0.23,'#',color=pl_line_color,fontsize=16,va='center',ha='center')
     fig.text(0.335,0.23,'Velo',color=pl_line_color,fontsize=16,va='center',ha='center')
     fig.text(0.42,0.23,'IVB',color=pl_line_color,fontsize=16,va='center',ha='center')
