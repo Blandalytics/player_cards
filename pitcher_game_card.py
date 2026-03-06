@@ -1100,6 +1100,13 @@ def pull_game_info(game_id):
         'D':2,
         'M':2
     }
+    team_maps = {
+        'AZ':'ARI',
+        'KC':'KCR',
+        'SD':'SDP',
+        'SF':'SFG',
+        'TB':'TBR'
+    }
     r = requests.get(f'https://baseballsavant.mlb.com/gf?game_pk={game_id}')
     x = r.json()
     game_hour = int(x['scoreboard']['datetime']['dateTime'][11:13])
@@ -1111,7 +1118,11 @@ def pull_game_info(game_id):
     ppd = 0 if x['scoreboard']['datetime']['originalDate']==x['scoreboard']['datetime']['officialDate'] else 1
     
     away_team = x['scoreboard']['teams']['away']['abbreviation']
+    if away_team in list(team_maps.keys()):
+        away_team = team_maps[away_team]
     home_team = x['scoreboard']['teams']['home']['abbreviation']
+    if home_team in list(team_maps.keys()):
+        home_team = team_maps[home_team]
     game_status_code = x['game_status_code']
     code_map = code_dict[game_status_code]
     if game_status_code  in ['P','S','D']:
