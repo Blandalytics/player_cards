@@ -1791,7 +1791,7 @@ def generate_chart(pitcher_id,game_id,game_df,game_group,szn_df,szn_comp,vs_past
     game_stats_ax = fig.add_axes([0.02,0.8425,.96,0.037], anchor='SW', zorder=1)
     start_grade, game_code = header_stats_chunk(game_id,pitcher_id,game_stats_ax)
     
-    start_grade_ax = fig.add_axes([0.315,0.705,.13,0.1], anchor='SW', zorder=1)
+    start_grade_ax = fig.add_axes([0.315,0.705,.12,0.1], anchor='SW', zorder=1)
     pitch_model_ax = fig.add_axes([0.01,0.705,.305,0.1], anchor='SW', zorder=1)
     
     # Grade only
