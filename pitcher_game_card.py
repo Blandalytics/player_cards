@@ -1649,10 +1649,10 @@ def stats_chunk(table_df,ax,vs_past):
         for stat in stat_list:
             x_val += width_dict[stat]
             y_val = pitch_list.index(pitch_type)
-            ax.text(x_val,
-                    label_adj,
-                    stat.replace(' ','\n'),
-                    fontsize=16,color=pl_line_color,ha='center',va='bottom')
+            # ax.text(x_val,
+            #         label_adj,
+            #         stat.replace(' ','\n'),
+            #         fontsize=16,color=pl_line_color,ha='center',va='bottom')
             stat_val = table_df.loc[table_df['pitchType']==pitch_type,stat].item()
             if (stat == 'Velo') & vs_past:
                 velo_change = table_df.loc[table_df['pitchType']==pitch_type,'Velo_diff'].item()
@@ -1685,11 +1685,11 @@ def stats_chunk(table_df,ax,vs_past):
                 else:
                     if (stat in ['PLV+','plvStuff+']) | (abs(stat_val-50)==50):
                         stat_val = int(stat_val)
-                # ax.text(x_val,
-                #         y_val,
-                #         f'{stat_val}{suffix_dict[stat]}',
-                #         ha='center',va='center',fontsize=20,color=stat_color
-                #         )
+                ax.text(x_val,
+                        y_val,
+                        f'{stat_val}{suffix_dict[stat]}',
+                        ha='center',va='center',fontsize=20,color=stat_color
+                        )
 
     ax.set(xlim=(-0.5,sum(width_dict.values())+0.5),
           ylim=(len(pitch_list)-0.5,0.5)
@@ -1987,10 +1987,10 @@ def generate_chart(pitcher_id,game_id,game_df,game_group,szn_df,szn_comp,vs_past
     fastball_ax = fig.add_axes([0.01,0.6,.425,0.082], anchor='SW', zorder=1)
     fastball_name, fastball_code = fastball_stats(game_group,fastball_ax)
     
-    stat_header_ax = fig.add_axes([0.01,0.015,.25,0.205], anchor='SW', zorder=1)
+    stat_header_ax = fig.add_axes([0.01,0.015,.25,0.195], anchor='SW', zorder=1)
     header_chunk(game_group,stat_header_ax)
     
-    stat_table_ax = fig.add_axes([0.26,0.015,0.73,0.205], anchor='SW', zorder=1)
+    stat_table_ax = fig.add_axes([0.26,0.015,0.73,0.195], anchor='SW', zorder=1)
     stats_chunk(game_group.merge(szn_comp[['pitchType','Velo_diff']],how='left',on='pitchType') if vs_past else game_group,
                 stat_table_ax,vs_past)
     
