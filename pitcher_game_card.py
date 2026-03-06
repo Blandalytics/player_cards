@@ -2194,7 +2194,7 @@ with col2:
     else:
         pitcher_list = {}
 
-if 'pitcher' not in ss:
+if ('pitcher' not in ss) & (len(pitcher_list.keys())>0):
     ss['pitcher'] = list(pitcher_list.keys())[0]
 
 with col3:
