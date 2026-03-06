@@ -271,8 +271,21 @@ def arm_angle_day(game_date,season=2025):
 def name_chunk(pitcher_id,game_id,ax):
     r = requests.get(f'https://baseballsavant.mlb.com/gf?game_pk={game_id}')
     x = r.json()
+    team_maps = {
+        'AZ':'ARI',
+        'KC':'KCR',
+        'SD':'SDP',
+        'SF':'SFG',
+        'TB':'TBR'
+    }
     team_abbr = x['scoreboard']['teams']['home' if str(pitcher_id) in x['home_pitchers'].keys() else 'away']['abbreviation']
+    if team_abbr in list(team_maps.keys()):
+        team_abbr = team_maps[team_abbr]
+        
     opp_abbr = x['scoreboard']['teams']['away' if str(pitcher_id) in x['home_pitchers'].keys() else 'home']['abbreviation']
+    if opp_abbr in list(team_maps.keys()):
+        opp_abbr = team_maps[opp_abbr]
+        
     home_away = 'vs' if str(pitcher_id) in x['home_pitchers'].keys() else '@'
 
     bio_info = bio_text(pitcher_id)
@@ -1131,21 +1144,6 @@ def generate_games(games_today):
             game_dict.update(future.result())
     game_df = pd.DataFrame.from_dict(game_dict, orient='index',columns=['Game ID','Time','Sort Time','Sort Inning','Sort Code'])
     return game_df.sort_values(['Sort Code','Sort Time','Game ID','Sort Inning'])['Game ID'].to_dict()
-
-# pitcher_id = st.number_input('Enter Pitcher MLBAMID',value=694973)
-# game_id = st.number_input('Enter MLB Game ID',value=831490)
-
-# if vs_past:
-#     if spring_training:
-#         prev_season = True
-#     else:
-#         prev_season = False
-#     szn_load = load_prev_pitches(pitcher_id,game_id,
-#                                   prev_season=prev_season
-#                                   )
-# else:
-#     prev_season = False
-#     szn_load = []
 
 @st.cache_data(ttl=600, show_spinner='Loading game data')
 def load_data(pitcher_id,game_id,vs_past,szn_load):
