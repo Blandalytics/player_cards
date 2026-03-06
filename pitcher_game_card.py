@@ -575,7 +575,7 @@ def header_stats_chunk(game_id,pitcher_id,ax):
     ax.set(ylim=(0,1))
     ax.axis('off')
     sns.despine()
-    return game_grade
+    return game_grade, game_code
 
 def pull_game(game_id,pitcher_id,pitcher_height):
     game_data = []
@@ -641,7 +641,7 @@ def game_line(game_id,pitcher_id):
     supplemental_decision  = ', QS' if (int(innings[0])>=6) and (int(earned_runs)<=3) else ', BS' if blown_save==1 else ''
     decision = f'(ND{supplemental_decision})' if (win+loss==0) and (starter==1) else f'(W{supplemental_decision})' if win==1 else f'(L{supplemental_decision})' if loss==1 else '(SV)' if save==1 else '(HD)' if hold==1 else ''
     decision = decision if game_code == 'F' else ''
-    return f'{game_date.strftime('%-b %-d, %Y')} {home_away} {opp} {decision}', game_date.year
+    return f'{game_date.strftime('%-b %-d, %Y')} {home_away} {opp} {decision}', game_date.year, game_code
 
 def load_prev_pitches(pitcher_id,game_id=None,prev_season=None):
     data_load = []
@@ -1788,7 +1788,7 @@ def generate_chart(pitcher_id,game_id,game_df,game_group,szn_df,szn_comp,vs_past
     game_text = name_chunk(pitcher_id,game_id,title_text_ax)
     
     game_stats_ax = fig.add_axes([0.02,0.8425,.96,0.037], anchor='SW', zorder=1)
-    start_grade = header_stats_chunk(game_id,pitcher_id,game_stats_ax)
+    start_grade, game_code = header_stats_chunk(game_id,pitcher_id,game_stats_ax)
     
     start_grade_ax = fig.add_axes([0.305,0.705,.13,0.1], anchor='SW', zorder=1)
     pitch_model_ax = fig.add_axes([0.01,0.705,.295,0.1], anchor='SW', zorder=1)
@@ -1799,8 +1799,18 @@ def generate_chart(pitcher_id,game_id,game_df,game_group,szn_df,szn_comp,vs_past
     vs_l_location_grade = letter_grade(game_df.loc[game_df['hitterHand']=='L','locGrade_game'].mean())
     location_grade = letter_grade(game_df['locGrade_game'].mean())
     plv_grade = letter_grade(game_df['plvGrade_game'].mean())
-    
-    start_grade_ax.text(0.5,0.8,'Spring\nTraining',ha='center',va='center',fontsize=22,color=pl_line_color)
+
+    code_map = {
+        'A':'All-Star\nGame',
+        'E':'Spring\nTraining',
+        'S':'Spring\nTraining',
+        'R':'Regular\nSeason',
+        'F':'Spring\nTraining',
+        'D':'Playoffs',
+        'L':'Playoffs',
+        'W':'World\nSeries',
+    }
+    start_grade_ax.text(0.5,0.8,code_map[game_code],ha='center',va='center',fontsize=22,color=pl_line_color)
     start_grade_ax.text(0.5,0.4,start_grade,ha='center',va='center',fontsize=60,color=grade_colors[start_grade])
     start_grade_ax.set(xlim=(0,1),ylim=(0,1))
     start_grade_ax.axis('off')
