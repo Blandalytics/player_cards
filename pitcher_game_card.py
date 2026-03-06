@@ -1760,8 +1760,8 @@ def generate_chart(pitcher_id,game_id,game_df,game_group,szn_df,szn_comp,vs_past
     game_stats_ax = fig.add_axes([0.02,0.8425,.96,0.037], anchor='SW', zorder=1)
     start_grade = header_stats_chunk(game_id,pitcher_id,game_stats_ax)
     
-    start_grade_ax = fig.add_axes([0.285,0.705,.15,0.1], anchor='SW', zorder=1)
-    pitch_model_ax = fig.add_axes([0.01,0.705,.275,0.1], anchor='SW', zorder=1)
+    start_grade_ax = fig.add_axes([0.305,0.705,.13,0.1], anchor='SW', zorder=1)
+    pitch_model_ax = fig.add_axes([0.01,0.705,.295,0.1], anchor='SW', zorder=1)
     
     # Grade only
     stuff_grade = letter_grade(game_df['stuffGrade_game'].mean())
@@ -2018,7 +2018,7 @@ def generate_chart(pitcher_id,game_id,game_df,game_group,szn_df,szn_comp,vs_past
     fig.add_artist(lines.Line2D([0.01, 0.1], [0.815, 0.815],linewidth=3,color=pl_text,alpha=line_alpha))
     fig.add_artist(lines.Line2D([0.195, 0.315], [0.815, 0.815],linewidth=3,color=pl_text,alpha=line_alpha))
     fig.add_artist(lines.Line2D([0.01, 0.01], [0.715, 0.813],linewidth=3,color=pl_text,alpha=line_alpha))
-    fig.add_artist(lines.Line2D([0.285, 0.285], [0.715, 0.813],linewidth=3,color=pl_text,alpha=line_alpha))
+    fig.add_artist(lines.Line2D([0.305, 0.305], [0.715, 0.813],linewidth=3,color=pl_text,alpha=line_alpha))
     
     fig.text(0.5,0.9,game_text,color='w',fontsize=24,va='center',ha='center',font=italic)
     
