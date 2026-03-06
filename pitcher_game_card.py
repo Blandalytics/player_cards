@@ -67,13 +67,13 @@ chart_blue = sns.color_palette('vlag',n_colors=10000)[0]
 
 @st.cache_data(ttl=3600)
 def letter_logo():
-    logo_loc = 'https://github.com/Blandalytics/baseball_snippets/blob/main/teal_letter_logo.png?raw=true'
+    logo_loc = 'https://res.cloudinary.com/dduabusaf/image/upload/v1772839606/teal_letter_logo_owufaj.png'
     logo = Image.open(urllib.request.urlopen(logo_loc))
     return logo
 
-# letter_logo = letter_logo()
+letter_logo = letter_logo()
 
-st.set_page_config(page_title='PLV Pitcher Game Card', page_icon='⚾',#letter_logo,
+st.set_page_config(page_title='PLV Pitcher Game Card', page_icon=letter_logo,
                    layout='wide')
 # st.title("NFBC Draft Data, over Time")
 new_title = '<p style="color:#72CBFD; font-weight: bold; font-size: 42px;">PLV Pitcher Game Card</p>'
@@ -304,7 +304,7 @@ def name_chunk(pitcher_id,game_id,ax):
 
 def load_logo():
     # logo_loc = 'https://github.com/Blandalytics/PLV_viz/blob/main/data/PL-text-wht.png?raw=true'
-    logo_loc = 'https://github.com/Blandalytics/player_cards/blob/main/PitcherList_Stats_watermark_with_logo.webp?raw=true'
+    logo_loc = 'https://res.cloudinary.com/dduabusaf/image/upload/v1772839288/PitcherList_Stats_watermark_with_logo_k9e3xa.webp'
     logo = Image.open(urllib.request.urlopen(logo_loc))
     return logo
 
