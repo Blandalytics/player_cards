@@ -1549,7 +1549,7 @@ def usage_chunk(table_df,ax,vs_past):
         if len(pitch_list)>1:
             font_size = usage_adjust * 15 + 16
         else:
-            font_size = 28
+            font_size = 25
 
         ax.text(0,
                 pitch_list.index(pitch_type)+0.05,
