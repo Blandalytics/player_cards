@@ -2033,11 +2033,11 @@ def generate_chart(pitcher_id,game_id,game_df,game_group,szn_df,szn_comp,vs_past
                                                   )
             )
     
-    fig.text(0.72,0.815,'Usage',color='w',fontsize=30,va='center',ha='center')
-    fig.text(0.65,0.8,'vs LHB%',fontsize=20,color=pl_line_color,ha='right',va='center',weight='regular')
-    fig.text(0.79,0.8,'vs RHB%',fontsize=20,color=pl_line_color,ha='left',va='center',weight='regular')
-    fig.add_artist(lines.Line2D([0.78, 0.99], [0.815, 0.815],linewidth=3,color=pl_text,alpha=line_alpha))
-    fig.add_artist(lines.Line2D([0.425, 0.66], [0.815, 0.815],linewidth=3,color=pl_text,alpha=line_alpha))
+    fig.text(0.7175,0.815,'Usage',color='w',fontsize=30,va='center',ha='center')
+    fig.text(0.6475,0.8,'vs LHB%',fontsize=20,color=pl_line_color,ha='right',va='center',weight='regular')
+    fig.text(0.7875,0.8,'vs RHB%',fontsize=20,color=pl_line_color,ha='left',va='center',weight='regular')
+    fig.add_artist(lines.Line2D([0.7775, 0.99], [0.815, 0.815],linewidth=3,color=pl_text,alpha=line_alpha))
+    fig.add_artist(lines.Line2D([0.4225, 0.66], [0.815, 0.815],linewidth=3,color=pl_text,alpha=line_alpha))
     fig.add_artist(lines.Line2D([0.99, 0.99], [0.59, 0.813],linewidth=3,color=pl_text,alpha=line_alpha))
     fig.add_artist(lines.Line2D([0.01, 0.99], [0.588, 0.588],linewidth=3,color=pl_text,alpha=line_alpha))
     if vs_past:
