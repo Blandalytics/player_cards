@@ -2013,10 +2013,10 @@ def generate_chart(pitcher_id,game_id,game_df,game_group,szn_df,szn_comp,vs_past
     fig.add_artist(lines.Line2D([0.435, 0.435], [0.59, 0.813],linewidth=3,color=pl_text,alpha=line_alpha))
     
     #Grade Only
-    fig.text(0.36,0.815,'Results', ha='center',va='center',color='w',fontsize=30) # .075 over from 0.01
+    fig.text(0.37,0.815,'Results', ha='center',va='center',color='w',fontsize=25) # .075 over from 0.01
     fig.text(0.1475,0.815,'Skills', ha='center',va='center',color='w',fontsize=30) # 0.1375 over from 0.435
     fig.add_artist(lines.Line2D([0.01, 0.1], [0.815, 0.815],linewidth=3,color=pl_text,alpha=line_alpha))
-    fig.add_artist(lines.Line2D([0.195, 0.295], [0.815, 0.815],linewidth=3,color=pl_text,alpha=line_alpha))
+    fig.add_artist(lines.Line2D([0.195, 0.315], [0.815, 0.815],linewidth=3,color=pl_text,alpha=line_alpha))
     fig.add_artist(lines.Line2D([0.01, 0.01], [0.715, 0.813],linewidth=3,color=pl_text,alpha=line_alpha))
     fig.add_artist(lines.Line2D([0.285, 0.285], [0.715, 0.813],linewidth=3,color=pl_text,alpha=line_alpha))
     
