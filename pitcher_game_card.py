@@ -1575,7 +1575,7 @@ def usage_chunk(table_df,ax,vs_past):
 
 def header_chunk(table_df,ax):
     pitch_list = list(table_df['pitchType'].unique())
-    bar_width = np.clip(2/len(pitch_list),0.5,0.9)
+    bar_width = np.clip(2/len(pitch_list),0.5,0.8)
     for pitch_type in pitch_list:
         ax.text(0.225,pitch_list.index(pitch_type),table_df.loc[table_df['pitchType']==pitch_type,'Type'].item(),
                       ha='left',va='center',fontsize=20,color=marker_colors[pitch_type]
