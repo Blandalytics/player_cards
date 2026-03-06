@@ -1592,7 +1592,7 @@ def header_chunk(table_df,ax):
     label_adj = -10/(5*len(pitch_list)-0.5)
     # ax.text(0.225,label_adj,'Type',fontsize=16,color=pl_line_color,ha='left',va='bottom')
     # ax.text(0.9,label_adj,'#',fontsize=16,color=pl_line_color,ha='center',va='bottom')
-    ax.set(ylim=(len(pitch_list)-0.5,0.5))
+    ax.set(ylim=(len(pitch_list)-0.5,1))
     ax.axis('off')
     sns.despine()
 
@@ -1987,10 +1987,10 @@ def generate_chart(pitcher_id,game_id,game_df,game_group,szn_df,szn_comp,vs_past
     fastball_ax = fig.add_axes([0.01,0.6,.425,0.082], anchor='SW', zorder=1)
     fastball_name, fastball_code = fastball_stats(game_group,fastball_ax)
     
-    stat_header_ax = fig.add_axes([0.01,0.015,.25,0.175], anchor='SW', zorder=1)
+    stat_header_ax = fig.add_axes([0.01,0.015,.25,0.17], anchor='SW', zorder=1)
     header_chunk(game_group,stat_header_ax)
     
-    stat_table_ax = fig.add_axes([0.26,0.015,0.73,0.175], anchor='SW', zorder=1)
+    stat_table_ax = fig.add_axes([0.26,0.015,0.73,0.17], anchor='SW', zorder=1)
     stats_chunk(game_group.merge(szn_comp[['pitchType','Velo_diff']],how='left',on='pitchType') if vs_past else game_group,
                 stat_table_ax,vs_past)
     
