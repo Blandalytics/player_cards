@@ -1590,9 +1590,9 @@ def header_chunk(table_df,ax):
                 ha='center',va='center',fontsize=20)
       
     label_adj = -10/(5*len(pitch_list)-0.5)
-    ax.text(0.225,label_adj,'Type',fontsize=16,color=pl_line_color,ha='left',va='bottom')
-    ax.text(0.9,label_adj,'#',fontsize=16,color=pl_line_color,ha='center',va='bottom')
-    ax.set(ylim=(len(pitch_list)-0.5,label_adj))
+    # ax.text(0.225,label_adj,'Type',fontsize=16,color=pl_line_color,ha='left',va='bottom')
+    # ax.text(0.9,label_adj,'#',fontsize=16,color=pl_line_color,ha='center',va='bottom')
+    # ax.set(ylim=(len(pitch_list)-0.5,label_adj))
     ax.axis('off')
     sns.despine()
 
@@ -1685,14 +1685,15 @@ def stats_chunk(table_df,ax,vs_past):
                 else:
                     if (stat in ['PLV+','plvStuff+']) | (abs(stat_val-50)==50):
                         stat_val = int(stat_val)
-                ax.text(x_val,
-                        y_val,
-                        f'{stat_val}{suffix_dict[stat]}',
-                        ha='center',va='center',fontsize=20,color=stat_color
-                        )
+                # ax.text(x_val,
+                #         y_val,
+                #         f'{stat_val}{suffix_dict[stat]}',
+                #         ha='center',va='center',fontsize=20,color=stat_color
+                #         )
 
     ax.set(xlim=(-0.5,sum(width_dict.values())+0.5),
-          ylim=(len(pitch_list)-0.5,label_adj))
+          # ylim=(len(pitch_list)-0.5,label_adj)
+          )
     ax.axis('off')
     sns.despine()
 
@@ -2034,8 +2035,8 @@ def generate_chart(pitcher_id,game_id,game_df,game_group,szn_df,szn_comp,vs_past
             )
     
     fig.text(0.7175,0.815,'Usage',color='w',fontsize=30,va='center',ha='center')
-    fig.text(0.66,0.795,'vs LHB%',fontsize=20,color=pl_line_color,ha='right',va='center',weight='regular')
-    fig.text(0.7775,0.795,'vs RHB%',fontsize=20,color=pl_line_color,ha='left',va='center',weight='regular')
+    fig.text(0.66,0.8,'vs LHB%',fontsize=20,color=pl_line_color,ha='right',va='center',weight='regular')
+    fig.text(0.7775,0.8,'vs RHB%',fontsize=20,color=pl_line_color,ha='left',va='center',weight='regular')
     fig.add_artist(lines.Line2D([0.7775, 0.99], [0.815, 0.815],linewidth=3,color=pl_text,alpha=line_alpha))
     fig.add_artist(lines.Line2D([0.4225, 0.66], [0.815, 0.815],linewidth=3,color=pl_text,alpha=line_alpha))
     fig.add_artist(lines.Line2D([0.99, 0.99], [0.59, 0.813],linewidth=3,color=pl_text,alpha=line_alpha))
