@@ -344,7 +344,7 @@ def adjusted_vaa(dataframe):
 
     return dataframe[['raw_vaa','adj_vaa']]
 
-def pull_play(play,outside_data,base_outs,single_pitcher=False):
+def pull_play(play,outside_data,base_outs,single_pitcher=True):
     game_pitcher_id = play['matchup']['pitcher']['id']
     if (int(game_pitcher_id) != int(outside_data['pitcher_id'])) & single_pitcher:
         return
@@ -2056,6 +2056,8 @@ def generate_chart(pitcher_id,game_id,game_df,game_group,szn_df,szn_comp,vs_past
     fig.add_artist(lines.Line2D([0.01, 0.99], [0.278, 0.278],linewidth=3,color=pl_text,alpha=line_alpha))
     
     fig.text(0.5,0.255,'Pitch Type Metrics',color='w',fontsize=30,va='center',ha='center')
+    if game_df.shape[0] != game_group['#'].sum():
+        fig.text(0.94,0.25,'Pitch Type Metrics',va='center',ha='right',alpha=0.5)
     fig.add_artist(lines.Line2D([0.01, 0.35], [0.255, 0.255],linewidth=3,color=pl_text,alpha=line_alpha))
     fig.add_artist(lines.Line2D([0.65, 0.99], [0.255, 0.255],linewidth=3,color=pl_text,alpha=line_alpha))
     fig.add_artist(lines.Line2D([0.01, 0.01], [0.017, 0.253],linewidth=3,color=pl_text,alpha=line_alpha))
