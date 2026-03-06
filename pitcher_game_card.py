@@ -1231,8 +1231,8 @@ def load_data(pitcher_id,game_id,vs_past,szn_load):
     
         game_group = (
             game_df
-            .dropna(subset=['sz_top','sz_bot','velo','extension','plate_time','HB','IVB','spin_rate',
-                            'spin_dir','pX','pZ','x0','z0','vY0','vZ0','aY','aZ'])
+            # .dropna(subset=['sz_top','sz_bot','velo','extension','plate_time','HB','IVB','spin_rate',
+            #                 'spin_dir','pX','pZ','x0','z0','vY0','vZ0','aY','aZ'])
             .astype({'xSLGcon':'float'})
             .groupby(['pitcherId','pitcherName','pitchType'])
             [['isPitch','usage','vRHH','vLHH','armAngle','velo','extension','IVB','HB','HAVAA','strike','whiff','csw',
