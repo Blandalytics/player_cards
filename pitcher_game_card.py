@@ -1164,8 +1164,6 @@ def load_data(pitcher_id,game_id,vs_past,szn_load):
 
     game_df = (
         game_df
-        # .dropna(subset=['sz_top','sz_bot','velo','extension','plate_time','HB','IVB','spin_rate',
-        #                 'spin_dir','pX','pZ','x0','z0','vY0','vZ0','aY','aZ'])
         .assign(pitchType = lambda x: x['pitchType'].map(pitchtype_map),
                 desc = lambda x: x['code'].map(desc_map),
                 ca_str = lambda x: np.where(x['desc']=='called_strike',1,0),
@@ -1228,11 +1226,14 @@ def load_data(pitcher_id,game_id,vs_past,szn_load):
         game_pate_times = game_df.groupby('pitchType')['plate_time'].mean().to_dict()
         
         game_df[['plvStuff+','stuffGrade_game','stuffGrade_szn','locGrade_game','locGrade_szn','PLV+','plvGrade_game','plvGrade_szn']] = pitch_models(game_df)
-    
+        for stat in ['stuffGrade_game','plvStuff+','plvGrade_game','PLV+']:
+            game_df[stat] = np.where(game_df[['sz_top','sz_bot','velo','extension','plate_time','HB','IVB','spin_rate','spin_dir','pX','pZ','x0','z0','vY0','vZ0','aY','aZ']].isnull().values.any(axis=1),
+                                     None,
+                                     game_df[stat]
+                                    )
+     
         game_group = (
             game_df
-            # .dropna(subset=['sz_top','sz_bot','velo','extension','plate_time','HB','IVB','spin_rate',
-            #                 'spin_dir','pX','pZ','x0','z0','vY0','vZ0','aY','aZ'])
             .astype({'xSLGcon':'float'})
             .groupby(['pitcherId','pitcherName','pitchType'])
             [['isPitch','usage','vRHH','vLHH','armAngle','velo','extension','IVB','HB','HAVAA','strike','whiff','csw',
@@ -2055,11 +2056,12 @@ def generate_chart(pitcher_id,game_id,game_df,game_group,szn_df,szn_comp,vs_past
     fig.add_artist(lines.Line2D([0.99, 0.99], [0.28, 0.563],linewidth=3,color=pl_text,alpha=line_alpha))
     fig.add_artist(lines.Line2D([0.01, 0.99], [0.278, 0.278],linewidth=3,color=pl_text,alpha=line_alpha))
     
-    if game_df.shape[0] != game_group['#'].sum():
-        fig.text(0.5,0.255,'Pitch Type Metrics*',color='w',fontsize=30,va='center',ha='center')
-        fig.text(0.97,0.235,'*Pitches w Complete Data',va='center',ha='right',alpha=0.5)
-    else:
-        fig.text(0.5,0.255,'Pitch Type Metrics',color='w',fontsize=30,va='center',ha='center')
+    fig.text(0.5,0.255,'Pitch Type Metrics',color='w',fontsize=30,va='center',ha='center')
+    if game_df.loc[game_df[['sz_top','sz_bot','velo','extension',
+                            'plate_time','HB','IVB','spin_rate',
+                            'spin_dir','pX','pZ','x0','z0','vY0',
+                            'vZ0','aY','aZ']].isnull().values.any(axis=1)].shape[0] > 0:
+        fig.text(0.97,0.245,'*Some pitches missing data',va='center',ha='right',alpha=0.5)
     fig.add_artist(lines.Line2D([0.01, 0.35], [0.255, 0.255],linewidth=3,color=pl_text,alpha=line_alpha))
     fig.add_artist(lines.Line2D([0.65, 0.99], [0.255, 0.255],linewidth=3,color=pl_text,alpha=line_alpha))
     fig.add_artist(lines.Line2D([0.01, 0.01], [0.017, 0.253],linewidth=3,color=pl_text,alpha=line_alpha))
