@@ -1562,13 +1562,13 @@ def usage_chunk(table_df,ax,vs_past):
                                 color=marker_colors[pitch_type],fontsize=20)
 
     label_adj = -10/(5*len(pitch_list)-0.5)
-    ax.text(fill_width*1.15,label_adj,'vs RHB%',fontsize=20,color=pl_line_color,ha='left',va='bottom',weight='regular')
-    ax.text(-fill_width*1.15,label_adj,'vs LHB%',fontsize=20,color=pl_line_color,ha='right',va='bottom',weight='regular')
+    # ax.text(fill_width*1.15,label_adj,'vs RHB%',fontsize=20,color=pl_line_color,ha='left',va='bottom',weight='regular')
+    # ax.text(-fill_width*1.15,label_adj,'vs LHB%',fontsize=20,color=pl_line_color,ha='right',va='bottom',weight='regular')
     x_lim = max(np.abs(np.array(ax.get_xlim()))) * 4/3
     y_lim = (ax.get_ylim()[0],ax.get_ylim()[1]*1.1)
     ax.set(
            xlim=(-x_lim,x_lim),
-          ylim=(len(pitch_list)-0.5,label_adj)
+          # ylim=(len(pitch_list)-0.5,label_adj)
           )
     ax.axis('off')
     sns.despine(left=True)
@@ -1993,7 +1993,7 @@ def generate_chart(pitcher_id,game_id,game_df,game_group,szn_df,szn_comp,vs_past
     stats_chunk(game_group.merge(szn_comp[['pitchType','Velo_diff']],how='left',on='pitchType') if vs_past else game_group,
                 stat_table_ax,vs_past)
     
-    usage_ax = fig.add_axes([0.445,0.593,.545,0.195], anchor='SW', zorder=1)
+    usage_ax = fig.add_axes([0.445,0.593,.545,0.175], anchor='SW', zorder=1)
     usage_chunk(szn_comp if vs_past else game_group,usage_ax,vs_past)
 
     line_alpha = 2/3
