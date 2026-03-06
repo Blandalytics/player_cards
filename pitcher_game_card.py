@@ -1987,10 +1987,10 @@ def generate_chart(pitcher_id,game_id,game_df,game_group,szn_df,szn_comp,vs_past
     fastball_ax = fig.add_axes([0.01,0.6,.425,0.082], anchor='SW', zorder=1)
     fastball_name, fastball_code = fastball_stats(game_group,fastball_ax)
     
-    stat_header_ax = fig.add_axes([0.01,0.015,.25,0.195], anchor='SW', zorder=1)
+    stat_header_ax = fig.add_axes([0.01,0.015,.25,0.205], anchor='SW', zorder=1)
     header_chunk(game_group,stat_header_ax)
     
-    stat_table_ax = fig.add_axes([0.26,0.015,0.73,0.195], anchor='SW', zorder=1)
+    stat_table_ax = fig.add_axes([0.26,0.015,0.73,0.205], anchor='SW', zorder=1)
     stats_chunk(game_group.merge(szn_comp[['pitchType','Velo_diff']],how='left',on='pitchType') if vs_past else game_group,
                 stat_table_ax,vs_past)
     
