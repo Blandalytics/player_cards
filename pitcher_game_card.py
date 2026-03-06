@@ -346,8 +346,8 @@ def adjusted_vaa(dataframe):
 
 def pull_play(play,outside_data,base_outs,single_pitcher=True):
     game_pitcher_id = play['matchup']['pitcher']['id']
-    # if (int(game_pitcher_id) != int(outside_data['pitcher_id'])) & single_pitcher:
-    #     return
+    if (int(game_pitcher_id) != int(outside_data['pitcher_id'])) & single_pitcher:
+        return
     pitcher_name = play['matchup']['pitcher']['fullName']
     pitcher_hand = play['matchup']['pitchHand']['code']
 
@@ -590,13 +590,13 @@ def pull_game(game_id,pitcher_id,pitcher_height):
     top_bot = 'top'
     base_outs = 0
     for play in game['liveData']['plays']['allPlays']:
-        if len(play['playEvents'])==0:
-            continue
-        else:
-            base_outs = play['playEvents'][-1]['count'].get('outs')
-            play_data = pull_play(play, rel_dict,base_outs)
-            if play_data:
-                game_data+=play_data
+        # if len(play['playEvents'])==0:
+        #     continue
+        # else:
+        base_outs = play['playEvents'][-1]['count'].get('outs')
+        play_data = pull_play(play, rel_dict,base_outs)
+        if play_data:
+            game_data+=play_data
 
     return game_data
 
@@ -1151,7 +1151,7 @@ def load_data(pitcher_id,game_id,vs_past,szn_load):
                               'velo','armAngle','extension','plate_time','HB','IVB','spin_rate','spin_dir',
                               'pX','pZ','x0','z0','vY0','vZ0','aY','aZ',
                               'launch_speed','launch_angle','hitX','hitY'])
-        .query(f'pitcherId=={pitcher_id}')
+        # .query(f'pitcherId=={pitcher_id}')
         .query('isPitch==1')
         .drop_duplicates('playId')
     )
