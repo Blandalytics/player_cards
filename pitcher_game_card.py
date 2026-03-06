@@ -344,7 +344,7 @@ def adjusted_vaa(dataframe):
 
     return dataframe[['raw_vaa','adj_vaa']]
 
-def pull_play(play,outside_data,base_outs,single_pitcher=True):
+def pull_play(play,outside_data,base_outs,single_pitcher=False):
     game_pitcher_id = play['matchup']['pitcher']['id']
     if (int(game_pitcher_id) != int(outside_data['pitcher_id'])) & single_pitcher:
         return
@@ -1151,7 +1151,7 @@ def load_data(pitcher_id,game_id,vs_past,szn_load):
                               'velo','armAngle','extension','plate_time','HB','IVB','spin_rate','spin_dir',
                               'pX','pZ','x0','z0','vY0','vZ0','aY','aZ',
                               'launch_speed','launch_angle','hitX','hitY'])
-        # .query(f'pitcherId=={pitcher_id}')
+        .query(f'pitcherId=={pitcher_id}')
         .query('isPitch==1')
         .drop_duplicates('playId')
     )
