@@ -1592,7 +1592,7 @@ def header_chunk(table_df,ax):
     label_adj = -10/(5*len(pitch_list)-0.5)
     # ax.text(0.225,label_adj,'Type',fontsize=16,color=pl_line_color,ha='left',va='bottom')
     # ax.text(0.9,label_adj,'#',fontsize=16,color=pl_line_color,ha='center',va='bottom')
-    # ax.set(ylim=(len(pitch_list)-0.5,label_adj))
+    ax.set(ylim=(len(pitch_list)-0.5,0.5))
     ax.axis('off')
     sns.despine()
 
@@ -1692,7 +1692,7 @@ def stats_chunk(table_df,ax,vs_past):
                 #         )
 
     ax.set(xlim=(-0.5,sum(width_dict.values())+0.5),
-          # ylim=(len(pitch_list)-0.5,label_adj)
+          ylim=(len(pitch_list)-0.5,0.5)
           )
     ax.axis('off')
     sns.despine()
