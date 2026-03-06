@@ -1443,42 +1443,47 @@ def fastball_stats(table_df,ax):
         'HAVAA':'°'
         }
 
-    fastball_comp = (
-        table_df
-        .loc[table_df['pitchType'].isin(['FF','SI','FC']),['pitchType','#','Type','Velo','Ext','IVB','HB','HAVAA','IVB_acc','HB_acc']]
-        .head(1)
-    )
-    fastball_type = fastball_comp['pitchType'].item()
-    stat_list = ['Velo','Ext','IVB','HB','HAVAA']
-    for stat in stat_list:
-        x_val = stat_list.index(stat)
-        stat_val = fastball_comp[stat].item()
-        if stat in ['IVB','HB']:
-            fastball_comp[stat+'_color'] = pd.cut(fastball_comp[stat+'_acc'],
-                                                  bins=pitchtype_metrics_dict[fastball_type][stat+'_acc'],
-                                                  labels=range(5))
-        else:
-            fastball_comp[stat+'_color'] = pd.cut(fastball_comp[stat],
-                                                  bins=pitchtype_metrics_dict[fastball_type][stat],
-                                                  labels=range(5))
-        color_val = fastball_comp[stat+'_color'].item()
-        stat_color = diverge_palette[color_val]
-        ax.text(x_val,
-                0.3,
-                f'{stat_val}{suffix_dict[stat]}',
-                ha='center',va='center',fontsize=30,color=stat_color
-                )
-        ax.text(x_val,
-                0.55,
-                stat.replace(' ','\n'),
-                fontsize=24,color=pl_line_color,ha='center',va='bottom')
-
-    ax.set(xlim=(-0.75,len(stat_list)-0.25),
-           ylim=(0,1)
-           )
-    ax.axis('off')
-    sns.despine()
-    return fastball_comp['Type'].item(),fastball_comp['pitchType'].item()
+    if table_df.loc[table_df['pitchType'].isin(['FF','SI','FC']).shape[0]==0:
+        ax.axis('off')
+        sns.despine()
+        return 'No Fastball','UN'
+    else:
+        fastball_comp = (
+            table_df
+            .loc[table_df['pitchType'].isin(['FF','SI','FC']),['pitchType','#','Type','Velo','Ext','IVB','HB','HAVAA','IVB_acc','HB_acc']]
+            .head(1)
+        )
+        fastball_type = fastball_comp['pitchType'].item()
+        stat_list = ['Velo','Ext','IVB','HB','HAVAA']
+        for stat in stat_list:
+            x_val = stat_list.index(stat)
+            stat_val = fastball_comp[stat].item()
+            if stat in ['IVB','HB']:
+                fastball_comp[stat+'_color'] = pd.cut(fastball_comp[stat+'_acc'],
+                                                      bins=pitchtype_metrics_dict[fastball_type][stat+'_acc'],
+                                                      labels=range(5))
+            else:
+                fastball_comp[stat+'_color'] = pd.cut(fastball_comp[stat],
+                                                      bins=pitchtype_metrics_dict[fastball_type][stat],
+                                                      labels=range(5))
+            color_val = fastball_comp[stat+'_color'].item()
+            stat_color = diverge_palette[color_val]
+            ax.text(x_val,
+                    0.3,
+                    f'{stat_val}{suffix_dict[stat]}',
+                    ha='center',va='center',fontsize=30,color=stat_color
+                    )
+            ax.text(x_val,
+                    0.55,
+                    stat.replace(' ','\n'),
+                    fontsize=24,color=pl_line_color,ha='center',va='bottom')
+    
+        ax.set(xlim=(-0.75,len(stat_list)-0.25),
+               ylim=(0,1)
+               )
+        ax.axis('off')
+        sns.despine()
+        return fastball_comp['Type'].item(),fastball_comp['pitchType'].item()
 
 def usage_chunk(table_df,ax,vs_past):
     pitch_list = list(table_df['pitchType'].unique())
