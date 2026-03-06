@@ -1198,7 +1198,7 @@ def load_data(pitcher_id,game_id,vs_past,szn_load):
         game_df['adj_spin_dir'] = np.where(game_df['pitcherHand']=='L',game_df['spin_dir'],360-game_df['spin_dir'])
         
         fastballs = ['FF','FC','FT','SI']
-        if (ame_df.loc[game_df['pitchType'].isin(fastballs)].shape[0]==0:
+        if game_df.loc[game_df['pitchType'].isin(fastballs)].shape[0]==0:
             fastball_df = pd.DataFrame()
         else:
             fastball_df = (game_df
