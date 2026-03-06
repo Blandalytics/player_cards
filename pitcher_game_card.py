@@ -535,14 +535,15 @@ def header_stats_chunk(game_id,pitcher_id,ax):
     whiffs_text = f'{whiffs} Whiffs' if whiffs!=1 else f'{whiffs} Whiff'
     csw = x[f'{home_text}_pitchers'][f'{pitcher_id}'][0]['avg_pitch_speed'][-1]['csw_percent']
 
-    ## Actual Game Score
-    # game_score = 40 + (2 * int(outs) + int(strikeouts) - 2 * int(walks) - 2 * int(hits) - 3 * int(earned_runs) - 6 * int(home_runs))
-    # game_score = (game_score-51)/17*10+75
+    if game_code in ['A','E','F','S']:
+        # Per-PA Game Score
+        game_score = (2 * int(outs) + int(strikeouts) - 2 * int(walks) - 2 * int(hits) - 3 * int(earned_runs) - 6 * int(home_runs)) / tbf
+        game_score = (game_score-0.481)/0.875*10+75
+    else:
+        # Actual Game Score (Starters)
+        game_score = 40 + (2 * int(outs) + int(strikeouts) - 2 * int(walks) - 2 * int(hits) - 3 * int(earned_runs) - 6 * int(home_runs))
+        game_score = (game_score-51)/17*10+75
 
-    # Per-PA Game Score
-    game_score = (2 * int(outs) + int(strikeouts) - 2 * int(walks) - 2 * int(hits) - 3 * int(earned_runs) - 6 * int(home_runs)) / tbf
-    game_score = (game_score-0.481)/0.875*10+75
-    
     if game_score<60:
         game_grade = 'F'
     elif game_score<70:
