@@ -1176,9 +1176,9 @@ def load_data(pitcher_id,game_id,vs_past,szn_load):
 
     missing_feats = []
     for col in ['sz_top','sz_bot','velo','extension','plate_time',
-                'HB','IVB','spin_rate','spin_dir','pX','pZ','x0','z0','vY0','vZ0','aY','aZ']:
+                'HB','IVB','spin_rate','adj_spin_dir','pX','pZ','x0','z0','vY0','vZ0','aY','aZ']:
         if game_df[col].isna().all():
-            missing_feats += [col]
+            missing_feats += [col.replace('adj_','')]
 
     game_df = (
         game_df
