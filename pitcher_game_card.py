@@ -1214,14 +1214,16 @@ def load_data(pitcher_id,game_id,vs_past,szn_load):
 
         game_df['adj_spin_dir'] = np.where(game_df['pitcherHand']=='L',game_df['spin_dir'],360-game_df['spin_dir'])
         
-        fastballs = ['FF','FC','FT','SI']
+        fastballs = ['FF','SI','FT','FC']
         if game_df.loc[game_df['pitchType'].isin(fastballs)].shape[0]==0:
             has_fastball = False
             fastball_df = pd.DataFrame(data={'pitcherId':[pitcher_id],'gameId':[game_id],'fastball_type':['NA']})
         else:
             has_fastball = True
-            fastball_df = (game_df
-                           .loc[game_df['pitchType'].isin(fastballs)]
+            fastball_df = preseason_df.loc[preseason_df['pitchType'].isin(fastballs)].copy()
+            fastball_df['sortType'] = pd.Categorical(fastball_df['pitchType'], categories=fastballs, ordered=True)
+            fastball_df = (fastball_df
+                           .sort_value('sortType')
                            .groupby(['pitcherId','gameId'], as_index=False)
                            ['pitchType']
                            .agg(pd.Series.mode)
