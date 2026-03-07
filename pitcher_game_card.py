@@ -1810,7 +1810,7 @@ def generate_chart(pitcher_id,game_id,game_df,game_group,szn_df,szn_comp,vs_past
     pitch_model_ax = fig.add_axes([0.01,0.705,.295,0.1], anchor='SW', zorder=1)
     
     # Grade only
-    stuff_grade = letter_grade(game_df['stuffGrade_game'].mean()))
+    stuff_grade = letter_grade(game_df['stuffGrade_game'].mean())
     vs_r_location_grade = letter_grade(game_df.loc[game_df['hitterHand']=='R','locGrade_game'].mean())
     vs_l_location_grade = letter_grade(game_df.loc[game_df['hitterHand']=='L','locGrade_game'].mean())
     location_grade = letter_grade(game_df['locGrade_game'].mean())
