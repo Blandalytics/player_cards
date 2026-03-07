@@ -144,7 +144,7 @@ diverge_palette = sns.blend_palette([color_min,'w',color_max],n_colors=5)
 
 grade_palette = sns.blend_palette([color_min,'w',color_max],n_colors=9)
 grade_colors = {
-    '':pl_background,
+    '-':'w',
     'F':grade_palette[0],
     'D-':grade_palette[2],
     'D':grade_palette[2],
@@ -1483,8 +1483,8 @@ def fastball_stats(table_df,ax):
             if np.isnan(stat_val):
                 ax.text(x_val,
                         0.3,
-                        '',
-                        ha='center',va='center',fontsize=30,color=pl_background
+                        '-',
+                        ha='center',va='center',fontsize=30,color='w'
                        )
             else:
                 if stat in ['IVB','HB']:
@@ -1795,7 +1795,7 @@ def letter_grade(val):
     grade = pd.cut([val],
                   bins=[-100,60,63,67,70,73,77,80,83,87,90,93,97,300],
                   labels=['F', 'D-', 'D', 'D+', 'C-', 'C', 'C+', 'B-', 'B', 'B+', 'A-', 'A', 'A+'])[0]
-    return '' if np.isnan(val) else grade
+    return '-' if np.isnan(val) else grade
 def generate_chart(pitcher_id,game_id,game_df,game_group,szn_df,szn_comp,vs_past):
     arm_angle = game_df['armAngle'].mean()
     
