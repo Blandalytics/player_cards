@@ -1788,7 +1788,7 @@ def letter_grade(val):
     grade = pd.cut([val],
                   bins=[-100,60,63,67,70,73,77,80,83,87,90,93,97,300],
                   labels=['F', 'D-', 'D', 'D+', 'C-', 'C', 'C+', 'B-', 'B', 'B+', 'A-', 'A', 'A+'])[0]
-    return '' if np.isnan(grade) else grade
+    return '' if np.isnan(val) else grade
 def generate_chart(pitcher_id,game_id,game_df,game_group,szn_df,szn_comp,vs_past):
     arm_angle = game_df['armAngle'].mean()
     
