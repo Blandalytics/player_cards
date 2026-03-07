@@ -1223,7 +1223,7 @@ def load_data(pitcher_id,game_id,vs_past,szn_load):
             fastball_df = game_df.loc[game_df['pitchType'].isin(fastballs)].copy()
             fastball_df['sortType'] = pd.Categorical(fastball_df['pitchType'], categories=fastballs, ordered=True)
             fastball_df = (fastball_df
-                           .sort_value('sortType')
+                           .sort_values('sortType')
                            .groupby(['pitcherId','gameId'], as_index=False)
                            ['pitchType']
                            .agg(pd.Series.mode)
