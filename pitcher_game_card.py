@@ -261,7 +261,7 @@ def to_nested_dict(df, orient='index'):
 
 def arm_angle_day(game_date,season=2025):
     today_date = datetime.today().replace(tzinfo=UTC).astimezone(tz=None)
-    if (today_date - game_date).days >= 3:
+    if ((today_date - game_date).days >= 3) & ((date(game_date.year,3,25) - today_date).days >= 0):
         url = f"https://baseballsavant.mlb.com/leaderboard/pitcher-arm-angles?batSide=&dateStart={game_date.strftime('%Y-%m-%d')}&dateEnd={game_date.strftime('%Y-%m-%d')}&gameType=R&groupBy=api_pitch_type_group03&min=1&minGroupPitches=1&perspective=back&pitchHand=&pitchType=&season=&size=small&sort=ascending&team=&csv=true"
     elif (date(game_date.year,3,25) - today_date).days >= 0:
         url = f"https://baseballsavant.mlb.com/leaderboard/pitcher-arm-angles?batSide=&dateStart=&dateEnd=&gameType=R&groupBy=api_pitch_type_group03&min=1&minGroupPitches=1&perspective=back&pitchHand=&pitchType=&season={game_date.year-1}&size=small&sort=ascending&team=&csv=true"
