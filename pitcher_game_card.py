@@ -1174,6 +1174,8 @@ def load_data(pitcher_id,game_id,vs_past,szn_load):
         .drop_duplicates('playId')
     )
 
+    game_df['adj_spin_dir'] = np.where(game_df['pitcherHand']=='L',game_df['spin_dir'],360-game_df['spin_dir'])
+
     missing_feats = []
     for col in ['sz_top','sz_bot','velo','extension','plate_time',
                 'HB','IVB','spin_rate','adj_spin_dir','pX','pZ','x0','z0','vY0','vZ0','aY','aZ']:
