@@ -261,9 +261,10 @@ def to_nested_dict(df, orient='index'):
 
 def arm_angle_day(game_date,season=2025):
     today_date = datetime.today().replace(tzinfo=UTC).astimezone(tz=None)
-    if ((today_date - game_date).days >= 3) & ((datetime(game_date.year,3,25) - today_date).days >= 0):
+    szn_start = (datetime(game_date.year,3,25).replace(tzinfo=UTC).astimezone(tz=None)
+    if ((today_date - game_date).days >= 3) & (szn_start - today_date).days >= 0):
         url = f"https://baseballsavant.mlb.com/leaderboard/pitcher-arm-angles?batSide=&dateStart={game_date.strftime('%Y-%m-%d')}&dateEnd={game_date.strftime('%Y-%m-%d')}&gameType=R&groupBy=api_pitch_type_group03&min=1&minGroupPitches=1&perspective=back&pitchHand=&pitchType=&season=&size=small&sort=ascending&team=&csv=true"
-    elif (datetime(game_date.year,3,25) - today_date).days >= 0:
+    elif (szn_start - today_date).days >= 0:
         url = f"https://baseballsavant.mlb.com/leaderboard/pitcher-arm-angles?batSide=&dateStart=&dateEnd=&gameType=R&groupBy=api_pitch_type_group03&min=1&minGroupPitches=1&perspective=back&pitchHand=&pitchType=&season={game_date.year-1}&size=small&sort=ascending&team=&csv=true"
     else:
         url = f"https://baseballsavant.mlb.com/leaderboard/pitcher-arm-angles?batSide=&dateStart=&dateEnd=&gameType=R&groupBy=api_pitch_type_group03&min=1&minGroupPitches=1&perspective=back&pitchHand=&pitchType=&season={game_date.year}&size=small&sort=ascending&team=&csv=true"
