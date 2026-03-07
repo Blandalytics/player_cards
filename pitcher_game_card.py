@@ -264,7 +264,7 @@ def arm_angle_day(game_date,season=2025):
     if (today_date - game_date).days >= 3:
         url = f"https://baseballsavant.mlb.com/leaderboard/pitcher-arm-angles?batSide=&dateStart={game_date.strftime('%Y-%m-%d')}&dateEnd={game_date.strftime('%Y-%m-%d')}&gameType=R&groupBy=api_pitch_type_group03&min=1&minGroupPitches=1&perspective=back&pitchHand=&pitchType=&season=&size=small&sort=ascending&team=&csv=true"
     else:
-        url = f"https://baseballsavant.mlb.com/leaderboard/pitcher-arm-angles?batSide=&dateStart=&dateEnd={game_date.strftime('%Y-%m-%d')}&gameType=R&groupBy=api_pitch_type_group03&min=1&minGroupPitches=1&perspective=back&pitchHand=&pitchType=&season=&size=small&sort=ascending&team=&csv=true"
+        url = f"https://baseballsavant.mlb.com/leaderboard/pitcher-arm-angles?batSide=&dateStart=&dateEnd=&gameType=R&groupBy=api_pitch_type_group03&min=1&minGroupPitches=1&perspective=back&pitchHand=&pitchType=&season={game_date.year}&size=small&sort=ascending&team=&csv=true"
     res = requests.get(url, timeout=None).content
     res_df = pd.read_csv(io.StringIO(res.decode('utf-8')))
     return to_nested_dict(res_df.groupby(['pitcher','api_pitch_type_group03'])[['ball_angle']].mean())
