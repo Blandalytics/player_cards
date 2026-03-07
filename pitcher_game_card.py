@@ -928,6 +928,7 @@ def pitch_models(data):
 
     run_expectancies = pd.read_csv('re_12_vals.csv').set_index(['cleaned_description','count']).to_dict()['delta_re']
 
+    model_df['extension'] = model_df['extension'].astype('float')
     model_df['balls_before_pitch'] = model_df['balls'].copy()
     model_df['strikes_before_pitch'] = model_df['strikes'].copy()
     model_df['count'] = model_df['balls'].astype('str')+'_'+model_df['strikes'].astype('str')
