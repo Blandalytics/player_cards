@@ -1480,21 +1480,28 @@ def fastball_stats(table_df,ax):
         for stat in stat_list:
             x_val = stat_list.index(stat)
             stat_val = fastball_comp[stat].item()
-            if stat in ['IVB','HB']:
-                fastball_comp[stat+'_color'] = pd.cut(fastball_comp[stat+'_acc'],
-                                                      bins=pitchtype_metrics_dict[fastball_type][stat+'_acc'],
-                                                      labels=range(5))
+            if np.isnan(stat_val):
+                ax.text(x_val,
+                        0.3,
+                        '',
+                        ha='center',va='center',fontsize=30,color=pl_background
+                       )
             else:
-                fastball_comp[stat+'_color'] = pd.cut(fastball_comp[stat],
-                                                      bins=pitchtype_metrics_dict[fastball_type][stat],
-                                                      labels=range(5))
-            color_val = fastball_comp[stat+'_color'].item()
-            stat_color = diverge_palette[color_val]
-            ax.text(x_val,
-                    0.3,
-                    f'{stat_val}{suffix_dict[stat]}',
-                    ha='center',va='center',fontsize=30,color=stat_color
-                    )
+                if stat in ['IVB','HB']:
+                    fastball_comp[stat+'_color'] = pd.cut(fastball_comp[stat+'_acc'],
+                                                          bins=pitchtype_metrics_dict[fastball_type][stat+'_acc'],
+                                                          labels=range(5))
+                else:
+                    fastball_comp[stat+'_color'] = pd.cut(fastball_comp[stat],
+                                                          bins=pitchtype_metrics_dict[fastball_type][stat],
+                                                          labels=range(5))
+                color_val = fastball_comp[stat+'_color'].item()
+                stat_color = diverge_palette[color_val]
+                ax.text(x_val,
+                        0.3,
+                        f'{stat_val}{suffix_dict[stat]}',
+                        ha='center',va='center',fontsize=30,color=stat_color
+                        )
             ax.text(x_val,
                     0.55,
                     stat.replace(' ','\n'),
