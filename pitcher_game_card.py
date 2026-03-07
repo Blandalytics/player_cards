@@ -1220,7 +1220,7 @@ def load_data(pitcher_id,game_id,vs_past,szn_load):
             fastball_df = pd.DataFrame(data={'pitcherId':[pitcher_id],'gameId':[game_id],'fastball_type':['NA']})
         else:
             has_fastball = True
-            fastball_df = preseason_df.loc[preseason_df['pitchType'].isin(fastballs)].copy()
+            fastball_df = game_df.loc[game_df['pitchType'].isin(fastballs)].copy()
             fastball_df['sortType'] = pd.Categorical(fastball_df['pitchType'], categories=fastballs, ordered=True)
             fastball_df = (fastball_df
                            .sort_value('sortType')
