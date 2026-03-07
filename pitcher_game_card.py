@@ -144,6 +144,7 @@ diverge_palette = sns.blend_palette([color_min,'w',color_max],n_colors=5)
 
 grade_palette = sns.blend_palette([color_min,'w',color_max],n_colors=9)
 grade_colors = {
+    '':pl_background,
     'F':grade_palette[0],
     'D-':grade_palette[2],
     'D':grade_palette[2],
@@ -1174,13 +1175,11 @@ def load_data(pitcher_id,game_id,vs_past,szn_load):
         .drop_duplicates('playId')
     )
 
-    game_df['adj_spin_dir'] = np.where(game_df['pitcherHand']=='L',game_df['spin_dir'],360-game_df['spin_dir'])
-
     missing_feats = []
     for col in ['sz_top','sz_bot','velo','extension','plate_time',
-                'HB','IVB','spin_rate','adj_spin_dir','pX','pZ','x0','z0','vY0','vZ0','aY','aZ']:
+                'HB','IVB','spin_rate','spin_dir','pX','pZ','x0','z0','vY0','vZ0','aY','aZ']:
         if game_df[col].isna().all():
-            missing_feats += [col.replace('adj_','')]
+            missing_feats += [col]
 
     game_df = (
         game_df
@@ -1786,10 +1785,10 @@ def gradient_bar(ax, x, y, width=0.5, bottom=0):
 logo = load_logo()
 
 def letter_grade(val):
-    return pd.cut([val],
+    grade = pd.cut([val],
                   bins=[-100,60,63,67,70,73,77,80,83,87,90,93,97,300],
                   labels=['F', 'D-', 'D', 'D+', 'C-', 'C', 'C+', 'B-', 'B', 'B+', 'A-', 'A', 'A+'])[0]
-
+    return '' if np.isnan(grade) else grade
 def generate_chart(pitcher_id,game_id,game_df,game_group,szn_df,szn_comp,vs_past):
     arm_angle = game_df['armAngle'].mean()
     
@@ -1811,12 +1810,12 @@ def generate_chart(pitcher_id,game_id,game_df,game_group,szn_df,szn_comp,vs_past
     pitch_model_ax = fig.add_axes([0.01,0.705,.295,0.1], anchor='SW', zorder=1)
     
     # Grade only
-    stuff_grade = letter_grade(game_df['stuffGrade_game'].mean())
+    stuff_grade = letter_grade(game_df['stuffGrade_game'].mean()))
     vs_r_location_grade = letter_grade(game_df.loc[game_df['hitterHand']=='R','locGrade_game'].mean())
     vs_l_location_grade = letter_grade(game_df.loc[game_df['hitterHand']=='L','locGrade_game'].mean())
     location_grade = letter_grade(game_df['locGrade_game'].mean())
     plv_grade = letter_grade(game_df['plvGrade_game'].mean())
-
+            
     code_map = {
         'A':'All-Star\nGame',
         'E':'Spring\nTraining',
