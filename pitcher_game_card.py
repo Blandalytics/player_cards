@@ -1813,7 +1813,7 @@ def generate_chart(pitcher_id,game_id,game_df,game_group,szn_df,szn_comp,vs_past
     title_text_ax = fig.add_axes([0.03,0.91,3/4,0.08], anchor='SW', zorder=1)
     game_text = name_chunk(pitcher_id,game_id,title_text_ax)
     
-    game_stats_ax = fig.add_axes([0.02,0.8425,.96,0.037], anchor='SW', zorder=1)
+    game_stats_ax = fig.add_axes([0.02,0.8375,.96,0.037], anchor='SW', zorder=1)
     start_grade, game_code = header_stats_chunk(game_id,pitcher_id,game_stats_ax)
     
     start_grade_ax = fig.add_axes([0.305,0.705,.13,0.1], anchor='SW', zorder=1)
