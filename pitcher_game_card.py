@@ -1831,6 +1831,7 @@ def generate_chart(pitcher_id,game_id,game_df,game_group,szn_df,szn_comp,vs_past
         'E':'Spring\nTraining',
         'S':'Spring\nTraining',
         'R':'Regular\nSeason',
+        'P':'Regular\nSeason',
         'F':'Spring\nTraining',
         'I':'Spring\nTraining',
         'D':'Playoffs',
