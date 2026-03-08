@@ -502,7 +502,7 @@ def pull_play(play,outside_data,base_outs,single_pitcher=True):
 def header_stats_chunk(game_id,pitcher_id,ax):
     r = requests.get(f'https://baseballsavant.mlb.com/gf?game_pk={game_id}')
     x = r.json()
-    game_code = x['game_status_code']
+    game_code = x['gamedayType']
 
     pitcher_lineup = [x['home_pitcher_lineup'][0]]+[x['away_pitcher_lineup'][0]]+([] if len(x['home_pitcher_lineup'])==1 else x['home_pitcher_lineup'][1:])+([] if len(x['away_pitcher_lineup'])==1 else x['away_pitcher_lineup'][1:])
     home_team = ['home']+['away']+([] if len(x['home_pitcher_lineup'])==1 else ['home']*(len(x['home_pitcher_lineup'])-1))+([] if len(x['away_pitcher_lineup'])==1 else ['away']*(len(x['away_pitcher_lineup'])-1))
