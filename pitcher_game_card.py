@@ -1813,7 +1813,7 @@ def generate_chart(pitcher_id,game_id,game_df,game_group,szn_df,szn_comp,vs_past
     title_text_ax = fig.add_axes([0.03,0.91,3/4,0.08], anchor='SW', zorder=1)
     game_text = name_chunk(pitcher_id,game_id,title_text_ax)
     
-    game_stats_ax = fig.add_axes([0.02,0.8375,.96,0.037], anchor='SW', zorder=1)
+    game_stats_ax = fig.add_axes([0.02,0.8425,.96,0.037], anchor='SW', zorder=1)
     start_grade, game_code = header_stats_chunk(game_id,pitcher_id,game_stats_ax)
     
     start_grade_ax = fig.add_axes([0.305,0.705,.13,0.1], anchor='SW', zorder=1)
@@ -2088,7 +2088,7 @@ def generate_chart(pitcher_id,game_id,game_df,game_group,szn_df,szn_comp,vs_past
     fig.add_artist(lines.Line2D([0.01, 0.01], [0.715, 0.813],linewidth=3,color=pl_text,alpha=line_alpha))
     fig.add_artist(lines.Line2D([0.305, 0.305], [0.715, 0.813],linewidth=3,color=pl_text,alpha=line_alpha))
     
-    fig.text(0.5,0.9,game_text,color='w',fontsize=24,va='center',ha='center',font=italic)
+    fig.text(0.5,0.8975,game_text,color='w',fontsize=24,va='center',ha='center',font=italic)
     
     fig.add_artist(mpatches.FancyBboxPatch((0.02, 0.85), 0.96, 0.023,
                                            ec=pl_text,
