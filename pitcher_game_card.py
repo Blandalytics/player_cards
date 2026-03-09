@@ -2151,7 +2151,7 @@ def generate_chart(pitcher_id,game_id,game_df,game_group,szn_df,szn_comp,prev_se
     fig.text(0.085,0.23,'Type',color=pl_line_color,fontsize=16,va='center',ha='center')
     fig.text(0.235,0.23,'#',color=pl_line_color,fontsize=16,va='center',ha='center')
     if comp_year:
-        fig.text(0.335,0.23,f'Velo (vs {str(comp_year)[-2:]})',color=pl_line_color,fontsize=16,va='center',ha='center')
+        fig.text(0.335,0.23,f"Velo (vs '{str(comp_year)[-2:]})",color=pl_line_color,fontsize=16,va='center',ha='center')
     else:
         fig.text(0.335,0.23,'Velo',color=pl_line_color,fontsize=16,va='center',ha='center')
     fig.text(0.42,0.23,'IVB',color=pl_line_color,fontsize=16,va='center',ha='center')
