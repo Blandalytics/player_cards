@@ -2130,7 +2130,7 @@ def generate_chart(pitcher_id,game_id,game_df,game_group,szn_df,szn_comp,prev_se
         if prev_season:
             fig.text(0.02,0.285,f'Shaded Regions are\n{comp_year} Shapes translated\nto current Velo',alpha=0.5)
         else:
-            fig.text(0.02,0.285,f'Shaded Regions are\nprior {comp_year} Shapes',alpha=0.5)
+            fig.text(0.02,0.285,f'Shaded Regions are\nprior {comp_year} Shapes\ntranslated to current Velo',alpha=0.5)
     fig.add_artist(lines.Line2D([0.01, 0.12], [0.565, 0.565],linewidth=3,color=pl_text,alpha=line_alpha))
     fig.add_artist(lines.Line2D([0.325, 0.505], [0.565, 0.565],linewidth=3,color=pl_text,alpha=line_alpha))
     fig.add_artist(lines.Line2D([0.6425, 0.7825], [0.565, 0.565],linewidth=3,color=pl_text,alpha=line_alpha))
