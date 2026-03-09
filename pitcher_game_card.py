@@ -2262,7 +2262,7 @@ if len(pitcher_list.keys()) >0:
             else:
                 prev_season = False
             szn_load = load_prev_pitches(pitcher_id,game_id,
-                                         prev_season=prev_season
+                                         prev_season=comp_year
                                           )
         else:
             prev_season = False
