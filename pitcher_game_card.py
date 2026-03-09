@@ -2238,7 +2238,7 @@ with col3:
         st.selectbox('Choose a pitcher:',list(pitcher_list.keys()),key='pitcher')
         pitcher_id = int(pitcher_list[ss['pitcher']][0])
         year_diff = 1
-        while year_diff < 4:
+        while year_diff < 5:
             response = requests.get(url=f'http://statsapi.mlb.com/api/v1/people/{pitcher_id}?hydrate=stats(group=pitching,type=gameLog,season={ss['date'].year - year_diff},endDate={ss['date']},sportId=[1,51],gameType=[E,R,S]),hydrations').json()
             if 'stats' in response['people'][0].keys():
                 vs_past = st.checkbox("Compare to past year's results?",value=True)
