@@ -1170,7 +1170,7 @@ def generate_games(games_today):
     return game_df.sort_values(['Sort Code','Sort Time','Game ID','Sort Inning'])['Game ID'].to_dict()
 
 @st.cache_data(ttl=600, show_spinner='Loading game data')
-def load_data(pitcher_id,game_id,vs_past,szn_load):
+def load_data(pitcher_id,game_id,comp_year,szn_load):
     game_df = (
         pd.DataFrame(pull_game(game_id, pitcher_id, 6.25),
                      columns=['gameId','gameDate','playId',
@@ -2255,7 +2255,7 @@ with col3:
 if len(pitcher_list.keys()) >0:
     if st.button('Generate Chart'):
         if comp_year:
-            response = requests.get(f'http://statsapi.mlb.com/api/v1/people/{pitcher_id}?hydrate=stats(group=pitching,type=gameLog,season=2025,sportId=[1,51],gameType=[E,R,S]),hydrations').json()
+            response = requests.get(f'http://statsapi.mlb.com/api/v1/people/{pitcher_id}?hydrate=stats(group=pitching,type=gameLog,season={comp_year},sportId=[1,51],gameType=[E,R,S]),hydrations').json()
             num_games = len(response['people'][0]['stats'][0]['splits'])
             if spring_training | (num_games < 5):
                 prev_season = True                    
