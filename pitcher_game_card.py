@@ -2150,7 +2150,10 @@ def generate_chart(pitcher_id,game_id,game_df,game_group,szn_df,szn_comp,prev_se
         fig.text(0.97,0.005,'*Some pitches missing data',va='center',ha='right',alpha=0.5)
     fig.text(0.085,0.23,'Type',color=pl_line_color,fontsize=16,va='center',ha='center')
     fig.text(0.235,0.23,'#',color=pl_line_color,fontsize=16,va='center',ha='center')
-    fig.text(0.335,0.23,'Velo',color=pl_line_color,fontsize=16,va='center',ha='center')
+    if comp_year:
+        fig.text(0.335,0.23,f'Velo (vs {comp_year})',color=pl_line_color,fontsize=16,va='center',ha='center')
+    else:
+        fig.text(0.335,0.23,'Velo',color=pl_line_color,fontsize=16,va='center',ha='center')
     fig.text(0.42,0.23,'IVB',color=pl_line_color,fontsize=16,va='center',ha='center')
     fig.text(0.49,0.23,'HB',color=pl_line_color,fontsize=16,va='center',ha='center')
     fig.text(0.57,0.23,'Str%',color=pl_line_color,fontsize=16,va='center',ha='center')
@@ -2262,7 +2265,6 @@ if len(pitcher_list.keys()) >0:
             else:
                 prev_season = False
                 comp_year = ss['date'].year
-            st.write(comp_year)
             szn_load = load_prev_pitches(pitcher_id,game_id,
                                          prev_season=prev_season,
                                          comp_year=comp_year
