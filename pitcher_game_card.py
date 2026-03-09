@@ -662,11 +662,11 @@ def game_line(game_id,pitcher_id):
     decision = decision if game_code == 'F' else ''
     return f'{game_date.strftime('%-b %-d, %Y')} {home_away} {opp} {decision}', game_date.year, game_code
 
-def load_prev_pitches(pitcher_id,game_id=None,prev_season=None):
+def load_prev_pitches(pitcher_id,game_id=None,prev_season=None,comp_year=None):
     data_load = []
     pitcher_height = player_height(pitcher_id)
-    if prev_season:
-        game_list = szn_games(pitcher_id,game_id,prev_season)
+    if prev_season & comp_year:
+        game_list = szn_games(pitcher_id,game_id,comp_year)
     else:
         if not game_id:
             game_id = load_game_ids(pitcher_id)[-1]
@@ -1807,7 +1807,7 @@ def letter_grade(val):
                   bins=[-100,60,63,67,70,73,77,80,83,87,90,93,97,300],
                   labels=['F', 'D-', 'D', 'D+', 'C-', 'C', 'C+', 'B-', 'B', 'B+', 'A-', 'A', 'A+'])[0]
     return '-' if np.isnan(val) else grade
-def generate_chart(pitcher_id,game_id,game_df,game_group,szn_df,szn_comp,vs_past):
+def generate_chart(pitcher_id,game_id,game_df,game_group,szn_df,szn_comp,prev_season,comp_year):
     arm_angle = game_df['armAngle'].mean()
     
     fig = plt.figure(figsize=(15,20))
@@ -1895,7 +1895,7 @@ def generate_chart(pitcher_id,game_id,game_df,game_group,szn_df,szn_comp,vs_past
     ax1.text(0,-27,'Drop',ha='center',va='center',fontsize=16,color=pl_white,alpha=1,zorder=1)
     
     pitch_list = list(game_df['pitchType'].unique())
-    if vs_past:
+    if comp_year:
         sns.kdeplot(szn_df.loc[szn_df['pitchType'].isin(pitch_list)].assign(HB = lambda x: np.where(x['pitcherHand']=='L',x['HB'].mul(-1),x['HB'])),
                     x='HB',
                     y='IVB',
@@ -2066,11 +2066,11 @@ def generate_chart(pitcher_id,game_id,game_df,game_group,szn_df,szn_comp,vs_past
     header_chunk(game_group,stat_header_ax)
     
     stat_table_ax = fig.add_axes([0.26,0.015,0.73,0.205], anchor='SW', zorder=1)
-    stats_chunk(game_group.merge(szn_comp[['pitchType','Velo_diff']],how='left',on='pitchType') if vs_past else game_group,
-                stat_table_ax,vs_past)
+    stats_chunk(game_group.merge(szn_comp[['pitchType','Velo_diff']],how='left',on='pitchType') if prev_season else game_group,
+                stat_table_ax,prev_season)
     
     usage_ax = fig.add_axes([0.445,0.593,.535,0.195], anchor='SW', zorder=1)
-    usage_chunk(szn_comp if vs_past else game_group,usage_ax,vs_past)
+    usage_chunk(szn_comp if prev_season else game_group,usage_ax,prev_season)
 
     line_alpha = 2/3
     
@@ -2116,21 +2116,21 @@ def generate_chart(pitcher_id,game_id,game_df,game_group,szn_df,szn_comp,vs_past
     fig.add_artist(lines.Line2D([0.425, 0.6525], [0.815, 0.815],linewidth=3,color=pl_text,alpha=line_alpha))
     fig.add_artist(lines.Line2D([0.99, 0.99], [0.59, 0.813],linewidth=3,color=pl_text,alpha=line_alpha))
     fig.add_artist(lines.Line2D([0.01, 0.99], [0.588, 0.588],linewidth=3,color=pl_text,alpha=line_alpha))
-    if vs_past:
+    if comp_year:
         if prev_season:
-            fig.text(0.98,0.595,'Arrows are vs\n2025 Usage',alpha=0.5,ha='right')
+            fig.text(0.98,0.595,f'Arrows are vs\n{comp_year} Usage',alpha=0.5,ha='right')
         else:
-            fig.text(0.98,0.595,'Arrows are vs\nprior 2025 Usage',alpha=0.5,ha='right')
+            fig.text(0.98,0.595,f'Arrows are vs\nprior {comp_year} Usage',alpha=0.5,ha='right')
     
     # Left align movement
     fig.text(0.57375,0.565,'vs LHB',color='w',fontsize=30,va='center',ha='center')
     fig.text(0.85125,0.565,'vs RHB',color='w',fontsize=30,va='center',ha='center')
     fig.text(0.2225,0.565,'Movement',color='w',fontsize=30,va='center',ha='center')
-    if vs_past:
+    if comp_year:
         if prev_season:
-            fig.text(0.02,0.285,'Shaded Regions\nare 2025 Shapes',alpha=0.5)
+            fig.text(0.02,0.285,f'Shaded Regions\nare {comp_year} Shapes',alpha=0.5)
         else:
-            fig.text(0.02,0.285,'Shaded Regions are\nprior 2025 Shapes',alpha=0.5)
+            fig.text(0.02,0.285,f'Shaded Regions are\nprior {comp_year} Shapes',alpha=0.5)
     fig.add_artist(lines.Line2D([0.01, 0.12], [0.565, 0.565],linewidth=3,color=pl_text,alpha=line_alpha))
     fig.add_artist(lines.Line2D([0.325, 0.505], [0.565, 0.565],linewidth=3,color=pl_text,alpha=line_alpha))
     fig.add_artist(lines.Line2D([0.6425, 0.7825], [0.565, 0.565],linewidth=3,color=pl_text,alpha=line_alpha))
@@ -2238,6 +2238,8 @@ with col3:
         st.selectbox('Choose a pitcher:',list(pitcher_list.keys()),key='pitcher')
         pitcher_id = int(pitcher_list[ss['pitcher']][0])
         year_diff = 1
+        vs_past = False
+        comp_year = None
         while year_diff < 4:
             response = requests.get(url=f'http://statsapi.mlb.com/api/v1/people/{pitcher_id}?hydrate=stats(group=pitching,type=gameLog,season={ss['date'].year - year_diff},endDate={ss['date']},sportId=[1,51],gameType=[E,R,S]),hydrations').json()
             if 'stats' in response['people'][0].keys():
@@ -2245,30 +2247,30 @@ with col3:
                 comp_year = ss['date'].year - year_diff
                 break
             year_diff += 1
-        else:
-            vs_past = False
-            comp_year = None
             
         spring_training = True if requests.get(f"https://statsapi.mlb.com/api/v1.1/game/{game_id}/feed/live").json()['gameData']['game']['type'] in ['E','F','S'] else False
         # spring_training = st.checkbox("Is Spring Training Game?",value=True)
         
 if len(pitcher_list.keys()) >0:
     if st.button('Generate Chart'):
-        if comp_year:
+        if vs_past:
             response = requests.get(f'http://statsapi.mlb.com/api/v1/people/{pitcher_id}?hydrate=stats(group=pitching,type=gameLog,season={comp_year},sportId=[1,51],gameType=[E,R,S]),hydrations').json()
             num_games = len(response['people'][0]['stats'][0]['splits'])
             if spring_training | (num_games < 5):
                 prev_season = True                    
             else:
                 prev_season = False
+                comp_year = ss['date'].year
             szn_load = load_prev_pitches(pitcher_id,game_id,
-                                         prev_season=comp_year
+                                         prev_season=prev_season,
+                                         comp_year=comp_year
                                           )
         else:
+            comp_year = None
             prev_season = False
             szn_load = []
         game_df, game_group, szn_df, szn_group, szn_comp, missing_feats = load_data(pitcher_id,game_id,comp_year,szn_load)
         if game_df.shape[0]>0:
-            generate_chart(pitcher_id,game_id,game_df,game_group,szn_df,szn_comp,vs_past)
+            generate_chart(pitcher_id,game_id,game_df,game_group,szn_df,szn_comp,prev_season,comp_year)
         else:
             st.write(f'ERROR: Game is missing required data ({', '.join(missing_feats)})')
