@@ -2110,8 +2110,8 @@ def generate_chart(pitcher_id,game_id,game_df,game_group,szn_df,szn_comp,prev_se
             )
     
     fig.text(0.7125,0.815,'Usage',color='w',fontsize=30,va='center',ha='center')
-    fig.text(0.6525,0.798,'vs LHB%',fontsize=20,color=pl_line_color,ha='right',va='center',weight='regular')
-    fig.text(0.7725,0.798,'vs RHB%',fontsize=20,color=pl_line_color,ha='left',va='center',weight='regular')
+    fig.text(0.6525,0.798,f'vs LHB ({game_df['vLHH'].fillna(0).sum():.0f})',fontsize=20,color=pl_line_color,ha='right',va='center',weight='regular')
+    fig.text(0.7725,0.798,f'vs RHB ({game_df['vRHH'].fillna(0).sum():.0f})',fontsize=20,color=pl_line_color,ha='left',va='center',weight='regular')
     fig.add_artist(lines.Line2D([0.7725, 0.99], [0.815, 0.815],linewidth=3,color=pl_text,alpha=line_alpha))
     fig.add_artist(lines.Line2D([0.425, 0.6525], [0.815, 0.815],linewidth=3,color=pl_text,alpha=line_alpha))
     fig.add_artist(lines.Line2D([0.99, 0.99], [0.59, 0.813],linewidth=3,color=pl_text,alpha=line_alpha))
@@ -2244,10 +2244,8 @@ with col3:
         comp_year = ss['date'].year - 1
         while comp_year > 2022:
             response = requests.get(url=f'http://statsapi.mlb.com/api/v1/people/{pitcher_id}?hydrate=stats(group=pitching,type=gameLog,season={comp_year},sportId=[1],gameType=[R]),hydrations').json()
-            # response = requests.get(url=f'http://statsapi.mlb.com/api/v1/people/{pitcher_id}?hydrate=stats(group=pitching,type=gameLog,season={ss['date'].year - year_diff},endDate={ss['date']},sportId=[1,51],gameType=[E,R,S]),hydrations').json()
             if 'stats' in response['people'][0].keys():
                 vs_past = st.checkbox("Compare to past year's results?",value=True)
-                # comp_year = ss['date'].year - year_diff
                 break
             comp_year -= 1
         else:
