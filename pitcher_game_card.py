@@ -325,15 +325,15 @@ def load_logo():
     logo = Image.open(urllib.request.urlopen(logo_loc))
     return logo
 
-def szn_games(player_id,game_id,sport_id=1,current_year=True):
-    season = get_game_date(game_id).year
-    if current_year:
-        start_date = f'{season}-01-01'
-        end_date = (get_game_date(game_id) - timedelta(days=1)).strftime('%Y-%m-%d') # stats from before the game
-    else:
-        season = season-1
+def szn_games(player_id,game_id,season,sport_id=1):
+    if season:
         start_date = f'{season}-01-01'
         end_date = f'{season}-11-30'
+    else:
+        season = get_game_date(game_id).year
+        start_date = f'{season}-01-01'
+        end_date = (get_game_date(game_id) - timedelta(days=1)).strftime('%Y-%m-%d') # stats from before the game
+        
     game_type_str = 'R'
     # Pull games the pitcher was in
     response = requests.get(url=f'http://statsapi.mlb.com/api/v1/people/{player_id}?hydrate=stats(group=pitching,type=gameLog,season={season},startDate={start_date},endDate={end_date},sportId={sport_id},gameType=[{game_type_str}]),hydrations').json()
@@ -666,7 +666,7 @@ def load_prev_pitches(pitcher_id,game_id=None,prev_season=None):
     data_load = []
     pitcher_height = player_height(pitcher_id)
     if prev_season:
-        game_list = szn_games(pitcher_id,game_id,current_year=False)
+        game_list = szn_games(pitcher_id,game_id,prev_season)
     else:
         if not game_id:
             game_id = load_game_ids(pitcher_id)[-1]
@@ -1352,7 +1352,7 @@ def load_data(pitcher_id,game_id,vs_past,szn_load):
         szn_df = None
         szn_group = None
         szn_comp = None
-        if vs_past:
+        if comp_year:
             szn_df = (
                 pd.DataFrame(szn_load,
                             columns=['gameId','gameDate','playId',
@@ -2237,17 +2237,24 @@ with col3:
     if len(list(pitcher_list.keys()))>0:
         st.selectbox('Choose a pitcher:',list(pitcher_list.keys()),key='pitcher')
         pitcher_id = int(pitcher_list[ss['pitcher']][0])
-        response = requests.get(url=f'http://statsapi.mlb.com/api/v1/people/{pitcher_id}?hydrate=stats(group=pitching,type=gameLog,season={ss['date'].year - 1},endDate={ss['date']},sportId=[1,51],gameType=[E,R,S]),hydrations').json()
-        if 'stats' in response['people'][0].keys():
-            vs_past = st.checkbox("Compare to past year's results?",value=True)
+        year_diff = 1
+        while year_diff < 4:
+            response = requests.get(url=f'http://statsapi.mlb.com/api/v1/people/{pitcher_id}?hydrate=stats(group=pitching,type=gameLog,season={ss['date'].year - year_diff},endDate={ss['date']},sportId=[1,51],gameType=[E,R,S]),hydrations').json()
+            if 'stats' in response['people'][0].keys():
+                vs_past = st.checkbox("Compare to past year's results?",value=True)
+                comp_year = ss['date'].year - year_diff
+                break
+            year_diff += 1
         else:
             vs_past = False
+            comp_year = None
+            
         spring_training = True if requests.get(f"https://statsapi.mlb.com/api/v1.1/game/{game_id}/feed/live").json()['gameData']['game']['type'] in ['E','F','S'] else False
         # spring_training = st.checkbox("Is Spring Training Game?",value=True)
         
 if len(pitcher_list.keys()) >0:
     if st.button('Generate Chart'):
-        if vs_past:
+        if comp_year:
             response = requests.get(f'http://statsapi.mlb.com/api/v1/people/{pitcher_id}?hydrate=stats(group=pitching,type=gameLog,season=2025,sportId=[1,51],gameType=[E,R,S]),hydrations').json()
             num_games = len(response['people'][0]['stats'][0]['splits'])
             if spring_training | (num_games < 5):
@@ -2255,12 +2262,12 @@ if len(pitcher_list.keys()) >0:
             else:
                 prev_season = False
             szn_load = load_prev_pitches(pitcher_id,game_id,
-                                          prev_season=prev_season
+                                         prev_season=prev_season
                                           )
         else:
             prev_season = False
             szn_load = []
-        game_df, game_group, szn_df, szn_group, szn_comp, missing_feats = load_data(pitcher_id,game_id,vs_past,szn_load)
+        game_df, game_group, szn_df, szn_group, szn_comp, missing_feats = load_data(pitcher_id,game_id,comp_year,szn_load)
         if game_df.shape[0]>0:
             generate_chart(pitcher_id,game_id,game_df,game_group,szn_df,szn_comp,vs_past)
         else:
