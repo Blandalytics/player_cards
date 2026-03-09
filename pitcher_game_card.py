@@ -325,7 +325,7 @@ def load_logo():
     logo = Image.open(urllib.request.urlopen(logo_loc))
     return logo
 
-def szn_games(player_id,game_id,season,sport_id=1):
+def szn_games(player_id,game_id,season=None,sport_id=1):
     if season:
         start_date = f'{season}-01-01'
         end_date = f'{season}-11-30'
@@ -666,7 +666,7 @@ def load_prev_pitches(pitcher_id,game_id=None,prev_season=None,comp_year=None):
     data_load = []
     pitcher_height = player_height(pitcher_id)
     if prev_season & comp_year:
-        game_list = szn_games(pitcher_id,game_id,comp_year)
+        game_list = szn_games(pitcher_id,game_id,season=comp_year)
     else:
         if not game_id:
             game_id = load_game_ids(pitcher_id)[-1]
