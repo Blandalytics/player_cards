@@ -2151,7 +2151,7 @@ def generate_chart(pitcher_id,game_id,game_df,game_group,szn_df,szn_comp,prev_se
     fig.text(0.085,0.23,'Type',color=pl_line_color,fontsize=16,va='center',ha='center')
     fig.text(0.235,0.23,'#',color=pl_line_color,fontsize=16,va='center',ha='center')
     if comp_year:
-        fig.text(0.335,0.23,f'Velo (vs {comp_year})',color=pl_line_color,fontsize=16,va='center',ha='center')
+        fig.text(0.335,0.23,f'Velo (vs {str(comp_year)[-2:]})',color=pl_line_color,fontsize=16,va='center',ha='center')
     else:
         fig.text(0.335,0.23,'Velo',color=pl_line_color,fontsize=16,va='center',ha='center')
     fig.text(0.42,0.23,'IVB',color=pl_line_color,fontsize=16,va='center',ha='center')
@@ -2241,14 +2241,15 @@ with col3:
         st.selectbox('Choose a pitcher:',list(pitcher_list.keys()),key='pitcher')
         pitcher_id = int(pitcher_list[ss['pitcher']][0])
         year_diff = 1
-        while year_diff < 4:
-            response = requests.get(url=f'http://statsapi.mlb.com/api/v1/people/{pitcher_id}?hydrate=stats(group=pitching,type=gameLog,season={ss['date'].year - year_diff},sportId=[1],gameType=[R]),hydrations').json()
+        comp_year = ss['date'].year - 1
+        while comp_year > 2022:
+            response = requests.get(url=f'http://statsapi.mlb.com/api/v1/people/{pitcher_id}?hydrate=stats(group=pitching,type=gameLog,season={},sportId=[1],gameType=[R]),hydrations').json()
             # response = requests.get(url=f'http://statsapi.mlb.com/api/v1/people/{pitcher_id}?hydrate=stats(group=pitching,type=gameLog,season={ss['date'].year - year_diff},endDate={ss['date']},sportId=[1,51],gameType=[E,R,S]),hydrations').json()
             if 'stats' in response['people'][0].keys():
                 vs_past = st.checkbox("Compare to past year's results?",value=True)
-                comp_year = ss['date'].year - year_diff
+                # comp_year = ss['date'].year - year_diff
                 break
-            year_diff += 1
+            comp_year -= 1
         else:
             vs_past = False
             comp_year = None
