@@ -2251,18 +2251,18 @@ with col3:
             comp_year = None
             
         spring_training = True if requests.get(f"https://statsapi.mlb.com/api/v1.1/game/{game_id}/feed/live").json()['gameData']['game']['type'] in ['E','F','S'] else False
-        # spring_training = st.checkbox("Is Spring Training Game?",value=True)
         
 if len(pitcher_list.keys()) >0:
     if st.button('Generate Chart'):
         if vs_past:
             response = requests.get(f'http://statsapi.mlb.com/api/v1/people/{pitcher_id}?hydrate=stats(group=pitching,type=gameLog,season={comp_year},sportId=[1,51],gameType=[E,R,S]),hydrations').json()
             num_games = len(response['people'][0]['stats'][0]['splits'])
-            if spring_training | (num_games < 5):
+            if spring_training | (num_games < 3):
                 prev_season = True                    
             else:
                 prev_season = False
                 comp_year = ss['date'].year
+            st.write(comp_year)
             szn_load = load_prev_pitches(pitcher_id,game_id,
                                          prev_season=prev_season,
                                          comp_year=comp_year
