@@ -665,7 +665,7 @@ def game_line(game_id,pitcher_id):
 def load_prev_pitches(pitcher_id,game_id=None,prev_season=None,comp_year=None):
     data_load = []
     pitcher_height = player_height(pitcher_id)
-    if prev_season & comp_year:
+    if (prev_season) & (comp_year):
         game_list = szn_games(pitcher_id,game_id,season=comp_year)
     else:
         if not game_id:
