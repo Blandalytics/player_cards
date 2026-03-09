@@ -2239,7 +2239,7 @@ with col3:
         pitcher_id = int(pitcher_list[ss['pitcher']][0])
         year_diff = 1
         while year_diff < 4:
-            response = requests.get(url=f'http://statsapi.mlb.com/api/v1/people/{pitcher_id}?hydrate=stats(group=pitching,type=gameLog,season={ss['date'].year - year_diff},sportId=[1,51],gameType=[E,R,S]),hydrations').json()
+            response = requests.get(url=f'http://statsapi.mlb.com/api/v1/people/{pitcher_id}?hydrate=stats(group=pitching,type=gameLog,season={ss['date'].year - year_diff},sportId=[1],gameType=[R]),hydrations').json()
             # response = requests.get(url=f'http://statsapi.mlb.com/api/v1/people/{pitcher_id}?hydrate=stats(group=pitching,type=gameLog,season={ss['date'].year - year_diff},endDate={ss['date']},sportId=[1,51],gameType=[E,R,S]),hydrations').json()
             if 'stats' in response['people'][0].keys():
                 vs_past = st.checkbox("Compare to past year's results?",value=True)
@@ -2255,7 +2255,7 @@ with col3:
 if len(pitcher_list.keys()) >0:
     if st.button('Generate Chart'):
         if vs_past:
-            response = requests.get(f'http://statsapi.mlb.com/api/v1/people/{pitcher_id}?hydrate=stats(group=pitching,type=gameLog,season={comp_year},sportId=[1,51],gameType=[E,R,S]),hydrations').json()
+            response = requests.get(f'http://statsapi.mlb.com/api/v1/people/{pitcher_id}?hydrate=stats(group=pitching,type=gameLog,season={comp_year},sportId=[1],gameType=[R]),hydrations').json()
             num_games = len(response['people'][0]['stats'][0]['splits'])
             if spring_training | (num_games < 3):
                 prev_season = True                    
