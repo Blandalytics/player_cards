@@ -1746,8 +1746,8 @@ def stats_chunk(table_df,ax,vs_past):
                 if np.isnan(stat_val):
                     stat_val = '-'
                 else:
-                    if (stat in ['PLV+','plvStuff+']) | (abs(stat_val-50)==50):
-                        stat_val = int(stat_val)
+                    if (stat in ['Str%','SwStr%','CSW%','PLV+','plvStuff+']):
+                        stat_val = int(round(stat_val))
                 ax.text(x_val,
                         y_val,
                         f'{stat_val}{suffix_dict[stat]}',
