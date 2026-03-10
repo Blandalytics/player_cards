@@ -2069,7 +2069,7 @@ def generate_chart(pitcher_id,game_id,game_df,game_group,szn_df,szn_comp,prev_se
     stats_chunk(game_group.merge(szn_comp[['pitchType','Velo_diff']],how='left',on='pitchType') if prev_season else game_group,
                 stat_table_ax,prev_season)
     
-    usage_ax = fig.add_axes([0.445,0.593,.535,0.195], anchor='SW', zorder=1)
+    usage_ax = fig.add_axes([0.445,0.598,.535,0.19], anchor='SW', zorder=1)
     usage_chunk(szn_comp if prev_season else game_group,usage_ax,prev_season)
 
     line_alpha = 2/3
