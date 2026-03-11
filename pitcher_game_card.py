@@ -76,7 +76,7 @@ letter_logo = letter_logo()
 st.set_page_config(page_title='PLV Pitcher Game Card', page_icon=letter_logo,
                    layout='wide')
 # st.title("NFBC Draft Data, over Time")
-new_title = '<p style="color:#72CBFD; font-weight: bold; font-size: 42px;">PLV Pitcher Game Card</p>'
+new_title = f'<p style="color:{pl_text}; font-weight: bold; font-size: 42px;">PLV Pitcher Game Card</p>'
 st.markdown(new_title, unsafe_allow_html=True)
 
 pitchtype_map = {
