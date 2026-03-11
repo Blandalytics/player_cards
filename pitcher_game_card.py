@@ -1946,6 +1946,7 @@ def generate_chart(pitcher_id,game_id,game_df,game_group,szn_df,szn_comp,prev_se
     
     sz_bot = (18+1.5)/12
     sz_top = (42-1.5)/12
+    sz_height_chunk = (sz_top-sz_bot)/3
     x_ft = 2.5
     y_bot = -0.5
     y_lim = 6.5
@@ -1968,12 +1969,12 @@ def generate_chart(pitcher_id,game_id,game_df,game_group,szn_df,szn_comp,prev_se
                     ax=ax2)
     
     # Inner Strike zone
-    ax2.plot([-8/12,8/12], [1.5+2/3,1.5+2/3], color=pl_background, linewidth=3.5, alpha=alpha_val)
-    ax2.plot([-8/12,8/12], [1.5+4/3,1.5+4/3], color=pl_background, linewidth=3.5, alpha=alpha_val)
+    ax2.plot([-8/12,8/12], [sz_bot+sz_height_chunk,sz_bot+sz_height_chunk], color=pl_background, linewidth=3.5, alpha=alpha_val)
+    ax2.plot([-8/12,8/12], [sz_bot+2*sz_height_chunk,sz_bot+2*sz_height_chunk], color=pl_background, linewidth=3.5, alpha=alpha_val)
     ax2.axvline(8.5/36, ymin=(sz_bot-y_bot+0.05)/(y_lim-1-y_bot), ymax=(sz_top-y_bot-0.05)/(y_lim-1-y_bot), color=pl_background, linewidth=3.5, alpha=alpha_val)
     ax2.axvline(-8.5/36, ymin=(sz_bot-y_bot+0.05)/(y_lim-1-y_bot), ymax=(sz_top-y_bot-0.05)/(y_lim-1-y_bot), color=pl_background, linewidth=3.5, alpha=alpha_val)
-    ax2.plot([-8.5/12,8.5/12], [1.5+2/3,1.5+2/3], color=pl_white, linewidth=2, alpha=alpha_val,zorder=2)
-    ax2.plot([-8.5/12,8.5/12], [1.5+4/3,1.5+4/3], color=pl_white, linewidth=2, alpha=alpha_val,zorder=2)
+    ax2.plot([-8.5/12,8.5/12], sz_bot+sz_height_chunk,sz_bot+sz_height_chunk], color=pl_white, linewidth=2, alpha=alpha_val,zorder=2)
+    ax2.plot([-8.5/12,8.5/12], [sz_bot+2*sz_height_chunk,sz_bot+2*sz_height_chunk], color=pl_white, linewidth=2, alpha=alpha_val,zorder=2)
     ax2.axvline(8.5/36, ymin=(sz_bot-y_bot+0.025)/(y_lim-y_bot-1), ymax=(sz_top-y_bot-0.025)/(y_lim-y_bot-1), color=pl_white, linewidth=3, alpha=alpha_val,zorder=2)
     ax2.axvline(-8.5/36, ymin=(sz_bot-y_bot+0.025)/(y_lim-y_bot-1), ymax=(sz_top-y_bot-0.025)/(y_lim-y_bot-1), color=pl_white, linewidth=3, alpha=alpha_val,zorder=2)
     
@@ -1998,12 +1999,12 @@ def generate_chart(pitcher_id,game_id,game_df,game_group,szn_df,szn_comp,prev_se
     
     ax3 = fig.add_axes([0.7225,0.275,0.2675,0.287], anchor='SW', zorder=1)
     # Inner Strike zone
-    ax3.plot([-8/12,8/12], [1.5+2/3,1.5+2/3], color=pl_background, linewidth=3.5, alpha=alpha_val)
-    ax3.plot([-8/12,8/12], [1.5+4/3,1.5+4/3], color=pl_background, linewidth=3.5, alpha=alpha_val)
+    ax3.plot([-8/12,8/12], [sz_bot+sz_height_chunk,sz_bot+sz_height_chunk], color=pl_background, linewidth=3.5, alpha=alpha_val)
+    ax3.plot([-8/12,8/12], [sz_bot+2*sz_height_chunk,sz_bot+2*sz_height_chunk], color=pl_background, linewidth=3.5, alpha=alpha_val)
     ax3.axvline(8.5/36, ymin=(sz_bot-y_bot+0.05)/(y_lim-1-y_bot), ymax=(sz_top-y_bot-0.05)/(y_lim-1-y_bot), color=pl_background, linewidth=3.5, alpha=alpha_val)
     ax3.axvline(-8.5/36, ymin=(sz_bot-y_bot+0.05)/(y_lim-1-y_bot), ymax=(sz_top-y_bot-0.05)/(y_lim-1-y_bot), color=pl_background, linewidth=3.5, alpha=alpha_val)
-    ax3.plot([-8.5/12,8.5/12], [1.5+2/3,1.5+2/3], color=pl_white, linewidth=2, alpha=alpha_val,zorder=2)
-    ax3.plot([-8.5/12,8.5/12], [1.5+4/3,1.5+4/3], color=pl_white, linewidth=2, alpha=alpha_val,zorder=2)
+    ax3.plot([-8.5/12,8.5/12], [sz_bot+sz_height_chunk,sz_bot+sz_height_chunk], color=pl_white, linewidth=2, alpha=alpha_val,zorder=2)
+    ax3.plot([-8.5/12,8.5/12], [sz_bot+2*sz_height_chunk,sz_bot+2*sz_height_chunk], color=pl_white, linewidth=2, alpha=alpha_val,zorder=2)
     ax3.axvline(10/36, ymin=(sz_bot-y_bot+0.025)/(y_lim-1-y_bot), ymax=(sz_top-y_bot-0.025)/(y_lim-1-y_bot), color=pl_white, linewidth=3, alpha=alpha_val,zorder=2)
     ax3.axvline(-10/36, ymin=(sz_bot-y_bot+0.025)/(y_lim-1-y_bot), ymax=(sz_top-y_bot-0.025)/(y_lim-1-y_bot), color=pl_white, linewidth=3, alpha=alpha_val,zorder=2)
     
