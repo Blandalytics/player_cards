@@ -2205,9 +2205,13 @@ with col1:
             games_today += [x['dates'][0]['games'][game]['gamePk']]
         game_list = generate_games(games_today)
 
+default_game = list(game_list.keys())[0]
 if 'game' not in ss:
-    ss['game'] = list(game_list.keys())[0]
+    ss['game'] = default_game
 
+if ss['game'] not in list(game_list.keys()):
+    ss['game'] = default_game
+    
 with col2:
     st.pills('Choose a game (all times EST):',list(game_list.keys()),default=ss['game'],
                           key='game',on_change=game_change)
