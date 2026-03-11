@@ -1978,10 +1978,10 @@ def generate_chart(pitcher_id,game_id,game_df,game_group,szn_df,szn_comp,prev_se
     ax2.axvline(-10/36, ymin=(sz_bot-y_bot+0.025)/(y_lim-y_bot-1), ymax=(sz_top-y_bot-0.025)/(y_lim-y_bot-1), color=pl_white, linewidth=3, alpha=alpha_val,zorder=2)
     
     # Outer Strike Zone
-    zone_outline_shadow = plt.Rectangle((-8.5/12, sz_bot), 17/12, 2,
+    zone_outline_shadow = plt.Rectangle((-8.5/12, sz_bot), 17/12, 21/12,
                                  color=pl_background,fill=False,alpha=alpha_val, linewidth=3,zorder=1)
     ax2.add_patch(zone_outline_shadow)
-    zone_outline = plt.Rectangle((-8.5/12, sz_bot), 17/12, 2, color=pl_white,fill=False,linewidth=2,alpha=alpha_val)
+    zone_outline = plt.Rectangle((-8.5/12, sz_bot), 17/12, 21/12, color=pl_white,fill=False,linewidth=2,alpha=alpha_val)
     ax2.add_patch(zone_outline)
     
     # Plate
