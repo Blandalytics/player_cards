@@ -1974,8 +1974,8 @@ def generate_chart(pitcher_id,game_id,game_df,game_group,szn_df,szn_comp,prev_se
     ax2.axvline(-10/36, ymin=(sz_bot-y_bot+0.05)/(y_lim-1-y_bot), ymax=(sz_top-y_bot-0.05)/(y_lim-1-y_bot), color=pl_background, linewidth=3.5, alpha=alpha_val)
     ax2.plot([-8.5/12,8.5/12], [1.5+2/3,1.5+2/3], color=pl_white, linewidth=2, alpha=alpha_val,zorder=2)
     ax2.plot([-8.5/12,8.5/12], [1.5+4/3,1.5+4/3], color=pl_white, linewidth=2, alpha=alpha_val,zorder=2)
-    ax2.axvline(10/36, ymin=(sz_bot-y_bot+0.025)/(y_lim-y_bot), ymax=(sz_top-y_bot-0.025)/(y_lim-y_bot), color=pl_white, linewidth=3, alpha=alpha_val,zorder=2)
-    ax2.axvline(-10/36, ymin=(sz_bot-y_bot+0.025)/(y_lim-y_bot), ymax=(sz_top-y_bot-0.025)/(y_lim-y_bot), color=pl_white, linewidth=3, alpha=alpha_val,zorder=2)
+    ax2.axvline(10/36, ymin=(sz_bot-y_bot+0.025)/(y_lim-y_bot-1), ymax=(sz_top-y_bot-0.025)/(y_lim-y_bot-1), color=pl_white, linewidth=3, alpha=alpha_val,zorder=2)
+    ax2.axvline(-10/36, ymin=(sz_bot-y_bot+0.025)/(y_lim-y_bot-1), ymax=(sz_top-y_bot-0.025)/(y_lim-y_bot-1), color=pl_white, linewidth=3, alpha=alpha_val,zorder=2)
     
     # Outer Strike Zone
     zone_outline_shadow = plt.Rectangle((-8.5/12, sz_bot), 17/12, 2,
