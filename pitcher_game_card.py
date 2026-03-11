@@ -1319,7 +1319,7 @@ def load_data(pitcher_id,game_id,comp_year,szn_load):
             .reset_index()
             .assign(Type = lambda x: x['pitchType'].map(pitch_names),
                     pitches_vR = lambda x: x['vRHH'],
-                    vRHH = lambda x: x['vRHH'].div(x['vRHH'].sum()).astype('float')*100,
+                    vRHH = lambda x: np.where(x['vRHH'].sum(skipna=False)==0,None,x['vRHH'].div(np.clip(x['vRHH'].sum(),1,100))).astype('float')*100,
                     vLHH = lambda x: np.where(x['vLHH'].sum(skipna=False)==0,None,x['vLHH'].div(np.clip(x['vLHH'].sum(),1,100))).astype('float')*100,
                     usage = lambda x: x['usage']*100,
                     strike = lambda x: x['strike'].astype('float')*100,
