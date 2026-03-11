@@ -1973,7 +1973,7 @@ def generate_chart(pitcher_id,game_id,game_df,game_group,szn_df,szn_comp,prev_se
     ax2.plot([-8/12,8/12], [sz_bot+2*sz_height_chunk,sz_bot+2*sz_height_chunk], color=pl_background, linewidth=3.5, alpha=alpha_val)
     ax2.axvline(8.5/36, ymin=(sz_bot-y_bot+0.05)/(y_lim-1-y_bot), ymax=(sz_top-y_bot-0.05)/(y_lim-1-y_bot), color=pl_background, linewidth=3.5, alpha=alpha_val)
     ax2.axvline(-8.5/36, ymin=(sz_bot-y_bot+0.05)/(y_lim-1-y_bot), ymax=(sz_top-y_bot-0.05)/(y_lim-1-y_bot), color=pl_background, linewidth=3.5, alpha=alpha_val)
-    ax2.plot([-8.5/12,8.5/12], sz_bot+sz_height_chunk,sz_bot+sz_height_chunk], color=pl_white, linewidth=2, alpha=alpha_val,zorder=2)
+    ax2.plot([-8.5/12,8.5/12], [sz_bot+sz_height_chunk,sz_bot+sz_height_chunk], color=pl_white, linewidth=2, alpha=alpha_val,zorder=2)
     ax2.plot([-8.5/12,8.5/12], [sz_bot+2*sz_height_chunk,sz_bot+2*sz_height_chunk], color=pl_white, linewidth=2, alpha=alpha_val,zorder=2)
     ax2.axvline(8.5/36, ymin=(sz_bot-y_bot+0.025)/(y_lim-y_bot-1), ymax=(sz_top-y_bot-0.025)/(y_lim-y_bot-1), color=pl_white, linewidth=3, alpha=alpha_val,zorder=2)
     ax2.axvline(-8.5/36, ymin=(sz_bot-y_bot+0.025)/(y_lim-y_bot-1), ymax=(sz_top-y_bot-0.025)/(y_lim-y_bot-1), color=pl_white, linewidth=3, alpha=alpha_val,zorder=2)
