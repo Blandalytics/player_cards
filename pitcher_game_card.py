@@ -2005,8 +2005,8 @@ def generate_chart(pitcher_id,game_id,game_df,game_group,szn_df,szn_comp,prev_se
     ax3.axvline(-8.5/36, ymin=(sz_bot-y_bot+0.05)/(y_lim-1-y_bot), ymax=(sz_top-y_bot-0.05)/(y_lim-1-y_bot), color=pl_background, linewidth=3.5, alpha=alpha_val)
     ax3.plot([-8.5/12,8.5/12], [sz_bot+sz_height_chunk,sz_bot+sz_height_chunk], color=pl_white, linewidth=2, alpha=alpha_val,zorder=2)
     ax3.plot([-8.5/12,8.5/12], [sz_bot+2*sz_height_chunk,sz_bot+2*sz_height_chunk], color=pl_white, linewidth=2, alpha=alpha_val,zorder=2)
-    ax3.axvline(10/36, ymin=(sz_bot-y_bot+0.025)/(y_lim-1-y_bot), ymax=(sz_top-y_bot-0.025)/(y_lim-1-y_bot), color=pl_white, linewidth=3, alpha=alpha_val,zorder=2)
-    ax3.axvline(-10/36, ymin=(sz_bot-y_bot+0.025)/(y_lim-1-y_bot), ymax=(sz_top-y_bot-0.025)/(y_lim-1-y_bot), color=pl_white, linewidth=3, alpha=alpha_val,zorder=2)
+    ax3.axvline(8.5/36, ymin=(sz_bot-y_bot+0.025)/(y_lim-1-y_bot), ymax=(sz_top-y_bot-0.025)/(y_lim-1-y_bot), color=pl_white, linewidth=3, alpha=alpha_val,zorder=2)
+    ax3.axvline(-8.5/36, ymin=(sz_bot-y_bot+0.025)/(y_lim-1-y_bot), ymax=(sz_top-y_bot-0.025)/(y_lim-1-y_bot), color=pl_white, linewidth=3, alpha=alpha_val,zorder=2)
     
     # Outer Strike Zone
     zone_outline_shadow = plt.Rectangle((-8.5/12, sz_bot), 17/12, 21/12,
