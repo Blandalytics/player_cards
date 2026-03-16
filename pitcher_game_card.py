@@ -1108,6 +1108,7 @@ def pull_game_info(game_id):
         'O':1,
         'I':1,
         'N':1,
+        'C':1,
         'P':2,
         'S':2,
         'D':2,
