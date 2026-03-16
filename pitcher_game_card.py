@@ -2259,7 +2259,7 @@ with col3:
             vs_past = False
             comp_year = None
             
-        spring_training = True if requests.get(f"https://statsapi.mlb.com/api/v1.1/game/{game_id}/feed/live").json()['gameData']['game']['type'] in ['E','F','S'] else False
+        spring_training = True if requests.get(f"https://statsapi.mlb.com/api/v1.1/game/{game_id}/feed/live").json()['gameData']['game']['type'] in ['E','F','S','I','C'] else False
         
 if len(pitcher_list.keys()) >0:
     if st.button('Generate Chart'):
