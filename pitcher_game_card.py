@@ -2252,7 +2252,7 @@ with col3:
         while comp_year > 2022:
             response = requests.get(url=f'http://statsapi.mlb.com/api/v1/people/{pitcher_id}?hydrate=stats(group=pitching,type=gameLog,season={comp_year},sportId=[1],gameType=[R]),hydrations').json()
             if 'stats' in response['people'][0].keys():
-                vs_past = st.checkbox("Compare to past year's results?",value=True)
+                vs_past = st.checkbox(f"Compare to past {comp_year} stats?",value=True)
                 break
             comp_year -= 1
         else:
