@@ -334,9 +334,8 @@ def szn_games(player_id,game_id,season=None,sport_id=1):
         start_date = f'{season}-01-01'
         end_date = (get_game_date(game_id) - timedelta(days=1)).strftime('%Y-%m-%d') # stats from before the game
         
-    game_type_str = 'R'
     # Pull games the pitcher was in
-    response = requests.get(url=f'http://statsapi.mlb.com/api/v1/people/{player_id}?hydrate=stats(group=pitching,type=gameLog,season={season},startDate={start_date},endDate={end_date},sportId=1,gameType=[{game_type_str}]),hydrations').json()
+    response = requests.get(url=f'http://statsapi.mlb.com/api/v1/people/{player_id}?hydrate=stats(group=pitching,type=gameLog,season={season},startDate={start_date},endDate={end_date},sportId=1,gameType=[R]),hydrations').json()
     game_ids = [x['game']['gamePk'] for x in response['people'][0]['stats'][0]['splits']]
     return game_ids
 
