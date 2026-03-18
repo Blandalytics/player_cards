@@ -2257,8 +2257,10 @@ with col3:
         else:
             vs_past = False
             comp_year = None
-            
-        spring_training = True if requests.get(f"https://statsapi.mlb.com/api/v1.1/game/{game_id}/feed/live").json()['gameData']['game']['type'] not in ['A','R','P','D','L','W'] else False
+
+        game_type = requests.get(f"https://statsapi.mlb.com/api/v1.1/game/{game_id}/feed/live").json()['gameData']['game']['type']
+        gameday_type = requests.get(f"https://statsapi.mlb.com/api/v1.1/game/{game_id}/feed/live").json()['gameData']['game']['gamedayType']
+        spring_training = False if gameday_type == 'P' else True
         
 if len(pitcher_list.keys()) >0:
     if st.button('Generate Chart'):
