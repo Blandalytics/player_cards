@@ -1193,6 +1193,7 @@ def load_data(pitcher_id,game_id,comp_year,szn_load):
         .query(f'pitcherId=={pitcher_id}')
         .query('isPitch==1')
         .drop_duplicates('playId')
+        .astype({'spin_rate':'float','spin_dir':'float'})
     )
 
     missing_feats = []
