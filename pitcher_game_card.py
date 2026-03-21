@@ -1003,6 +1003,9 @@ def pitch_models(data):
             model.load_model(f'model_files/statcast_contact_model_{pitch_type}_{model_type}.json')
 
             if model_type == 'stuff':
+                for feature in model.feature_names_in_:
+                    if feature not in model_df.columns.values:
+                        st.write(feature)
                 model_df.loc[model_df['pitch_type_bucket']==pitch_type,['swinging_strike_pred','contact_input']] = model.predict_proba(model_df.loc[model_df['pitch_type_bucket']==pitch_type,model.feature_names_in_])
             else:
                 model_df.loc[model_df['pitch_type_bucket']==pitch_type,['swinging_strike_raw','contact_raw']] = model.predict_proba(model_df.loc[model_df['pitch_type_bucket']==pitch_type,model.feature_names_in_])
