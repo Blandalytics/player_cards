@@ -956,7 +956,7 @@ def pitch_models(data):
                       'balls_before_pitch_0','balls_before_pitch_1','balls_before_pitch_2',
                       'balls_before_pitch_3','strikes_before_pitch_0','strikes_before_pitch_1',
                       'strikes_before_pitch_2']
-    for feat in category_feats+['spin_rate','adj_spin_dir']:
+    for feat in category_feats:
         if feat not in model_df.columns.values:
             model_df[feat] = False
 
@@ -982,6 +982,9 @@ def pitch_models(data):
         for pitch_type in ['Fastball','Breaking Ball','Offspeed']:
             if model_df.loc[model_df['pitch_type_bucket']==pitch_type].shape[0]==0:
                 continue
+            for feature in model.feature_names_in_:
+                if feature not in list(model_df.columns.values):
+                    continue
             if model_type != 'stuff':
                 # Swing Decision
                 model = xgb.XGBClassifier()
