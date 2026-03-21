@@ -982,13 +982,15 @@ def pitch_models(data):
         for pitch_type in ['Fastball','Breaking Ball','Offspeed']:
             if model_df.loc[model_df['pitch_type_bucket']==pitch_type].shape[0]==0:
                 continue
-            for feature in model.feature_names_in_:
-                if feature not in list(model_df.columns.values):
-                    continue
+                
             if model_type != 'stuff':
                 # Swing Decision
                 model = xgb.XGBClassifier()
                 model.load_model(f'model_files/statcast_swing_model_{pitch_type}_{model_type}.json')
+
+                for feature in model.feature_names_in_:
+                    if feature not in list(model_df.columns.values):
+                        continue
 
                 model_df.loc[model_df['pitch_type_bucket']==pitch_type,['take_input','swing_input']] = model.predict_proba(model_df.loc[model_df['pitch_type_bucket']==pitch_type,model.feature_names_in_])
 
@@ -1004,6 +1006,10 @@ def pitch_models(data):
             # Swing Result
             model = xgb.XGBClassifier()
             model.load_model(f'model_files/statcast_contact_model_{pitch_type}_{model_type}.json')
+
+            for feature in model.feature_names_in_:
+                if feature not in list(model_df.columns.values):
+                    continue
 
             if model_type == 'stuff':
                 model_df.loc[model_df['pitch_type_bucket']==pitch_type,['swinging_strike_pred','contact_input']] = model.predict_proba(model_df.loc[model_df['pitch_type_bucket']==pitch_type,model.feature_names_in_])
