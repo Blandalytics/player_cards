@@ -2259,7 +2259,7 @@ with col3:
         st.selectbox('Choose a pitcher:',list(pitcher_list.keys()),key='pitcher')
         pitcher_id = int(pitcher_list[ss['pitcher']][0])
         year_diff = 1
-        comp_year = ss['date'].year - 1
+        comp_year = ss['date'].year
         while comp_year > 2022:
             response = requests.get(url=f'http://statsapi.mlb.com/api/v1/people/{pitcher_id}?hydrate=stats(group=pitching,type=gameLog,season={comp_year},sportId=[1],gameType=[R]),hydrations').json()
             if 'stats' in response['people'][0].keys():
@@ -2277,10 +2277,10 @@ with col3:
 if len(pitcher_list.keys()) >0:
     if st.button('Generate Chart'):
         if vs_past:
-            response = requests.get(f'http://statsapi.mlb.com/api/v1/people/{pitcher_id}?hydrate=stats(group=pitching,type=gameLog,season={comp_year},sportId=[1],gameType=[R]),hydrations').json()
+            response = requests.get(f'http://statsapi.mlb.com/api/v1/people/{pitcher_id}?hydrate=stats(group=pitching,type=gameLog,season={ss['date'].year},sportId=[1],gameType=[R]),hydrations').json()
             num_games = len(response['people'][0]['stats'][0]['splits'])
-            if spring_training | ((num_games < 3) & (comp_year == ss['date'].year)):
-                prev_season = True                    
+            if spring_training | (num_games < 3):
+                prev_season = True
             else:
                 prev_season = False
                 comp_year = ss['date'].year
