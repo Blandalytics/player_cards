@@ -2281,6 +2281,7 @@ if len(pitcher_list.keys()) >0:
             num_games = len(response['people'][0]['stats'][0]['splits'])
             if spring_training | (num_games < 3):
                 prev_season = True
+                comp_year = comp_year-1
             else:
                 prev_season = False
                 comp_year = ss['date'].year
