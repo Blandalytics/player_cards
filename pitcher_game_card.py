@@ -556,30 +556,32 @@ def header_stats_chunk(game_id,pitcher_id,ax):
         # Per-PA Game Score
         game_score = (2 * int(outs) + int(strikeouts) - 2 * int(walks) - 2 * int(hits) - 3 * int(earned_runs) - 6 * int(home_runs)) / tbf
         game_score = (game_score-0.481)/0.875*10+75
+
+        if game_score<60:
+            game_grade = 'F'
+        elif game_score<70:
+            game_grade = 'D'
+        elif game_score<80:
+            game_grade = 'C'
+        elif game_score<90:
+            game_grade = 'B'
+        else:
+            game_grade = 'A'
+    
+        if game_score%10 <3:
+            game_grade_adj = '-'
+        elif (game_score%10 >7) | (game_score >= 100):
+            game_grade_adj = '+'
+        else:
+            game_grade_adj = ''
+            
+        game_grade = game_grade if game_grade <60 else game_grade+game_grade_adj    
     else:
         # Actual Game Score (Starters)
         game_score = 40 + (2 * int(outs) + int(strikeouts) - 2 * int(walks) - 2 * int(hits) - 3 * int(earned_runs) - 6 * int(home_runs))
-        game_score = (game_score-51)/17*10+75
-
-    if game_score<60:
-        game_grade = 'F'
-    elif game_score<70:
-        game_grade = 'D'
-    elif game_score<80:
-        game_grade = 'C'
-    elif game_score<90:
-        game_grade = 'B'
-    else:
-        game_grade = 'A'
-
-    if game_score%10 <3:
-        game_grade_adj = '-'
-    elif (game_score%10 >7) | (game_score >= 100):
-        game_grade_adj = '+'
-    else:
-        game_grade_adj = ''
-
-    game_grade = game_grade if game_score <60 else game_grade+game_grade_adj
+        grade_letters = ['F','D-','D','D+','C-','C','C+','B-','B','B+','A-','A','A+']
+        grade_edges = [-100,15,26,36,43,49,55,60,64,68,72,76,81,200]
+        game_grade = pd.cut([game_score],labels=grade_letters,bins=grade_edges)[0]
 
     hr_text = '' if home_runs==0 else f' ({home_run_text})'
     game_text = f'{innings} IP, {earned_runs} ER, {hit_text}{hr_text}, {walk_text}, {strikeout_text} - {whiffs_text}, {csw}% CSW, {pitches} Pitches'
