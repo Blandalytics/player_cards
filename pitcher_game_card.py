@@ -2259,7 +2259,7 @@ with col3:
         st.selectbox('Choose a pitcher:',list(pitcher_list.keys()),key='pitcher')
         pitcher_id = int(pitcher_list[ss['pitcher']][0])
         year_diff = 1
-        comp_year = ss['date'].year
+        comp_year = ss['date'].year - 1
         while comp_year > 2022:
             response = requests.get(url=f'http://statsapi.mlb.com/api/v1/people/{pitcher_id}?hydrate=stats(group=pitching,type=gameLog,season={comp_year},sportId=[1],gameType=[R]),hydrations').json()
             if 'stats' in response['people'][0].keys():
@@ -2281,7 +2281,7 @@ if len(pitcher_list.keys()) >0:
             num_games = len(response['people'][0]['stats'][0]['splits'])
             if spring_training | (num_games < 3):
                 prev_season = True
-                comp_year = comp_year-1
+                # comp_year = comp_year-1
             else:
                 prev_season = False
                 comp_year = ss['date'].year
