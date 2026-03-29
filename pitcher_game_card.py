@@ -578,9 +578,14 @@ def header_stats_chunk(game_id,pitcher_id,ax):
         game_grade = game_grade if game_grade <60 else game_grade+game_grade_adj    
     else:
         # Actual Game Score (Starters)
-        game_score = 40 + (2 * int(outs) + int(strikeouts) - 2 * int(walks) - 2 * int(hits) - 3 * int(earned_runs) - 6 * int(home_runs))
         grade_letters = ['F','D-','D','D+','C-','C','C+','B-','B','B+','A-','A','A+']
-        grade_edges = [-100,15,26,36,43,49,55,60,64,68,72,76,81,200]
+        
+        # game_score = 40 + (2 * int(outs) + int(strikeouts) - 2 * int(walks) - 2 * int(hits) - 3 * int(earned_runs) - 6 * int(home_runs))
+        # grade_edges = [-100,15,26,36,43,49,55,60,64,68,72,76,81,200]
+        
+        game_score = 75 + 0.9 * int(outs) + 0.4 * int(strikeouts) - 0.4 * int(walks) - 0.1 * int(hits) - 4.7 * int(earned_runs) - 4.7 * int(home_runs)
+        grade_edges = [-10e6,60,60+1/3,60+2/3,70,70+1/3,70+2/3,80,80+1/3,80+2/3,90,90+1/3,90+2/3,10e6]
+        
         game_grade = pd.cut([game_score],labels=grade_letters,bins=grade_edges)[0]
 
     hr_text = '' if home_runs==0 else f' ({home_run_text})'
