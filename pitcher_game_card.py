@@ -575,7 +575,7 @@ def header_stats_chunk(game_id,pitcher_id,ax):
         else:
             game_grade_adj = ''
             
-        game_grade = game_grade if game_grade <60 else game_grade+game_grade_adj    
+        game_grade = game_grade if game_score <60 else game_grade+game_grade_adj    
     else:
         # Actual Game Score (Starters)
         grade_letters = ['F','D-','D','D+','C-','C','C+','B-','B','B+','A-','A','A+']
