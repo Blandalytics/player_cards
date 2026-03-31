@@ -1077,7 +1077,7 @@ def pitch_models(data):
             else:
                 model_df[stat+'_re'] = model_df[['pitch_type_bucket',stat+'_re']].apply(tuple,axis=1).map(stuff_expectancies)
             # model_df[stat+'_re'] = model_df[[stat+'_re','count']].apply(tuple,axis=1).map(run_expectancies)
-            model_df['delta_re'] = model_df['delta_re'].add(model_df[stat+'_pred']
+            model_df['delta_re'] = model_df['delta_re'].add(model_df[stat+'_pred'])
 
         model_df[model_type+'Grade_game'] = -((model_df['delta_re'] - model_constant_dict[model_type]['game_mean']) / model_constant_dict[model_type]['game_stdev']) * 10 + 75
         model_df[model_type+'Grade_szn'] = -((model_df['delta_re'] - model_constant_dict[model_type]['szn_mean']) / model_constant_dict[model_type]['szn_stdev']) * 10 + 75
