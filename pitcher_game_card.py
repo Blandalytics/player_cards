@@ -2189,7 +2189,7 @@ def generate_chart(pitcher_id,game_id,game_df,game_group,szn_df,szn_comp,prev_se
     
     fig.add_artist(lines.Line2D([0, 1, 1, 0], [1, 1, 0, 0],linewidth=3,color='w',alpha=0))
     
-    grid.tight_layout(fig,pad=2)
+    # grid.tight_layout(fig,pad=2)
     sns.despine(left=True,bottom=True)
     st.pyplot(fig, width='content')
 
