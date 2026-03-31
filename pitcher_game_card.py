@@ -1336,8 +1336,8 @@ def load_data(pitcher_id,game_id,comp_year,szn_load):
             .reset_index()
             .assign(Type = lambda x: x['pitchType'].map(pitch_names),
                     pitches_vR = lambda x: x['vRHH'],
-                    vRHH = lambda x: np.where(x['vRHH'].sum(skipna=False)==0,0,x['vRHH'].div(np.clip(x['vRHH'].sum(),1,100))).astype('float')*100,
-                    vLHH = lambda x: np.where(x['vLHH'].sum(skipna=False)==0,0,x['vLHH'].div(np.clip(x['vLHH'].sum(),1,100))).astype('float')*100,
+                    vRHH = lambda x: np.where(x['vRHH'].sum(skipna=False)==0,None,x['vRHH'].div(np.clip(x['vRHH'].sum(),1,100))).astype('float')*100,
+                    vLHH = lambda x: np.where(x['vLHH'].sum(skipna=False)==0,None,x['vLHH'].div(np.clip(x['vLHH'].sum(),1,100))).astype('float')*100,
                     usage = lambda x: x['usage']*100,
                     strike = lambda x: x['strike'].astype('float')*100,
                     whiff = lambda x: x['whiff'].astype('float')*100,
@@ -2128,8 +2128,8 @@ def generate_chart(pitcher_id,game_id,game_df,game_group,szn_df,szn_comp,prev_se
             )
     
     fig.text(0.7125,0.815,'Usage',color='w',fontsize=30,va='center',ha='center')
-    fig.text(0.6525,0.798,f'vs LHB ({game_df['vLHH'].sum():.0f})',fontsize=20,color=pl_line_color,ha='right',va='center',weight='regular')
-    fig.text(0.7725,0.798,f'vs RHB ({game_df['vRHH'].sum():.0f})',fontsize=20,color=pl_line_color,ha='left',va='center',weight='regular')
+    fig.text(0.6525,0.798,f'vs LHB ({game_df['vLHH'].fillna(0).sum():.0f})',fontsize=20,color=pl_line_color,ha='right',va='center',weight='regular')
+    fig.text(0.7725,0.798,f'vs RHB ({game_df['vRHH'].fillna(0).sum():.0f})',fontsize=20,color=pl_line_color,ha='left',va='center',weight='regular')
     fig.add_artist(lines.Line2D([0.7725, 0.99], [0.815, 0.815],linewidth=3,color=pl_text,alpha=line_alpha))
     fig.add_artist(lines.Line2D([0.425, 0.6525], [0.815, 0.815],linewidth=3,color=pl_text,alpha=line_alpha))
     fig.add_artist(lines.Line2D([0.99, 0.99], [0.59, 0.813],linewidth=3,color=pl_text,alpha=line_alpha))
