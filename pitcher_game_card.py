@@ -2268,11 +2268,11 @@ with col3:
         comp_years = []
         while prev_year > 2022:
             response = requests.get(f'http://statsapi.mlb.com/api/v1/people/{pitcher_id}?hydrate=stats(group=pitching,type=gameLog,season={prev_year},sportId=[1],gameType=[R]),hydrations').json()
-            num_games = len(response['people'][0]['stats'][0]['splits'])
+            # num_games = len(response['people'][0]['stats'][0]['splits'])
             # response = requests.get(url=f'http://statsapi.mlb.com/api/v1/people/{pitcher_id}?hydrate=stats(group=pitching,type=gameLog,season={comp_year},sportId=[1],gameType=[R]),hydrations').json()
-            # if 'stats' in response['people'][0].keys():
-            if num_games >=3:
-                comp_years += [prev_year]
+            if 'stats' in response['people'][0].keys():
+                if num_games >=3:
+                    comp_years += [prev_year]
             prev_year -= 1
         if len(comp_years) > 0:
             vs_past = st.checkbox(f"Compare to previous stats?",value=True)
