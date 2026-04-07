@@ -2276,6 +2276,8 @@ with col3:
             prev_year -= 1
         if len(comp_years) > 0:
             vs_past = st.checkbox(f"Compare to previous stats?",value=True)
+            if vs_past:
+                comp_year = st.selectbox('Year for comparison:',comp_years)
         else:
             vs_past = False
             comp_year = None
@@ -2287,7 +2289,6 @@ with col3:
 if len(pitcher_list.keys()) >0:
     if st.button('Generate Chart'):
         if vs_past:
-            comp_year = st.selectbox('Year for comparison:',comp_years)
             # response = requests.get(f'http://statsapi.mlb.com/api/v1/people/{pitcher_id}?hydrate=stats(group=pitching,type=gameLog,season={ss['date'].year},sportId=[1],gameType=[R]),hydrations').json()
             # num_games = len(response['people'][0]['stats'][0]['splits'])
             if spring_training | (comp_year != ss['date'].year):
