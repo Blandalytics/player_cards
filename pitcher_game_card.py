@@ -671,7 +671,7 @@ def game_line(game_id,pitcher_id):
 def load_prev_pitches(pitcher_id,game_id=None,prev_season=None,comp_year=None):
     data_load = []
     pitcher_height = player_height(pitcher_id)
-    if prev_season:
+    if prev_season & (comp_year != ss['date'].year):
         game_list = szn_games(pitcher_id,game_id,season=comp_year)
     else:
         if not game_id:
@@ -2291,14 +2291,18 @@ if len(pitcher_list.keys()) >0:
         if vs_past:
             # response = requests.get(f'http://statsapi.mlb.com/api/v1/people/{pitcher_id}?hydrate=stats(group=pitching,type=gameLog,season={ss['date'].year},sportId=[1],gameType=[R]),hydrations').json()
             # num_games = len(response['people'][0]['stats'][0]['splits'])
-            if spring_training | (comp_year != ss['date'].year):
-                prev_season = True
-            else:
-                prev_season = False
+            # if spring_training | (comp_year != ss['date'].year):
+            prev_season = True
             szn_load = load_prev_pitches(pitcher_id,game_id,
-                                         prev_season=prev_season,
-                                         comp_year=comp_year
-                                          )
+                                     prev_season=prev_season,
+                                     comp_year=comp_year
+                                      )
+            # else:
+            #     prev_season = False
+            # szn_load = load_prev_pitches(pitcher_id,game_id,
+            #                              prev_season=prev_season,
+            #                              comp_year=comp_year
+            #                               )
         else:
             comp_year = None
             prev_season = False
