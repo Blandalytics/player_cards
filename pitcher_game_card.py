@@ -1928,7 +1928,7 @@ def generate_chart(pitcher_id,game_id,game_df,game_group,szn_df,szn_comp,prev_se
         label_dist = dist-0.25
         ax1.text(label_dist,-0.5,f'{dist}"',ha='right',va='top',fontsize=14,color=pl_white,alpha=0.75,zorder=1)
         ax1.text(-label_dist+0.25,-0.5,f'{dist}"',ha='left',va='top',fontsize=14,color=pl_white,alpha=0.75,zorder=1)
-        ax1.text(0.5,label_dist-(0.25*int(chart_lim/12)),f'{dist}"',ha='left',va='top',fontsize=14,color=pl_white,alpha=0.75,zorder=1)
+        ax1.text(0.5,label_dist-(0.25*int((chart_lim+6)/12)),f'{dist}"',ha='left',va='top',fontsize=14,color=pl_white,alpha=0.75,zorder=1)
         ax1.text(0.5,-label_dist+0.5,f'{dist}"',ha='left',va='bottom',fontsize=14,color=pl_white,alpha=0.75,zorder=1)
     
     if hand=='R':
