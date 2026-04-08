@@ -1921,6 +1921,7 @@ def generate_chart(pitcher_id,game_id,game_df,game_group,szn_df,szn_comp,prev_se
         ax1.add_patch(circle_minor)
     
     for dist in range(1,int(chart_lim/12)+1):
+        dist = dist * 12
         circle_major = plt.Circle((0, 0), dist, color=pl_white,fill=False,alpha=0.5,linewidth=2)
         ax1.add_patch(circle_major)
         
