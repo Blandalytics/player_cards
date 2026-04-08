@@ -1915,7 +1915,8 @@ def generate_chart(pitcher_id,game_id,game_df,game_group,szn_df,szn_comp,prev_se
     ax1.axvline(0,ymin=3/(chart_lim+2),ymax=(chart_lim-1)/(chart_lim+2),color=pl_white,alpha=0.5,zorder=0.5,linewidth=2)
     ax1.axhline(0,xmin=3/(chart_lim+2),xmax=(chart_lim-1)/(chart_lim+2),color=pl_white,alpha=0.5,zorder=0.5,linewidth=2)
     
-    for dist in range(1,int(chart_lim/12)*12):
+    for dist in range(1,int(chart_lim/12)):
+        dist = dist * 12
         circle_minor = plt.Circle((0, 0), dist-6, color=pl_white,fill=False,alpha=0.25,linestyle='--',linewidth=2)
         ax1.add_patch(circle_minor)
         circle_major = plt.Circle((0, 0), dist, color=pl_white,fill=False,alpha=0.5,linewidth=2)
