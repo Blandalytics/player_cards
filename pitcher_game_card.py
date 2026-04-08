@@ -1939,10 +1939,10 @@ def generate_chart(pitcher_id,game_id,game_df,game_group,szn_df,szn_comp,prev_se
     ax1.text(0,-(chart_lim-2),'Drop',ha='center',va='center',fontsize=16,color=pl_white,alpha=1,zorder=1)
     
     arm_rads = np.deg2rad(arm_angle)
-    x_val = np.cos(arm_rads) * (1 if hand=='R' else -1) * (chart_lim-4)
-    y_val = np.sin(arm_rads) * (chart_lim-4)
-    ax1.plot([0,x_val],
-             [0,y_val],
+    x_val = np.cos(arm_rads) * (1 if hand=='R' else -1) * chart_lim
+    y_val = np.sin(arm_rads) * chart_lim
+    ax1.plot([0,x_val-np.cos(arm_rads)*(4 if hand=='R' else -4)],
+             [0,y_val-np.sin(arm_rads)*4],
              color='w',linestyle='--')
     ax1.plot([0,-x_val],
              [0,-y_val],
