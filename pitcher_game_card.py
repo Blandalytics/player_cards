@@ -1910,7 +1910,7 @@ def generate_chart(pitcher_id,game_id,game_df,game_group,szn_df,szn_comp,prev_se
                     ax=ax1,
                     legend=False)
     
-    chart_lim = max(29,int(game_df[['HB','IVB']].abs().max().max()/6)*6-1)
+    chart_lim = max(29,int(game_df[['HB','IVB']].abs().max().max()/6+1)*6-1)
 
     ax1.axvline(0,ymin=3/(chart_lim+2),ymax=(chart_lim-1)/(chart_lim+2),color=pl_white,alpha=0.5,zorder=0.5,linewidth=2)
     ax1.axhline(0,xmin=3/(chart_lim+2),xmax=(chart_lim-1)/(chart_lim+2),color=pl_white,alpha=0.5,zorder=0.5,linewidth=2)
