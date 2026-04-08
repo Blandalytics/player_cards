@@ -1883,34 +1883,6 @@ def generate_chart(pitcher_id,game_id,game_df,game_group,szn_df,szn_comp,prev_se
     hand = bio_text(pitcher_id)[2]
     
     ax1 = fig.add_axes([0.03,0.275,0.423,0.287], anchor='SW', zorder=1)
-    circle1 = plt.Circle((0, 0), 6, color=pl_white,fill=False,alpha=0.25,linestyle='--',linewidth=2)
-    ax1.add_patch(circle1)
-    circle2 = plt.Circle((0, 0), 12, color=pl_white,fill=False,alpha=0.5,linewidth=2)
-    ax1.add_patch(circle2)
-    circle3 = plt.Circle((0, 0), 18, color=pl_white,fill=False,alpha=0.25,linestyle='--',linewidth=2)
-    ax1.add_patch(circle3)
-    circle4 = plt.Circle((0, 0), 24, color=pl_white,fill=False,alpha=0.5,linewidth=2)
-    ax1.add_patch(circle4)
-    ax1.axvline(0,ymin=6/62,ymax=56/62,color=pl_white,alpha=0.5,zorder=0.5,linewidth=2)
-    ax1.axhline(0,xmin=6/62,xmax=56/62,color=pl_white,alpha=0.5,zorder=0.5,linewidth=2)
-    
-    for dist in [12,24]:
-        label_dist = dist-0.25
-        ax1.text(label_dist,-0.5,f'{dist}"',ha='right',va='top',fontsize=14,color=pl_white,alpha=0.75,zorder=1)
-        ax1.text(-label_dist+0.25,-0.5,f'{dist}"',ha='left',va='top',fontsize=14,color=pl_white,alpha=0.75,zorder=1)
-        ax1.text(0.5,label_dist-0.5,f'{dist}"',ha='left',va='top',fontsize=14,color=pl_white,alpha=0.75,zorder=1)
-        ax1.text(0.5,-label_dist+0.5,f'{dist}"',ha='left',va='bottom',fontsize=14,color=pl_white,alpha=0.75,zorder=1)
-    
-    if hand=='R':
-        ax1.text(29,0,'Arm\nSide',ha='center',va='center',fontsize=16,color=pl_white,alpha=1,zorder=1)
-        ax1.text(-29,0,'Glove\nSide',ha='center',va='center',fontsize=16,color=pl_white,alpha=1,zorder=1)
-    else:
-        ax1.text(29,0,'Glove\nSide',ha='center',va='center',fontsize=16,color=pl_white,alpha=1,zorder=1)
-        ax1.text(-29,0,'Arm\nSide',ha='center',va='center',fontsize=16,color=pl_white,alpha=1,zorder=1)
-    
-    ax1.text(0,27,'Rise',ha='center',va='center',fontsize=16,color=pl_white,alpha=1,zorder=1)
-    ax1.text(0,-27,'Drop',ha='center',va='center',fontsize=16,color=pl_white,alpha=1,zorder=1)
-    
     pitch_list = list(game_df['pitchType'].unique())
     if comp_year:
         sns.kdeplot(szn_df.loc[szn_df['pitchType'].isin(pitch_list)].assign(HB = lambda x: np.where(x['pitcherHand']=='L',x['HB'].mul(-1),x['HB'])),
@@ -1938,7 +1910,33 @@ def generate_chart(pitcher_id,game_id,game_df,game_group,szn_df,szn_comp,prev_se
                     ax=ax1,
                     legend=False)
     
-    chart_lim = 29
+    chart_lim = max(29,int(game_df[['HB','IVB']].abs().max().max()/6)*6-1)
+
+    ax1.axvline(0,ymin=3/(chart_lim+2),ymax=(chart_lim-1)/(chart_lim+2),color=pl_white,alpha=0.5,zorder=0.5,linewidth=2)
+    ax1.axhline(0,xmin=3/(chart_lim+2),xmax=(chart_lim-1)/(chart_lim+2),color=pl_white,alpha=0.5,zorder=0.5,linewidth=2)
+    
+    for dist in range(1,int(chart_lim/12)*12):
+        circle_minor = plt.Circle((0, 0), dist-6, color=pl_white,fill=False,alpha=0.25,linestyle='--',linewidth=2)
+        ax1.add_patch(circle_minor)
+        circle_major = plt.Circle((0, 0), dist, color=pl_white,fill=False,alpha=0.5,linewidth=2)
+        ax1.add_patch(circle_major)
+        
+        label_dist = dist-0.25
+        ax1.text(label_dist,-0.5,f'{dist}"',ha='right',va='top',fontsize=14,color=pl_white,alpha=0.75,zorder=1)
+        ax1.text(-label_dist+0.25,-0.5,f'{dist}"',ha='left',va='top',fontsize=14,color=pl_white,alpha=0.75,zorder=1)
+        ax1.text(0.5,label_dist-0.5,f'{dist}"',ha='left',va='top',fontsize=14,color=pl_white,alpha=0.75,zorder=1)
+        ax1.text(0.5,-label_dist+0.5,f'{dist}"',ha='left',va='bottom',fontsize=14,color=pl_white,alpha=0.75,zorder=1)
+    
+    if hand=='R':
+        ax1.text(chart_lim,0,'Arm\nSide',ha='center',va='center',fontsize=16,color=pl_white,alpha=1,zorder=1)
+        ax1.text(-chart_lim,0,'Glove\nSide',ha='center',va='center',fontsize=16,color=pl_white,alpha=1,zorder=1)
+    else:
+        ax1.text(chart_lim,0,'Glove\nSide',ha='center',va='center',fontsize=16,color=pl_white,alpha=1,zorder=1)
+        ax1.text(-chart_lim,0,'Arm\nSide',ha='center',va='center',fontsize=16,color=pl_white,alpha=1,zorder=1)
+    
+    ax1.text(0,(chart_lim-2),'Rise',ha='center',va='center',fontsize=16,color=pl_white,alpha=1,zorder=1)
+    ax1.text(0,-(chart_lim-2),'Drop',ha='center',va='center',fontsize=16,color=pl_white,alpha=1,zorder=1)
+    
     arm_rads = np.deg2rad(arm_angle)
     x_val = np.cos(arm_rads) * (1 if hand=='R' else -1) * chart_lim
     y_val = np.sin(arm_rads) * chart_lim
