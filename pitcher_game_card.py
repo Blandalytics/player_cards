@@ -538,7 +538,7 @@ def header_stats_chunk(game_id,pitcher_id,ax):
     walks = stat_base['baseOnBalls']
     ibb = stat_base['intentionalWalks']
     ibb_text = f' ({ibb} IBBs)' if ibb>1 else f' ({ibb} IBB)' if ibb==1 else ''
-    walk_text = f'{walks} BBs{ibb_text}' if walks!=1 else f'{walks} BB{ibb_text}'
+    walk_text = f'{walks} BBs' if walks!=1 else f'{walks} BB'
     win = stat_base['wins']
     loss = stat_base['losses']
     save = stat_base['saves']
