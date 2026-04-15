@@ -583,8 +583,8 @@ def header_stats_chunk(game_id,pitcher_id,ax):
         # game_score = 40 + (2 * int(outs) + int(strikeouts) - 2 * int(walks) - 2 * int(hits) - 3 * int(earned_runs) - 6 * int(home_runs))
         # grade_edges = [-100,15,26,36,43,49,55,60,64,68,72,76,81,200]
         
-        game_score = 3.67 + 1/3 * int(outs) + 0.2 * int(strikeouts) - 0.2 * int(walks) - 0.2 * int(hits) - 0.8 * int(earned_runs) - 0.2 * int(home_runs)
-        grade_edges = [-100, 1.2, 2.5, 3.4, 4.2, 4.9, 5.6, 6.3, 7.1, 7.9, 8.8, 9.7, 11.3, 100]
+        game_score = 30 + 8/3 * int(outs) + 2 * int(strikeouts) - 2 * int(walks) - 1 * int(hits) - 7 * int(earned_runs) - 1 * int(home_runs)
+        grade_edges = [-100, 12, 22.3, 30, 36.6, 41, 47.6, 53.6, 60.6, 67, 74, 82.3, 95, 1000]
         
         game_grade = pd.cut([game_score],labels=grade_letters,bins=grade_edges)[0]
 
