@@ -1853,12 +1853,12 @@ def generate_chart(pitcher_id,game_id,game_df,game_group,szn_df,szn_comp,prev_se
             
     code_map = {
         'A':'All-Star\nGame',
-        'E':'Spring\nTraining',
-        'S':'Spring\nTraining',
-        'R':'Regular\nSeason',
-        'P':'Regular\nSeason',
-        'F':'Spring\nTraining',
-        'I':'Spring\nTraining',
+        'E':'Box\nScore',
+        'S':'Box\nScore',
+        'R':'Box\nScore',
+        'P':'Box\nScore',
+        'F':'Box\nScore',
+        'I':'Box\nScore',
         'D':'Playoffs',
         'L':'Playoffs',
         'W':'World\nSeries',
