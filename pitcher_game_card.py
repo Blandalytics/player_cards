@@ -686,8 +686,11 @@ def load_prev_pitches(pitcher_id,game_id=None,prev_season=None,comp_year=None):
     return data_load
 
 def xSLGcon(df):
-    with open('2025_pl_xSLG_model.pkl', 'rb') as f:
-        xSLG_model = pickle.load(f)
+    # with open('2025_pl_xSLG_model.pkl', 'rb') as f:
+    #     xSLG_model = pickle.load(f)
+        
+    xSLG_model = xgb.XGBClassifier()
+    xSLG_model.load_model(f'2026_pl_xSLG_model.json')
         
     data = df[xSLG_model.feature_names_in_].copy()
 
