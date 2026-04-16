@@ -2229,69 +2229,122 @@ with col1:
         game_list = generate_games(games_today)
     game_filter = st.checkbox(f"Filter by game?",value=True)
 
-default_game = list(game_list.keys())[0]
-if 'game' not in ss:
-    ss['game'] = default_game
-
-if ss['game'] not in list(game_list.keys()):
-    ss['game'] = default_game
+if game_filter: # If filtering by games
+    default_game = list(game_list.keys())[0]
+    if 'game' not in ss:
+        ss['game'] = default_game
     
-with col2:
-    st.pills('Choose a game (all times EST):',list(game_list.keys()),default=ss['game'],
-                          key='game',on_change=game_change)
-    game_id = game_list[ss['game']]
-    game_id = int(game_id)
-    r = requests.get(f'https://baseballsavant.mlb.com/gf?game_pk={game_id}')
-    x = r.json()
-    # sport_id = 
-    game_code = x['game_status_code']
-    if (len(x['home_pitcher_lineup'])>0) & (len(x['away_pitcher_lineup'])>0):
-        pitcher_lineup = [x['home_pitcher_lineup'][0]]+[x['away_pitcher_lineup'][0]]+([] if len(x['home_pitcher_lineup'])==1 else x['home_pitcher_lineup'][1:])+([] if len(x['away_pitcher_lineup'])==1 else x['away_pitcher_lineup'][1:])
-        home_team = [1]+[0]+([] if len(x['home_pitcher_lineup'])==1 else [1]*(len(x['home_pitcher_lineup'])-1))+([] if len(x['away_pitcher_lineup'])==1 else [0]*(len(x['away_pitcher_lineup'])-1))
-        test_list = {}
-        for home_away_pitcher in ['home','away']:
-            if f'{home_away_pitcher}_pitchers' not in x.keys():
-                continue
-            for pitcher_id in list(x[f'{home_away_pitcher}_pitchers'].keys()):
-                test_list.update({pitcher_id:x[f'{home_away_pitcher}_pitchers'][pitcher_id][0]['pitcher_name']})
-        pitcher_lineup = [x for x in pitcher_lineup if str(x) in test_list.keys()]
-        if len(test_list.keys())>0:
-            pitcher_list = {test_list[str(x)]:[str(x),y] for x,y in zip(pitcher_lineup,home_team)}
+    if ss['game'] not in list(game_list.keys()):
+        ss['game'] = default_game
+        
+    with col2:
+        st.pills('Choose a game (all times EST):',list(game_list.keys()),default=ss['game'],
+                              key='game',on_change=game_change)
+        game_id = game_list[ss['game']]
+        game_id = int(game_id)
+        r = requests.get(f'https://baseballsavant.mlb.com/gf?game_pk={game_id}')
+        x = r.json()
+        # sport_id = 
+        game_code = x['game_status_code']
+        if (len(x['home_pitcher_lineup'])>0) & (len(x['away_pitcher_lineup'])>0):
+            pitcher_lineup = [x['home_pitcher_lineup'][0]]+[x['away_pitcher_lineup'][0]]+([] if len(x['home_pitcher_lineup'])==1 else x['home_pitcher_lineup'][1:])+([] if len(x['away_pitcher_lineup'])==1 else x['away_pitcher_lineup'][1:])
+            home_team = [1]+[0]+([] if len(x['home_pitcher_lineup'])==1 else [1]*(len(x['home_pitcher_lineup'])-1))+([] if len(x['away_pitcher_lineup'])==1 else [0]*(len(x['away_pitcher_lineup'])-1))
+            test_list = {}
+            for home_away_pitcher in ['home','away']:
+                if f'{home_away_pitcher}_pitchers' not in x.keys():
+                    continue
+                for pitcher_id in list(x[f'{home_away_pitcher}_pitchers'].keys()):
+                    test_list.update({pitcher_id:x[f'{home_away_pitcher}_pitchers'][pitcher_id][0]['pitcher_name']})
+            pitcher_lineup = [x for x in pitcher_lineup if str(x) in test_list.keys()]
+            if len(test_list.keys())>0:
+                pitcher_list = {test_list[str(x)]:[str(x),y] for x,y in zip(pitcher_lineup,home_team)}
+            else:
+                pitcher_list = {}
         else:
             pitcher_list = {}
-    else:
-        pitcher_list = {}
+    if ('pitcher' not in ss) & (len(pitcher_list.keys())>0):
+        ss['pitcher'] = list(pitcher_list.keys())[0]
 
-if ('pitcher' not in ss) & (len(pitcher_list.keys())>0):
-    ss['pitcher'] = list(pitcher_list.keys())[0]
+    with col3:
+        if len(list(pitcher_list.keys()))>0:
+            st.selectbox('Choose a pitcher:',list(pitcher_list.keys()),key='pitcher')
+            pitcher_id = int(pitcher_list[ss['pitcher']][0])
+            year_diff = 1
+            prev_year = ss['date'].year
+            comp_years = []
+            while prev_year > 2022:
+                response = requests.get(f'http://statsapi.mlb.com/api/v1/people/{pitcher_id}?hydrate=stats(group=pitching,type=gameLog,season={prev_year},sportId=[1],gameType=[R]),hydrations').json()
+                # response = requests.get(url=f'http://statsapi.mlb.com/api/v1/people/{pitcher_id}?hydrate=stats(group=pitching,type=gameLog,season={comp_year},sportId=[1],gameType=[R]),hydrations').json()
+                if 'stats' in response['people'][0].keys():
+                    num_games = len(response['people'][0]['stats'][0]['splits'])
+                    if num_games >=3:
+                        comp_years += [prev_year]
+                prev_year -= 1
+            if len(comp_years) > 0:
+                vs_past = st.checkbox(f"Compare to previous stats?",value=True)
+                if vs_past:
+                    comp_year = st.selectbox('Year for comparison:',comp_years)
+            else:
+                vs_past = False
+                comp_year = None
+    
+            game_type = requests.get(f"https://statsapi.mlb.com/api/v1.1/game/{game_id}/feed/live").json()['gameData']['game']['type']
+            gameday_type = requests.get(f"https://statsapi.mlb.com/api/v1.1/game/{game_id}/feed/live").json()['gameData']['game']['gamedayType']
+            spring_training = False if gameday_type == 'P' else True
+else: # list all pitchers
+    pitcher_list = {}
+    for game in range(len(x['dates'][0]['games'])):
+        game_chunk = x['dates'][0]['games'][game]
+        if game_chunk['status']['abstractGameState'] in ['Live','Final']:
+            game_id = x['dates'][0]['games'][game]['gamePk']
+            game_r = requests.get(f'https://baseballsavant.mlb.com/gf?game_pk={game_id}')
+            game_x = game_r.json()
+            game_code = game_x['game_status_code']
+            test_list = {}
+            if (len(game_x['home_pitcher_lineup'])>0) & (len(game_x['away_pitcher_lineup'])>0):
+                pitcher_lineup = game_x['home_pitcher_lineup']+game_x['away_pitcher_lineup']
+                for home_away_pitcher in ['home','away']:
+                    if f'{home_away_pitcher}_pitchers' not in game_x.keys():
+                        continue
+                    for pitcher_id in list(game_x[f'{home_away_pitcher}_pitchers'].keys()):
+                        test_list.update({pitcher_id:game_x[f'{home_away_pitcher}_pitchers'][pitcher_id][0]['pitcher_name']})
+                pitcher_lineup = [x for x in pitcher_lineup if str(x) in test_list.keys()]
+                if len(test_list.keys())>0:
+                    pitcher_list.update({test_list[str(x)]:str(x) for x in pitcher_lineup})
+    pitcher_names = list(pitcher_list.keys())
+    pitcher_names.sort(key=lambda name: name.split(" ")[1].lower())
+    pitcher_list = {x:pitcher_list[x] for x in pitcher_names}
+    
+    if ('pitcher' not in ss) & (len(pitcher_list.keys())>0):
+        ss['pitcher'] = list(pitcher_list.keys())[0]
 
-with col3:
-    if len(list(pitcher_list.keys()))>0:
-        st.selectbox('Choose a pitcher:',list(pitcher_list.keys()),key='pitcher')
-        pitcher_id = int(pitcher_list[ss['pitcher']][0])
-        year_diff = 1
-        prev_year = ss['date'].year
-        comp_years = []
-        while prev_year > 2022:
-            response = requests.get(f'http://statsapi.mlb.com/api/v1/people/{pitcher_id}?hydrate=stats(group=pitching,type=gameLog,season={prev_year},sportId=[1],gameType=[R]),hydrations').json()
-            # response = requests.get(url=f'http://statsapi.mlb.com/api/v1/people/{pitcher_id}?hydrate=stats(group=pitching,type=gameLog,season={comp_year},sportId=[1],gameType=[R]),hydrations').json()
-            if 'stats' in response['people'][0].keys():
-                num_games = len(response['people'][0]['stats'][0]['splits'])
-                if num_games >=3:
-                    comp_years += [prev_year]
-            prev_year -= 1
-        if len(comp_years) > 0:
-            vs_past = st.checkbox(f"Compare to previous stats?",value=True)
-            if vs_past:
-                comp_year = st.selectbox('Year for comparison:',comp_years)
-        else:
-            vs_past = False
-            comp_year = None
-
-        game_type = requests.get(f"https://statsapi.mlb.com/api/v1.1/game/{game_id}/feed/live").json()['gameData']['game']['type']
-        gameday_type = requests.get(f"https://statsapi.mlb.com/api/v1.1/game/{game_id}/feed/live").json()['gameData']['game']['gamedayType']
-        spring_training = False if gameday_type == 'P' else True
-        
+    with col2:
+        if len(list(pitcher_list.keys()))>0:
+            st.selectbox('Choose a pitcher:',list(pitcher_list.keys()),key='pitcher')
+            pitcher_id = int(pitcher_list[ss['pitcher']][0])
+            year_diff = 1
+            prev_year = ss['date'].year
+            comp_years = []
+            while prev_year > 2022:
+                response = requests.get(f'http://statsapi.mlb.com/api/v1/people/{pitcher_id}?hydrate=stats(group=pitching,type=gameLog,season={prev_year},sportId=[1],gameType=[R]),hydrations').json()
+                # response = requests.get(url=f'http://statsapi.mlb.com/api/v1/people/{pitcher_id}?hydrate=stats(group=pitching,type=gameLog,season={comp_year},sportId=[1],gameType=[R]),hydrations').json()
+                if 'stats' in response['people'][0].keys():
+                    num_games = len(response['people'][0]['stats'][0]['splits'])
+                    if num_games >=3:
+                        comp_years += [prev_year]
+                prev_year -= 1
+            if len(comp_years) > 0:
+                vs_past = st.checkbox(f"Compare to previous stats?",value=True)
+                if vs_past:
+                    comp_year = st.selectbox('Year for comparison:',comp_years)
+            else:
+                vs_past = False
+                comp_year = None
+    
+            game_type = requests.get(f"https://statsapi.mlb.com/api/v1.1/game/{game_id}/feed/live").json()['gameData']['game']['type']
+            gameday_type = requests.get(f"https://statsapi.mlb.com/api/v1.1/game/{game_id}/feed/live").json()['gameData']['game']['gamedayType']
+            spring_training = False if gameday_type == 'P' else True
+    
 if len(pitcher_list.keys()) >0:
     if st.button('Generate Chart'):
         if vs_past:
