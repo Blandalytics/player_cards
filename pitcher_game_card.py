@@ -2227,6 +2227,7 @@ with col1:
             # if x['dates'][0]['games'][game]['gamedayType'] in ['E','P']:
             games_today += [x['dates'][0]['games'][game]['gamePk']]
         game_list = generate_games(games_today)
+    game_filter = st.checkbox(f"Filter by game?",value=True)
 
 default_game = list(game_list.keys())[0]
 if 'game' not in ss:
