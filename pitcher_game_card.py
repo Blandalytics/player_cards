@@ -2316,12 +2316,12 @@ else: # list all pitchers
     pitcher_list = {x:pitcher_list[x] for x in pitcher_names}
     
     if ('pitcher' not in ss) & (len(pitcher_list.keys())>0):
-        ss['pitcher'] = list(pitcher_list.keys())[0]
+        ss['pitcher'] = list(pitcher_list.keys())
 
     with col2:
         if len(list(pitcher_list.keys()))>0:
             st.selectbox('Choose a pitcher:',list(pitcher_list.keys()),key='pitcher')
-            pitcher_id = int(pitcher_list[ss['pitcher']][0])
+            pitcher_id = int(pitcher_list[ss['pitcher']])
             year_diff = 1
             prev_year = ss['date'].year
             comp_years = []
