@@ -2310,18 +2310,19 @@ else: # list all pitchers
                         test_list.update({pitcher_id:game_x[f'{home_away_pitcher}_pitchers'][pitcher_id][0]['pitcher_name']})
                 pitcher_lineup = [x for x in pitcher_lineup if str(x) in test_list.keys()]
                 if len(test_list.keys())>0:
-                    pitcher_list.update({test_list[str(x)]:str(x) for x in pitcher_lineup})
+                    pitcher_list.update({test_list[str(x)]:[str(x),game_id] for x in pitcher_lineup})
     pitcher_names = list(pitcher_list.keys())
     pitcher_names.sort(key=lambda name: name.split(" ")[1].lower())
     pitcher_list = {x:pitcher_list[x] for x in pitcher_names}
     
     if ('pitcher' not in ss) & (len(pitcher_list.keys())>0):
-        ss['pitcher'] = list(pitcher_list.keys())
+        ss['pitcher'] = list(pitcher_list.keys())[0]
 
     with col2:
         if len(list(pitcher_list.keys()))>0:
             st.selectbox('Choose a pitcher:',list(pitcher_list.keys()),key='pitcher')
-            pitcher_id = int(pitcher_list[ss['pitcher']])
+            pitcher_id = int(pitcher_list[ss['pitcher']][0])
+            game_id = pitcher_list[ss['pitcher']][1]
             year_diff = 1
             prev_year = ss['date'].year
             comp_years = []
