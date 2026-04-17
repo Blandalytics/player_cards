@@ -2313,10 +2313,10 @@ else: # list all pitchers
                 pitcher_lineup = [x for x in pitcher_lineup if str(x) in test_list.keys()]
                 if len(test_list.keys())>0:
                     pitcher_list.update({test_list[str(x)]:[str(x),game_id] for x in pitcher_lineup})
+            del game_r, game_x
     pitcher_names = list(pitcher_list.keys())
     pitcher_names.sort(key=lambda name: name.split(" ")[-1].lower())
     pitcher_list = {x:pitcher_list[x] for x in pitcher_names}
-    del game_r, game_x
     
     if ('pitcher' not in ss) & (len(pitcher_list.keys())>0):
         ss['pitcher'] = list(pitcher_list.keys())[0]
