@@ -2210,7 +2210,7 @@ def date_change():
         del ss['player']
 def game_change():
     if 'player' in ss:
-        del ss['player']
+        del ss['player'], game_df, game_group, szn_df, szn_group, szn_comp, missing_feats
     
 col1, col2, col3 = st.columns([0.25,0.5,0.25])
 with col1:
