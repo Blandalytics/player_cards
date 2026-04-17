@@ -2196,7 +2196,10 @@ def generate_chart(pitcher_id,game_id,game_df,game_group,szn_df,szn_comp,prev_se
     
     # grid.tight_layout(fig,pad=2)
     sns.despine(left=True,bottom=True)
-    st.pyplot(fig, width='content')
+    try:
+        st.pyplot(fig, width='content')
+    except PIL.Image.DecompressionBombError:
+        st.write('Error generating card. Please click "Generate Card" button again')
 
 st.write('Data (especially pitch types) are subject to change. If you get an error message, try refreshing your page. Please send any feedback to Kyle Bland, on [Bluesky](https://bsky.app/profile/blandalytics.pitcherlist.com) or [Twitter](https://x.com/blandalytics).')
 today = (datetime.now(UTC)-timedelta(hours=16)).date()
@@ -2351,7 +2354,7 @@ else: # list all pitchers
 del date_r, date_x
 
 if len(pitcher_list.keys()) >0:
-    if st.button('Generate Chart'):
+    if st.button('Generate Card'):
         if vs_past:
             # response = requests.get(f'http://statsapi.mlb.com/api/v1/people/{pitcher_id}?hydrate=stats(group=pitching,type=gameLog,season={ss['date'].year},sportId=[1],gameType=[R]),hydrations').json()
             # num_games = len(response['people'][0]['stats'][0]['splits'])
