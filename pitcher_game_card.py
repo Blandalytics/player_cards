@@ -1887,7 +1887,7 @@ def generate_chart(pitcher_id,game_id,game_df,game_group,szn_df,szn_comp,prev_se
     
     ax1 = fig.add_axes([0.03,0.275,0.423,0.287], anchor='SW', zorder=1)
     pitch_list = list(game_df['pitchType'].unique())
-    if comp_year:
+    if comp_year & (szn_df.shape[0]>0):
         sns.kdeplot(szn_df.loc[szn_df['pitchType'].isin(pitch_list)].assign(HB = lambda x: np.where(x['pitcherHand']=='L',x['HB'].mul(-1),x['HB'])).dropna(),
                     x='HB',
                     y='IVB',
