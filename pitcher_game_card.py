@@ -2251,7 +2251,7 @@ if game_filter: # If filtering by games
             home_team = [1]+[0]+([] if len(game_x['home_pitcher_lineup'])==1 else [1]*(len(game_x['home_pitcher_lineup'])-1))+([] if len(game_x['away_pitcher_lineup'])==1 else [0]*(len(game_x['away_pitcher_lineup'])-1))
             test_list = {}
             for home_away_pitcher in ['home','away']:
-                if f'{home_away_pitcher}_pitchers' not in x.keys():
+                if f'{home_away_pitcher}_pitchers' not in game_x.keys():
                     continue
                 for pitcher_id in list(game_x[f'{home_away_pitcher}_pitchers'].keys()):
                     test_list.update({pitcher_id:game_x[f'{home_away_pitcher}_pitchers'][pitcher_id][0]['pitcher_name']})
