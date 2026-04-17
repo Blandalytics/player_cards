@@ -2207,7 +2207,7 @@ def date_change():
     if 'game' in ss:
         del ss['game']
     if 'player' in ss:
-        del ss['player']
+        del ss['player'], game_df, game_group, szn_df, szn_group, szn_comp, missing_feats
 def game_change():
     if 'player' in ss:
         del ss['player'], game_df, game_group, szn_df, szn_group, szn_comp, missing_feats
@@ -2217,15 +2217,15 @@ with col1:
     st.date_input("Select a game date:", ss['date'], 
                   min_value=date(2023, 3, 17), max_value=today+timedelta(days=2),
                   key='date',on_change=date_change)
-    r = requests.get(f'https://statsapi.mlb.com/api/v1/schedule?sportId=1,51&date={ss['date']}')
-    x = r.json()
-    if x['totalGames']==0:
+    date_r = requests.get(f'https://statsapi.mlb.com/api/v1/schedule?sportId=1,51&date={ss['date']}')
+    date_x = date_r.json()
+    if date_x['totalGames']==0:
         print(f'No games on {ss['date']}')
     else:
         games_today = []
-        for game in range(len(x['dates'][0]['games'])):
+        for game in range(len(date_x['dates'][0]['games'])):
             # if x['dates'][0]['games'][game]['gamedayType'] in ['E','P']:
-            games_today += [x['dates'][0]['games'][game]['gamePk']]
+            games_today += [date_x['dates'][0]['games'][game]['gamePk']]
         game_list = generate_games(games_today)
     game_filter = st.checkbox(f"Filter by game?",value=True)
 
@@ -2242,19 +2242,19 @@ if game_filter: # If filtering by games
                               key='game',on_change=game_change)
         game_id = game_list[ss['game']]
         game_id = int(game_id)
-        r = requests.get(f'https://baseballsavant.mlb.com/gf?game_pk={game_id}')
-        x = r.json()
+        game_r = requests.get(f'https://baseballsavant.mlb.com/gf?game_pk={game_id}')
+        game_x = game_r.json()
         # sport_id = 
-        game_code = x['game_status_code']
-        if (len(x['home_pitcher_lineup'])>0) & (len(x['away_pitcher_lineup'])>0):
-            pitcher_lineup = [x['home_pitcher_lineup'][0]]+[x['away_pitcher_lineup'][0]]+([] if len(x['home_pitcher_lineup'])==1 else x['home_pitcher_lineup'][1:])+([] if len(x['away_pitcher_lineup'])==1 else x['away_pitcher_lineup'][1:])
-            home_team = [1]+[0]+([] if len(x['home_pitcher_lineup'])==1 else [1]*(len(x['home_pitcher_lineup'])-1))+([] if len(x['away_pitcher_lineup'])==1 else [0]*(len(x['away_pitcher_lineup'])-1))
+        game_code = game_x['game_status_code']
+        if (len(game_x['home_pitcher_lineup'])>0) & (len(game_x['away_pitcher_lineup'])>0):
+            pitcher_lineup = [game_x['home_pitcher_lineup'][0]]+[game_x['away_pitcher_lineup'][0]]+([] if len(game_x['home_pitcher_lineup'])==1 else game_x['home_pitcher_lineup'][1:])+([] if len(game_x['away_pitcher_lineup'])==1 else game_x['away_pitcher_lineup'][1:])
+            home_team = [1]+[0]+([] if len(game_x['home_pitcher_lineup'])==1 else [1]*(len(game_x['home_pitcher_lineup'])-1))+([] if len(game_x['away_pitcher_lineup'])==1 else [0]*(len(game_x['away_pitcher_lineup'])-1))
             test_list = {}
             for home_away_pitcher in ['home','away']:
                 if f'{home_away_pitcher}_pitchers' not in x.keys():
                     continue
-                for pitcher_id in list(x[f'{home_away_pitcher}_pitchers'].keys()):
-                    test_list.update({pitcher_id:x[f'{home_away_pitcher}_pitchers'][pitcher_id][0]['pitcher_name']})
+                for pitcher_id in list(game_x[f'{home_away_pitcher}_pitchers'].keys()):
+                    test_list.update({pitcher_id:game_x[f'{home_away_pitcher}_pitchers'][pitcher_id][0]['pitcher_name']})
             pitcher_lineup = [x for x in pitcher_lineup if str(x) in test_list.keys()]
             if len(test_list.keys())>0:
                 pitcher_list = {test_list[str(x)]:[str(x),y] for x,y in zip(pitcher_lineup,home_team)}
@@ -2262,6 +2262,7 @@ if game_filter: # If filtering by games
                 pitcher_list = {}
         else:
             pitcher_list = {}
+        del game_r, game_x
     if ('pitcher' not in ss) & (len(pitcher_list.keys())>0):
         ss['pitcher'] = list(pitcher_list.keys())[0]
 
@@ -2280,6 +2281,7 @@ if game_filter: # If filtering by games
                     if num_games >=3:
                         comp_years += [prev_year]
                 prev_year -= 1
+            del response
             if len(comp_years) > 0:
                 vs_past = st.checkbox(f"Compare to previous stats?",value=True)
                 if vs_past:
@@ -2293,10 +2295,10 @@ if game_filter: # If filtering by games
             spring_training = False if gameday_type == 'P' else True
 else: # list all pitchers
     pitcher_list = {}
-    for game in range(len(x['dates'][0]['games'])):
-        game_chunk = x['dates'][0]['games'][game]
+    for game in range(len(date_x['dates'][0]['games'])):
+        game_chunk = date_x['dates'][0]['games'][game]
         if game_chunk['status']['abstractGameState'] in ['Live','Final']:
-            game_id = x['dates'][0]['games'][game]['gamePk']
+            game_id = date_x['dates'][0]['games'][game]['gamePk']
             game_r = requests.get(f'https://baseballsavant.mlb.com/gf?game_pk={game_id}')
             game_x = game_r.json()
             game_code = game_x['game_status_code']
@@ -2314,6 +2316,7 @@ else: # list all pitchers
     pitcher_names = list(pitcher_list.keys())
     pitcher_names.sort(key=lambda name: name.split(" ")[-1].lower())
     pitcher_list = {x:pitcher_list[x] for x in pitcher_names}
+    del game_r, game_x
     
     if ('pitcher' not in ss) & (len(pitcher_list.keys())>0):
         ss['pitcher'] = list(pitcher_list.keys())[0]
@@ -2341,11 +2344,12 @@ else: # list all pitchers
             else:
                 vs_past = False
                 comp_year = None
-    
+            del response
             game_type = requests.get(f"https://statsapi.mlb.com/api/v1.1/game/{game_id}/feed/live").json()['gameData']['game']['type']
             gameday_type = requests.get(f"https://statsapi.mlb.com/api/v1.1/game/{game_id}/feed/live").json()['gameData']['game']['gamedayType']
             spring_training = False if gameday_type == 'P' else True
-    
+del date_r, date_x
+
 if len(pitcher_list.keys()) >0:
     if st.button('Generate Chart'):
         if vs_past:
