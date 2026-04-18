@@ -2352,7 +2352,7 @@ else: # list all pitchers
             game_type = requests.get(f"https://statsapi.mlb.com/api/v1.1/game/{game_id}/feed/live").json()['gameData']['game']['type']
             gameday_type = requests.get(f"https://statsapi.mlb.com/api/v1.1/game/{game_id}/feed/live").json()['gameData']['game']['gamedayType']
             spring_training = False if gameday_type == 'P' else True
-del date_r, date_x
+    del date_r, date_x
 
 if len(pitcher_list.keys()) >0:
     if st.button('Generate Card'):
@@ -2362,9 +2362,9 @@ if len(pitcher_list.keys()) >0:
             # if spring_training | (comp_year != ss['date'].year):
             prev_season = True
             szn_load = load_prev_pitches(pitcher_id,game_id,
-                                     prev_season=prev_season,
-                                     comp_year=comp_year
-                                      )
+                                         prev_season=prev_season,
+                                         comp_year=comp_year
+                                         )
             # else:
             #     prev_season = False
             # szn_load = load_prev_pitches(pitcher_id,game_id,
