@@ -1888,7 +1888,7 @@ def generate_chart(pitcher_id,game_id,game_df,game_group,szn_df,szn_comp,prev_se
     ax1 = fig.add_axes([0.03,0.275,0.423,0.287], anchor='SW', zorder=1)
     pitch_list = list(game_df['pitchType'].unique())
     if comp_year:
-        if (szn_df.shape[0]>0):
+        if (szn_df.loc[szn_df['pitchType'].isin(pitch_list)].shape[0]>0):
             sns.kdeplot(szn_df.loc[szn_df['pitchType'].isin(pitch_list)].assign(HB = lambda x: np.where(x['pitcherHand']=='L',x['HB'].mul(-1),x['HB'])).dropna(),
                         x='HB',
                         y='IVB',
@@ -2352,7 +2352,7 @@ else: # list all pitchers
             game_type = requests.get(f"https://statsapi.mlb.com/api/v1.1/game/{game_id}/feed/live").json()['gameData']['game']['type']
             gameday_type = requests.get(f"https://statsapi.mlb.com/api/v1.1/game/{game_id}/feed/live").json()['gameData']['game']['gamedayType']
             spring_training = False if gameday_type == 'P' else True
-    del date_r, date_x
+del date_r, date_x
 
 if len(pitcher_list.keys()) >0:
     if st.button('Generate Card'):
