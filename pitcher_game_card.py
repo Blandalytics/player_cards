@@ -1890,17 +1890,17 @@ def generate_chart(pitcher_id,game_id,game_df,game_group,szn_df,szn_comp,prev_se
     if comp_year:
         if (szn_df.shape[0]>0):
             sns.kdeplot(szn_df.loc[szn_df['pitchType'].isin(pitch_list)].assign(HB = lambda x: np.where(x['pitcherHand']=='L',x['HB'].mul(-1),x['HB'])).dropna(),
-                    x='HB',
-                    y='IVB',
-                    hue='pitchType',
-                    palette=marker_colors,
-                    levels=[0.1,1],
-                    fill=True,
-                    bw_adjust=2.5,
-                    cut=2,
-                    alpha=0.25,
-                    legend=False,
-                    ax=ax1)
+                        x='HB',
+                        y='IVB',
+                        hue='pitchType',
+                        palette=marker_colors,
+                        levels=[0.1,1],
+                        fill=True,
+                        bw_adjust=2.5,
+                        cut=2,
+                        alpha=0.25,
+                        legend=False,
+                        ax=ax1)
     sns.scatterplot(game_df.assign(HB = lambda x: np.where(x['pitcherHand']=='L',x['HB'].mul(-1),x['HB'])),
                     x='HB',
                     y='IVB',
@@ -2211,10 +2211,10 @@ def date_change():
     if 'game' in ss:
         del ss['game']
     if 'player' in ss:
-        del ss['player'], game_df, game_group, szn_df, szn_group, szn_comp, missing_feats
+        del ss['player']#, game_df, game_group, szn_df, szn_group, szn_comp, missing_feats
 def game_change():
     if 'player' in ss:
-        del ss['player'], game_df, game_group, szn_df, szn_group, szn_comp, missing_feats
+        del ss['player']#, game_df, game_group, szn_df, szn_group, szn_comp, missing_feats
     
 col1, col2, col3 = st.columns([0.25,0.5,0.25])
 with col1:
