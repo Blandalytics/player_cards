@@ -553,7 +553,7 @@ def header_stats_chunk(game_id,pitcher_id,ax):
     csw = x[f'{home_text}_pitchers'][f'{pitcher_id}'][0]['avg_pitch_speed'][-1]['csw_percent']
 
     grade_letters = ['F','D-','D','D+','C-','C','C+','B-','B','B+','A-','A','A+']
-    if (game_code in ['A','E','F','S']) | ((starter==0) & (outs<12)):
+    if (game_code in ['A','E','F','S']) | ((starter==0) & (outs<12)) | (tbf<=6):
         r = requests.get(f"https://statsapi.mlb.com/api/v1.1/game/{game_id}/feed/live")
         game = r.json()
         for play in game['liveData']['plays']['allPlays']:
