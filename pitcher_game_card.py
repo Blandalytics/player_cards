@@ -558,12 +558,12 @@ def header_stats_chunk(game_id,pitcher_id,ax):
         game = r.json()
         for play in game['liveData']['plays']['allPlays']:
             if play['matchup']['pitcher']['id']==pitcher_id:
-                inning = np.clip(play['about']['inning'],4,9)
+                inning = int(np.clip(play['about']['inning'],4,9))
                 
                 fld_score = play['result']['homeScore'] if play['about']['isTopInning'] else play['result']['awayScore']
                 bat_score = play['result']['awayScore'] if play['about']['isTopInning'] else play['result']['homeScore']
                 score_diff = np.clip(fld_score-bat_score,-3,4)
-                run_diff = np.where(score_diff>0,score_diff-1,abs(score_diff))
+                run_diff = int(np.where(score_diff>0,score_diff-1,abs(score_diff)))
                 break
         # RP Game Score
         win_weight_dict = {
