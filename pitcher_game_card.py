@@ -552,37 +552,63 @@ def header_stats_chunk(game_id,pitcher_id,ax):
     whiffs_text = f'{whiffs} Whiffs' if whiffs!=1 else f'{whiffs} Whiff'
     csw = x[f'{home_text}_pitchers'][f'{pitcher_id}'][0]['avg_pitch_speed'][-1]['csw_percent']
 
-    if game_code in ['A','E','F','S']:
-        # Per-PA Game Score
-        game_score = (2 * int(outs) + int(strikeouts) - 2 * int(walks) - 2 * int(hits) - 3 * int(earned_runs) - 6 * int(home_runs)) / tbf
-        game_score = (game_score-0.481)/0.875*10+75
-
-        if game_score<60:
-            game_grade = 'F'
-        elif game_score<70:
-            game_grade = 'D'
-        elif game_score<80:
-            game_grade = 'C'
-        elif game_score<90:
-            game_grade = 'B'
-        else:
-            game_grade = 'A'
-    
-        if game_score%10 <3:
-            game_grade_adj = '-'
-        elif (game_score%10 >7) | (game_score >= 100):
-            game_grade_adj = '+'
-        else:
-            game_grade_adj = ''
-            
-        game_grade = game_grade if game_score <60 else game_grade+game_grade_adj    
+    grade_letters = ['F','D-','D','D+','C-','C','C+','B-','B','B+','A-','A','A+']
+    if (game_code in ['A','E','F','S']) | ((starter==0) & (outs<12)):
+        r = requests.get(f"https://statsapi.mlb.com/api/v1.1/game/{game_id}/feed/live")
+        game = r.json()
+        for play in game['liveData']['plays']['allPlays']:
+            if play['matchup']['pitcher']['id']==801403:
+                inning = np.clip(play['about']['inning'],4,9)
+                
+                fld_score = play['result']['homeScore'] if play['about']['isTopInning'] else play['result']['awayScore']
+                bat_score = play['result']['awayScore'] if play['about']['isTopInning'] else play['result']['homeScore']
+                score_diff = np.clip(fld_score-bat_score,-3,4)
+                run_diff = np.where(score_diff>0,score_diff-1,abs(score_diff))
+                break
+        # RP Game Score
+        win_weight_dict = {
+         'out': {
+             (4, 0): 3, (4, 1): 3, (4, 2): 2, (4, 3): 1,
+             (5, 0): 4, (5, 1): 3, (5, 2): 2, (5, 3): 1,
+             (6, 0): 4, (6, 1): 3, (6, 2): 2, (6, 3): 1,
+             (7, 0): 4, (7, 1): 3, (7, 2): 2, (7, 3): 1,
+             (8, 0): 5, (8, 1): 3, (8, 2): 2, (8, 3): 1,
+             (9, 0): 8, (9, 1): 4, (9, 2): 2, (9, 3): 1},
+         'strikeout': {
+             (4, 0): 3, (4, 1): 2, (4, 2): 2, (4, 3): 1,
+             (5, 0): 4, (5, 1): 3, (5, 2): 2, (5, 3): 1,
+             (6, 0): 4, (6, 1): 3, (6, 2): 2, (6, 3): 1,
+             (7, 0): 4, (7, 1): 3, (7, 2): 2, (7, 3): 1,
+             (8, 0): 5, (8, 1): 3, (8, 2): 2, (8, 3): 1,
+             (9, 0): 8, (9, 1): 4, (9, 2): 2, (9, 3): 1},
+         'walk': {
+             (4, 0): -3, (4, 1): -2, (4, 2): -2, (4, 3): -1,
+             (5, 0): -3, (5, 1): -2, (5, 2): -2, (5, 3): -1,
+             (6, 0): -3, (6, 1): -3, (6, 2): -2, (6, 3): -1,
+             (7, 0): -4, (7, 1): -3, (7, 2): -2, (7, 3): -1,
+             (8, 0): -4, (8, 1): -3, (8, 2): -2, (8, 3): -1,
+             (9, 0): -5, (9, 1): -4, (9, 2): -2, (9, 3): -1},
+         'hit': {
+             (4, 0): -8, (4, 1): -7, (4, 2): -6, (4, 3): -2,
+             (5, 0): -10, (5, 1): -9, (5, 2): -6, (5, 3): -2,
+             (6, 0): -11, (6, 1): -8, (6, 2): -6, (6, 3): -2,
+             (7, 0): -12, (7, 1): -8, (7, 2): -5, (7, 3): -2,
+             (8, 0): -15, (8, 1): -8, (8, 2): -5, (8, 3): -1,
+             (9, 0): -21, (9, 1): -9, (9, 2): -4, (9, 3): -1},
+         'home_run': {
+             (4, 0): -17, (4, 1): -14, (4, 2): -11, (4, 3): -4,
+             (5, 0): -21, (5, 1): -18, (5, 2): -14, (5, 3): -4,
+             (6, 0): -23, (6, 1): -17, (6, 2): -12, (6, 3): -3,
+             (7, 0): -26, (7, 1): -17, (7, 2): -11, (7, 3): -3,
+             (8, 0): -33, (8, 1): -18, (8, 2): -9, (8, 3): -2,
+             (9, 0): -43, (9, 1): -18, (9, 2): -8, (9, 3): -1}
+        }
+        game_score = 50 + int(outs) * win_weight_dict['out'][(inning,run_diff)] + int(strikeouts) * win_weight_dict['strikeout'][(inning,run_diff)] + int(walks) * win_weight_dict['walk'][(inning,run_diff)] + int(hits) * win_weight_dict['hit'][(inning,run_diff)] + int(home_runs) * win_weight_dict['home_run'][(inning,run_diff)]
+        grade_edges = [-1000,27,36,42,46,48,50,51,52,53,56,60,70,1000]
+        
+        game_grade = pd.cut([game_score],labels=grade_letters,bins=grade_edges)[0]  
     else:
         # Actual Game Score (Starters)
-        grade_letters = ['F','D-','D','D+','C-','C','C+','B-','B','B+','A-','A','A+']
-        
-        # game_score = 40 + (2 * int(outs) + int(strikeouts) - 2 * int(walks) - 2 * int(hits) - 3 * int(earned_runs) - 6 * int(home_runs))
-        # grade_edges = [-100,15,26,36,43,49,55,60,64,68,72,76,81,200]
-        
         game_score = 30 + 8/3 * int(outs) + 2 * int(strikeouts) - 2 * int(walks) - 1 * int(hits) - 7 * int(earned_runs) - 1 * int(home_runs)
         grade_edges = [-100, 12, 22.3, 30, 36.6, 41, 47.6, 53.6, 60.6, 67, 74, 82.3, 95, 1000]
         
