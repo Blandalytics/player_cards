@@ -574,14 +574,14 @@ def header_stats_chunk(game_id,pitcher_id,ax):
              (6, 0): 4, (6, 1): 3, (6, 2): 2, (6, 3): 1,
              (7, 0): 4, (7, 1): 3, (7, 2): 2, (7, 3): 1,
              (8, 0): 5, (8, 1): 3, (8, 2): 2, (8, 3): 1,
-             (9, 0): 8, (9, 1): 4, (9, 2): 2, (9, 3): 1},
+             (9, 0): 6, (9, 1): 4, (9, 2): 2, (9, 3): 1},
          'strikeout': {
              (4, 0): 3, (4, 1): 2, (4, 2): 2, (4, 3): 1,
              (5, 0): 4, (5, 1): 3, (5, 2): 2, (5, 3): 1,
              (6, 0): 4, (6, 1): 3, (6, 2): 2, (6, 3): 1,
              (7, 0): 5, (7, 1): 4, (7, 2): 2, (7, 3): 1,
              (8, 0): 6, (8, 1): 4, (8, 2): 2, (8, 3): 1,
-             (9, 0): 9, (9, 1): 5, (9, 2): 3, (9, 3): 1},
+             (9, 0): 9, (9, 1): 7, (9, 2): 6, (9, 3): 1},
          'walk': {
              (4, 0): -3, (4, 1): -2, (4, 2): -2, (4, 3): -1,
              (5, 0): -3, (5, 1): -2, (5, 2): -2, (5, 3): -1,
@@ -604,8 +604,8 @@ def header_stats_chunk(game_id,pitcher_id,ax):
              (8, 0): -33, (8, 1): -18, (8, 2): -9, (8, 3): -2,
              (9, 0): -43, (9, 1): -18, (9, 2): -8, (9, 3): -1}
         }
-        game_score = 50 + int(outs) * win_weight_dict['out'][(inning,run_diff)] + int(strikeouts) * win_weight_dict['strikeout'][(inning,run_diff)] + int(walks) * win_weight_dict['walk'][(inning,run_diff)] + int(hits) * win_weight_dict['hit'][(inning,run_diff)] + int(home_runs) * win_weight_dict['home_run'][(inning,run_diff)]
-        grade_edges = [-1000,27,37,43,46,48,50,51,52,53,56,61,71,1000]
+        game_score = 50 + (int(outs)-int(strikeouts)) * win_weight_dict['out'][(inning,run_diff)] + int(strikeouts) * win_weight_dict['strikeout'][(inning,run_diff)] + int(walks) * win_weight_dict['walk'][(inning,run_diff)] + int(hits) * win_weight_dict['hit'][(inning,run_diff)] + int(home_runs) * win_weight_dict['home_run'][(inning,run_diff)]
+        grade_edges = [-1000,27,37,42,46,48,50,51,52,53,56,61,67,1000]
         
         game_grade = pd.cut([game_score],labels=grade_letters,bins=grade_edges)[0]  
     else:
