@@ -557,7 +557,7 @@ def header_stats_chunk(game_id,pitcher_id,ax):
         r = requests.get(f"https://statsapi.mlb.com/api/v1.1/game/{game_id}/feed/live")
         game = r.json()
         for play in game['liveData']['plays']['allPlays']:
-            if play['matchup']['pitcher']['id']==801403:
+            if play['matchup']['pitcher']['id']==pitcher_id:
                 inning = np.clip(play['about']['inning'],4,9)
                 
                 fld_score = play['result']['homeScore'] if play['about']['isTopInning'] else play['result']['awayScore']
