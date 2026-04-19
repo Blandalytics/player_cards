@@ -12,6 +12,7 @@ import matplotlib.patches as mpatches
 import matplotlib.pyplot as plt
 from matplotlib.offsetbox import OffsetImage, AnnotationBbox
 from matplotlib.patches import FancyBboxPatch, BoxStyle, Ellipse
+import PIL
 from PIL import Image
 import urllib
 import pickle
