@@ -260,7 +260,7 @@ def to_nested_dict(df, orient='index'):
         result[key] = to_nested_dict(sub_df.droplevel(0))
     return result
 
-def arm_angle_day(game_date,season=2025):
+def arm_angle_day(game_date,season=2026):
     today_date = datetime.today().replace(tzinfo=UTC).astimezone(tz=None)
     szn_start = datetime(game_date.year,3,25).replace(tzinfo=UTC).astimezone(tz=None)
     if ((today_date - game_date).days >= 3) & ((game_date - szn_start).days > 0):
@@ -636,7 +636,7 @@ def pull_game(game_id,pitcher_id,pitcher_height):
     game = r.json()
 
     game_date = get_game_date(game_id)
-    arm_angles = arm_angle_day(game_date)
+    arm_angles = None#arm_angle_day(game_date)
 
     rel_dict = {
         'pitcher_id':pitcher_id,
