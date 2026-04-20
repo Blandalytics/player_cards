@@ -414,14 +414,14 @@ def pull_play(play,outside_data,base_outs,single_pitcher=True):
         sz_top = pitch['pitchData'].get('strikeZoneTop')
         sz_bot = pitch['pitchData'].get('strikeZoneBottom')
 
-        arm_angles = outside_data['arm_angles']
-        if int(game_pitcher_id) in arm_angles.keys():
-            if pitch_type in arm_angles[int(game_pitcher_id)].keys():
-                arm_angle = arm_angles[int(game_pitcher_id)][pitch_type].get('ball_angle')
-            else:
-                arm_angle = None
-        else:
-            arm_angle = None
+        # arm_angles = outside_data['arm_angles']
+        # if int(game_pitcher_id) in arm_angles.keys():
+        #     if pitch_type in arm_angles[int(game_pitcher_id)].keys():
+        #         arm_angle = arm_angles[int(game_pitcher_id)][pitch_type].get('ball_angle')
+        #     else:
+        #         arm_angle = None
+        # else:
+        arm_angle = None
 
         if 'coordinates' in pitch['pitchData'].keys():
             pX = pitch['pitchData']['coordinates'].get('pX')
