@@ -134,9 +134,9 @@ marker_colors = {
     'SV':'#2A98FF',
     'CH':'#6DE95D',
     'SC':'#6DE95D',
-    'KN':'#999999',
-    'SC':'#999999',
-    'UN':'#999999',
+    'KN':'#c7c7c7',
+    'SC':'#c7c7c7',
+    'UN':'#c7c7c7',
 }
 
 color_min = '#4BBFDF'
