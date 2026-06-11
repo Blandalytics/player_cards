@@ -1788,12 +1788,14 @@ def stats_chunk(table_df,ax,vs_past):
                         color_val = table_df.loc[table_df['pitchType']==pitch_type,stat+'_color'].item()
                         if stat == 'xSLGcon':
                             color_val = 4 - color_val
-                            stat_val = f'{stat_val:.3f}'.lstrip('0')
+                            
                         stat_color = diverge_palette[color_val]
                 else:
                     stat_color = 'w'
                 if np.isnan(stat_val):
                     stat_val = '-'
+                elif stat == 'xSLGcon':
+                    stat_val = f'{stat_val:.3f}'.lstrip('0')
                 else:
                     if (stat in ['Str%','SwStr%','CSW%','PLV+','plvStuff+']):
                         stat_val = int(round(stat_val))
