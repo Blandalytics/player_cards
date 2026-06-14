@@ -32,7 +32,7 @@ from concurrent.futures import ThreadPoolExecutor, as_completed
 import warnings
 warnings.filterwarnings("ignore", category=DeprecationWarning)
 
-base_font = 'DM Sans'
+base_font = 'Inter'
 font = load_google_font(base_font, weight='bold')
 italic = load_google_font(base_font, weight='bold', italic=True)
 fm.fontManager.addfont(str(font.get_file()))
