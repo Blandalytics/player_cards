@@ -60,7 +60,7 @@ sns.set_theme(
         'legend.facecolor':pl_background,
         'text.color': pl_white
      },
-    font=base_font
+    # font=base_font
     )
 mpl.rcParams.update({"font.weight": 600})
 chart_red = sns.color_palette('vlag',n_colors=10000)[-1]
