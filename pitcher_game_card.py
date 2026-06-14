@@ -33,9 +33,9 @@ import warnings
 warnings.filterwarnings("ignore", category=DeprecationWarning)
 
 base_font = 'DM Sans'
-font = load_google_font(base_font, weight='bold')
-italic = load_google_font(base_font, weight='bold', italic=True)
-fm.fontManager.addfont(str(font.get_file()))
+# font = load_google_font(base_font, weight='bold')
+# italic = load_google_font(base_font, weight='bold', italic=True)
+# fm.fontManager.addfont(str(font.get_file()))
 
 ## Set Styling
 # Plot Style
