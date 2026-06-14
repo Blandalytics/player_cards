@@ -24,10 +24,13 @@ import tqdm
 import xgboost as xgb
 from xgboost import XGBClassifier
 from io import BytesIO
+import pyfonts
 from pyfonts import set_default_font, load_google_font
 from typing import List
 
 from concurrent.futures import ThreadPoolExecutor, as_completed
+
+st.write(pyfonts.__version__)
 
 import warnings
 warnings.filterwarnings("ignore", category=DeprecationWarning)
