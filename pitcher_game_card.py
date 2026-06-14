@@ -32,7 +32,7 @@ from concurrent.futures import ThreadPoolExecutor, as_completed
 import warnings
 warnings.filterwarnings("ignore", category=DeprecationWarning)
 
-base_font = 'Inter'
+base_font = 'DM Sans'
 font = load_google_font(base_font, weight='bold')
 italic = load_google_font(base_font, weight='bold', italic=True)
 fm.fontManager.addfont(str(font.get_file()))
@@ -62,7 +62,7 @@ sns.set_theme(
      },
     font=base_font
     )
-# mpl.rcParams.update({"font.weight": 600})
+mpl.rcParams.update({"font.weight": 600})
 chart_red = sns.color_palette('vlag',n_colors=10000)[-1]
 chart_blue = sns.color_palette('vlag',n_colors=10000)[0]
 
