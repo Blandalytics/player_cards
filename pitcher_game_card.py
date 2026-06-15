@@ -32,7 +32,7 @@ from concurrent.futures import ThreadPoolExecutor, as_completed
 # import warnings
 # warnings.filterwarnings("ignore", category=DeprecationWarning)
 for fontpath in fm.findSystemFonts(fontpaths=None, fontext="ttf"):
-    print(fontpath)
+    st.write(fontpath)
 
 # base_font = 'DM Sans'
 # font = load_google_font(base_font, weight='bold')
