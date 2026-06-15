@@ -29,8 +29,8 @@ from typing import List
 
 from concurrent.futures import ThreadPoolExecutor, as_completed
 
-import warnings
-warnings.filterwarnings("ignore", category=DeprecationWarning)
+# import warnings
+# warnings.filterwarnings("ignore", category=DeprecationWarning)
 
 base_font = 'DM Sans'
 font = load_google_font(base_font, weight='bold')
