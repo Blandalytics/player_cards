@@ -35,7 +35,7 @@ warnings.filterwarnings("ignore", category=DeprecationWarning)
 base_font = 'DM Sans'
 font = load_google_font(base_font, weight=700)
 # set_default_font(font)
-italic = load_google_font(base_font, italic=True)
+# italic = load_google_font(base_font, italic=True)
 # fm._get_fontconfig_fonts.cache_clear()
 fm.fontManager.addfont(str(font.get_file()))
 
@@ -305,7 +305,7 @@ def name_chunk(pitcher_id,game_id,ax):
 
     sub_text = ax.text(0.1,0,
         f'{bio_info[1][0]}HP | {team_abbr} | {bio_info[1][1]}',
-        ha='left',va='center',font=italic,
+        ha='left',va='center',#font=italic,
                        color=pl_line_color,fontsize=20)
 
     # define text before gradient to get extent
