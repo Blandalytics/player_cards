@@ -305,8 +305,7 @@ def name_chunk(pitcher_id,game_id,ax):
 
     sub_text = ax.text(0.1,0,
         f'{bio_info[1][0]}HP | {team_abbr} | {bio_info[1][1]}',
-        ha='left',va='center',#font=italic,
-                       color=pl_line_color,fontsize=20)
+        ha='left',va='center',font=italic,color=pl_line_color,fontsize=20)
 
     # define text before gradient to get extent
     text = mpl.textpath.TextPath((0, 0.4), name, size=font_adj)
@@ -2154,8 +2153,7 @@ def generate_chart(pitcher_id,game_id,game_df,game_group,szn_df,szn_comp,prev_se
     fig.add_artist(lines.Line2D([0.01, 0.01], [0.715, 0.813],linewidth=3,color=pl_text,alpha=line_alpha))
     fig.add_artist(lines.Line2D([0.305, 0.305], [0.715, 0.813],linewidth=3,color=pl_text,alpha=line_alpha))
     
-    fig.text(0.5,0.896,game_text,color='w',fontsize=24,va='center',ha='center',#font=italic
-            )
+    fig.text(0.5,0.896,game_text,color='w',fontsize=24,va='center',ha='center',font=italic)
     
     fig.add_artist(mpatches.FancyBboxPatch((0.02, 0.85), 0.96, 0.023,
                                            ec=pl_text,
