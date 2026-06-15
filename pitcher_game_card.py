@@ -31,7 +31,7 @@ from concurrent.futures import ThreadPoolExecutor, as_completed
 
 # import warnings
 # warnings.filterwarnings("ignore", category=DeprecationWarning)
-for fontpath in font_manager.findSystemFonts(fontpaths=None, fontext="ttf"):
+for fontpath in fm.findSystemFonts(fontpaths=None, fontext="ttf"):
     print(fontpath)
 
 # base_font = 'DM Sans'
