@@ -34,8 +34,9 @@ warnings.filterwarnings("ignore", category=DeprecationWarning)
 
 base_font = 'DM Sans'
 font = load_google_font(base_font, weight='bold')
+set_default_font(font)
 italic = load_google_font(base_font, weight='bold', italic=True)
-fm.fontManager.addfont(str(font.get_file()))
+# fm.fontManager.addfont(str(font.get_file()))
 
 ## Set Styling
 # Plot Style
@@ -60,7 +61,7 @@ sns.set_theme(
         'legend.facecolor':pl_background,
         'text.color': pl_white
      },
-    font=base_font
+    # font=base_font
     )
 mpl.rcParams.update({"font.weight": 600})
 chart_red = sns.color_palette('vlag',n_colors=10000)[-1]
