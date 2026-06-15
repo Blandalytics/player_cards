@@ -36,7 +36,7 @@ base_font = 'DM Sans'
 font = load_google_font(base_font, weight='bold')
 # set_default_font(font)
 italic = load_google_font(base_font, weight='bold', italic=True)
-fm._get_fontconfig_fonts.cache_clear()
+# fm._get_fontconfig_fonts.cache_clear()
 fm.fontManager.addfont(str(font.get_file()))
 
 ## Set Styling
