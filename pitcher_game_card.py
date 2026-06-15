@@ -35,7 +35,7 @@ warnings.filterwarnings("ignore", category=DeprecationWarning)
 base_font = 'DM Sans'
 font = load_google_font(base_font, weight=700)
 # set_default_font(font)
-# italic = load_google_font(base_font, weight=700, italic=True)
+italic = load_google_font(base_font, italic=True)
 # fm._get_fontconfig_fonts.cache_clear()
 fm.fontManager.addfont(str(font.get_file()))
 
