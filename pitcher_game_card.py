@@ -305,7 +305,7 @@ def name_chunk(pitcher_id,game_id,ax):
 
     sub_text = ax.text(0.1,0,
         f'{bio_info[1][0]}HP | {team_abbr} | {bio_info[1][1]}',
-        ha='left',va='center',#font=italic,
+        ha='left',va='center',font=italic,
                        color=pl_line_color,fontsize=20)
 
     # define text before gradient to get extent
