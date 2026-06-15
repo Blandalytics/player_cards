@@ -64,7 +64,7 @@ sns.set_theme(
      },
     font=base_font
     )
-mpl.rcParams.update({"font.weight": 600})
+mpl.rcParams.update({"font.weight": 700})
 chart_red = sns.color_palette('vlag',n_colors=10000)[-1]
 chart_blue = sns.color_palette('vlag',n_colors=10000)[0]
 
