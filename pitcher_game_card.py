@@ -78,7 +78,6 @@ letter_logo = letter_logo()
 
 st.set_page_config(page_title='PLV Pitcher Game Card', page_icon=letter_logo,
                    layout='wide')
-# st.title("NFBC Draft Data, over Time")
 new_title = f'<p style="color:{pl_text}; font-weight: bold; font-size: 42px;">PLV Pitcher Game Card</p>'
 st.markdown(new_title, unsafe_allow_html=True)
 
@@ -1992,7 +1991,7 @@ def generate_chart(pitcher_id,game_id,game_df,game_group,szn_df,szn_comp,prev_se
              y_val,
              f'{arm_angle:.0f}°',
              ha='center',va='center',
-             fontsize=16,color=pl_white,fontweight='light',
+             fontsize=16,color=pl_white,fontweight=700,
              bbox=dict(facecolor=pl_background, edgecolor='w', boxstyle='round',linewidth=1,alpha=0.75))
     
     ax1.set(xlim=(-chart_lim-2,chart_lim+2),
@@ -2169,8 +2168,8 @@ def generate_chart(pitcher_id,game_id,game_df,game_group,szn_df,szn_comp,prev_se
             )
     
     fig.text(0.7125,0.815,'Usage',color='w',fontsize=30,va='center',ha='center')
-    fig.text(0.6525,0.798,f'vs LHB ({game_df['vLHH'].fillna(0).sum():.0f})',fontsize=20,color=pl_line_color,ha='right',va='center',weight='regular')
-    fig.text(0.7725,0.798,f'vs RHB ({game_df['vRHH'].fillna(0).sum():.0f})',fontsize=20,color=pl_line_color,ha='left',va='center',weight='regular')
+    fig.text(0.6525,0.798,f'vs LHB ({game_df['vLHH'].fillna(0).sum():.0f})',fontsize=20,color=pl_line_color,ha='right',va='center',weight=700)
+    fig.text(0.7725,0.798,f'vs RHB ({game_df['vRHH'].fillna(0).sum():.0f})',fontsize=20,color=pl_line_color,ha='left',va='center',weight=700)
     fig.add_artist(lines.Line2D([0.7725, 0.99], [0.815, 0.815],linewidth=3,color=pl_text,alpha=line_alpha))
     fig.add_artist(lines.Line2D([0.425, 0.6525], [0.815, 0.815],linewidth=3,color=pl_text,alpha=line_alpha))
     fig.add_artist(lines.Line2D([0.99, 0.99], [0.59, 0.813],linewidth=3,color=pl_text,alpha=line_alpha))
