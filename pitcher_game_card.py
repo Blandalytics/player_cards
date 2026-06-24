@@ -1171,8 +1171,6 @@ def pull_game_info(game_id):
     }
     r = requests.get(f'https://baseballsavant.mlb.com/gf?game_pk={game_id}')
     x = r.json()
-    game_status_code = x['game_status_code']
-    code_map = code_dict[game_status_code]
     if 'scoreboard' not in x.keys():
         game_hour = 16
         game_minutes = 0
@@ -1181,11 +1179,15 @@ def pull_game_info(game_id):
         raw_time = game_hour*60+game_minutes
         am_pm = 'AM' if game_hour <12 else 'PM'
         game_time = f'{game_hour-12}:{game_minutes:>02}{am_pm}' if (am_pm=='PM') & (game_hour!=12) else f'{game_hour}:{game_minutes:>02}{am_pm}'
+        code_map = 2
     else:
         game_hour = int(x['scoreboard']['datetime']['dateTime'][11:13])
         game_hour = game_hour-4 if game_hour >3 else game_hour+20
         game_minutes = int(x['scoreboard']['datetime']['dateTime'][14:16])
         ppd = 0 if x['scoreboard']['datetime']['originalDate']==x['scoreboard']['datetime']['officialDate'] else 1
+        
+        game_status_code = x['game_status_code']
+        code_map = code_dict[game_status_code]
         raw_time = game_hour*60+game_minutes
         am_pm = 'AM' if game_hour <12 else 'PM'
         game_time = f'{game_hour-12}:{game_minutes:>02}{am_pm}' if (am_pm=='PM') & (game_hour!=12) else f'{game_hour}:{game_minutes:>02}{am_pm}'
