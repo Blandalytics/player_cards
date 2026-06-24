@@ -1171,45 +1171,47 @@ def pull_game_info(game_id):
     }
     r = requests.get(f'https://baseballsavant.mlb.com/gf?game_pk={game_id}')
     x = r.json()
-    if 'scoreboard' in x.keys():
+    game_status_code = x['game_status_code']
+    code_map = code_dict[game_status_code]
+    if 'scoreboard' not in x.keys():
+        game_hour = 16
+        game_minutes = 0
+        ppd = 0
+        inning_sort = None
+    else:
         game_hour = int(x['scoreboard']['datetime']['dateTime'][11:13])
         game_hour = game_hour-4 if game_hour >3 else game_hour+20
         game_minutes = int(x['scoreboard']['datetime']['dateTime'][14:16])
-    else:
-        game_hour = 16
-        game_minutes = 0
+        ppd = 0 if x['scoreboard']['datetime']['originalDate']==x['scoreboard']['datetime']['officialDate'] else 1
+        
+        away_team = x['scoreboard']['teams']['away']['abbreviation']
+        if away_team in list(team_maps.keys()):
+            away_team = team_maps[away_team]
+        home_team = x['scoreboard']['teams']['home']['abbreviation']
+        if home_team in list(team_maps.keys()):
+            home_team = team_maps[home_team]
+        if game_status_code  in ['P','S','D','C']:
+            game_info = f'{away_team} @ {home_team}: {game_time}'
+            inning_sort = None
+        else:
+            game_info = f'{away_team} @ {home_team}'
+            home_runs = x['scoreboard']['linescore']['teams']['home']['runs']
+            away_runs = x['scoreboard']['linescore']['teams']['away']['runs']
+            inning = x['scoreboard']['linescore']['currentInning']
+            top_bot = x['scoreboard']['linescore']['inningHalf'][0]
+            inning_sort = int(inning)*2 - (0 if top_bot=='Bottom' else 1)
+            if game_status_code == 'F':
+                if home_runs>away_runs:
+                    game_info = f'FINAL: {away_team} {away_runs} @ **:blue[{home_team} {home_runs}]**'
+                elif home_runs<away_runs:
+                    game_info = f'FINAL: **:blue[{away_team} {away_runs}]** @ {home_team} {home_runs}'
+                else:
+                    game_info = f'FINAL: {away_team} {away_runs} @ {home_team} {home_runs}'
+            else:
+                game_info = f'{top_bot}{inning}: {away_team} {away_runs} @ {home_team} {home_runs}'
     raw_time = game_hour*60+game_minutes
     am_pm = 'AM' if game_hour <12 else 'PM'
     game_time = f'{game_hour-12}:{game_minutes:>02}{am_pm}' if (am_pm=='PM') & (game_hour!=12) else f'{game_hour}:{game_minutes:>02}{am_pm}'
-    ppd = 0 if x['scoreboard']['datetime']['originalDate']==x['scoreboard']['datetime']['officialDate'] else 1
-    
-    away_team = x['scoreboard']['teams']['away']['abbreviation']
-    if away_team in list(team_maps.keys()):
-        away_team = team_maps[away_team]
-    home_team = x['scoreboard']['teams']['home']['abbreviation']
-    if home_team in list(team_maps.keys()):
-        home_team = team_maps[home_team]
-    game_status_code = x['game_status_code']
-    code_map = code_dict[game_status_code]
-    if game_status_code  in ['P','S','D','C']:
-        game_info = f'{away_team} @ {home_team}: {game_time}'
-        inning_sort = None
-    else:
-        game_info = f'{away_team} @ {home_team}'
-        home_runs = x['scoreboard']['linescore']['teams']['home']['runs']
-        away_runs = x['scoreboard']['linescore']['teams']['away']['runs']
-        inning = x['scoreboard']['linescore']['currentInning']
-        top_bot = x['scoreboard']['linescore']['inningHalf'][0]
-        inning_sort = int(inning)*2 - (0 if top_bot=='Bottom' else 1)
-        if game_status_code == 'F':
-            if home_runs>away_runs:
-                game_info = f'FINAL: {away_team} {away_runs} @ **:blue[{home_team} {home_runs}]**'
-            elif home_runs<away_runs:
-                game_info = f'FINAL: **:blue[{away_team} {away_runs}]** @ {home_team} {home_runs}'
-            else:
-                game_info = f'FINAL: {away_team} {away_runs} @ {home_team} {home_runs}'
-        else:
-            game_info = f'{top_bot}{inning}: {away_team} {away_runs} @ {home_team} {home_runs}'
     return {game_info:[game_id,game_time,raw_time,inning_sort,code_map]}
 
 def generate_games(games_today):
