@@ -1179,6 +1179,7 @@ def pull_game_info(game_id):
         raw_time = game_hour*60+game_minutes
         am_pm = 'AM' if game_hour <12 else 'PM'
         game_time = f'{game_hour-12}:{game_minutes:>02}{am_pm}' if (am_pm=='PM') & (game_hour!=12) else f'{game_hour}:{game_minutes:>02}{am_pm}'
+        game_info = ''
         code_map = 2
     else:
         game_hour = int(x['scoreboard']['datetime']['dateTime'][11:13])
