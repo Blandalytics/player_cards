@@ -1178,11 +1178,17 @@ def pull_game_info(game_id):
         game_minutes = 0
         ppd = 0
         inning_sort = None
+        raw_time = game_hour*60+game_minutes
+        am_pm = 'AM' if game_hour <12 else 'PM'
+        game_time = f'{game_hour-12}:{game_minutes:>02}{am_pm}' if (am_pm=='PM') & (game_hour!=12) else f'{game_hour}:{game_minutes:>02}{am_pm}'
     else:
         game_hour = int(x['scoreboard']['datetime']['dateTime'][11:13])
         game_hour = game_hour-4 if game_hour >3 else game_hour+20
         game_minutes = int(x['scoreboard']['datetime']['dateTime'][14:16])
         ppd = 0 if x['scoreboard']['datetime']['originalDate']==x['scoreboard']['datetime']['officialDate'] else 1
+        raw_time = game_hour*60+game_minutes
+        am_pm = 'AM' if game_hour <12 else 'PM'
+        game_time = f'{game_hour-12}:{game_minutes:>02}{am_pm}' if (am_pm=='PM') & (game_hour!=12) else f'{game_hour}:{game_minutes:>02}{am_pm}'
         
         away_team = x['scoreboard']['teams']['away']['abbreviation']
         if away_team in list(team_maps.keys()):
@@ -1209,9 +1215,7 @@ def pull_game_info(game_id):
                     game_info = f'FINAL: {away_team} {away_runs} @ {home_team} {home_runs}'
             else:
                 game_info = f'{top_bot}{inning}: {away_team} {away_runs} @ {home_team} {home_runs}'
-    raw_time = game_hour*60+game_minutes
-    am_pm = 'AM' if game_hour <12 else 'PM'
-    game_time = f'{game_hour-12}:{game_minutes:>02}{am_pm}' if (am_pm=='PM') & (game_hour!=12) else f'{game_hour}:{game_minutes:>02}{am_pm}'
+    
     return {game_info:[game_id,game_time,raw_time,inning_sort,code_map]}
 
 def generate_games(games_today):
