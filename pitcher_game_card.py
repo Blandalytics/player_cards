@@ -2268,7 +2268,7 @@ with col1:
     st.date_input("Select a game date:", ss['date'], 
                   min_value=date(2023, 3, 17), max_value=today+timedelta(days=2),
                   key='date',on_change=date_change)
-    date_r = requests.get(f'https://statsapi.mlb.com/api/v1/schedule?sportId=1,21,51&date={ss['date']}')
+    date_r = requests.get(f'https://statsapi.mlb.com/api/v1/schedule?sportId=1,14,21,51&date={ss['date']}')
     date_x = date_r.json()
     if date_x['totalGames']==0:
         print(f'No games on {ss['date']}')
