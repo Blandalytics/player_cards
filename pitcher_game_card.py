@@ -2477,10 +2477,24 @@ def game_change():
 statcast_levels = {
     1:'MLB',
     11:'AAA',
+    12:'AA',
+    13:'High-A',
     14:'Single-A (FSL)',
+    16:'Rookie',
+    17:'Winter',
     21:'Minors',
     22:'College',
-    51:'International'
+    23:'Independent',
+    31:'NPB',
+    32:'KBO',
+    51:'International',
+    52:'Olympics',
+    61:'Negro League',
+    509:'International (18U)',
+    510:'International (16U)',
+    576:'Women's Professional Softball',
+    586:'High School',
+    6005:'International (Amateur)'
 }
 inverted_levels = {v: k for k, v in statcast_levels.items()}
 col1, col2, col3 = st.columns([0.25,0.5,0.25])
