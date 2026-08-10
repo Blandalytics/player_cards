@@ -2492,7 +2492,7 @@ statcast_levels = {
     61:'Negro League',
     509:'International (18U)',
     510:'International (16U)',
-    576:'Women's Professional Softball',
+    576:"Women's Professional Softball",
     586:'High School',
     6005:'International (Amateur)'
 }
