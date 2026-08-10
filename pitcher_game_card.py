@@ -27,7 +27,7 @@ from xgboost import XGBClassifier
 from io import BytesIO
 from pyfonts import set_default_font, load_google_font
 
-from __future__ import annotations
+# from __future__ import annotations
 from typing import Dict, Iterable, List, Optional, Union
 
 from concurrent.futures import ThreadPoolExecutor, as_completed
