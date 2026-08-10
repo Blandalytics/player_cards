@@ -2494,13 +2494,13 @@ with col1:
         ss['level'] = 'MLB'
     st.selectbox('Choose a level:',[statcast_levels[x] for x in list(date_dict.keys())],
                  key='level',on_change=level_change)
-    level_text = inverted_levels[ss['level']]
-    date_r = requests.get(f'https://statsapi.mlb.com/api/v1/schedule?sportIds={level_text}&date={ss['date']}')
+    level_val = inverted_levels[ss['level']]
+    date_r = requests.get(f'https://statsapi.mlb.com/api/v1/schedule?sportIds={level_val}&date={ss['date']}')
     date_x = date_r.json()
     if date_x['totalGames']==0:
-        print(f'No games on {ss['date']}')
+        print(f'No {ss['level'} games on {ss['date']}')
     else:
-        games_today = date_dict[ss['level']]
+        games_today = date_dict[level_val]
         # for game in range(len(date_x['dates'][0]['games'])):
         #     # if x['dates'][0]['games'][game]['gamedayType'] in ['E','P']:
         #     games_today += [date_x['dates'][0]['games'][game]['gamePk']]
