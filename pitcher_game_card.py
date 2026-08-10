@@ -2504,10 +2504,13 @@ with col1:
     if date_x['totalGames']==0:
         print(f'No {ss['level']} games on {ss['date']}')
     else:
-        games_today = date_dict[level_val]
-        # for game in range(len(date_x['dates'][0]['games'])):
-        #     # if x['dates'][0]['games'][game]['gamedayType'] in ['E','P']:
-        #     games_today += [date_x['dates'][0]['games'][game]['gamePk']]
+        if bool(date_dict):
+            games_today = date_dict[level_val]
+        else:
+            games_today = []
+            for game in range(len(date_x['dates'][0]['games'])):
+                # if x['dates'][0]['games'][game]['gamedayType'] in ['E','P']:
+                games_today += [date_x['dates'][0]['games'][game]['gamePk']]
             
         game_list = generate_games(games_today)
     game_filter = st.checkbox(f"Filter by game?",value=True)
