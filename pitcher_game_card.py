@@ -2498,7 +2498,7 @@ with col1:
     date_r = requests.get(f'https://statsapi.mlb.com/api/v1/schedule?sportIds={level_val}&date={ss['date']}')
     date_x = date_r.json()
     if date_x['totalGames']==0:
-        print(f'No {ss['level'} games on {ss['date']}')
+        print(f'No {ss['level']} games on {ss['date']}')
     else:
         games_today = date_dict[level_val]
         # for game in range(len(date_x['dates'][0]['games'])):
