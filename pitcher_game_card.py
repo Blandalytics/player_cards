@@ -2492,7 +2492,7 @@ with col1:
     date_dict = get_game_pks(ss['date'])
     if 'level' not in ss:
         ss['level'] = 'MLB'
-    if not bool(date_dict):
+    if bool(date_dict):
         st.selectbox('Choose a level:',[statcast_levels[x] for x in list(date_dict.keys())],
                      key='level',on_change=level_change)
         level_val = inverted_levels[ss['level']]
