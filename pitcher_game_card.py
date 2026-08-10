@@ -2477,7 +2477,7 @@ def game_change():
 statcast_levels = {
     1:'MLB',
     11:'AAA',
-    14:'Single-A',
+    14:'Single-A (FSL)',
     21:'Minors',
     22:'College',
     51:'International'
