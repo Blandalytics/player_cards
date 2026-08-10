@@ -2255,6 +2255,13 @@ if 'date' not in ss:
     ss['date'] = today
     
 def date_change():
+    if 'level'  in ss:
+        del ss['level']
+    if 'game' in ss:
+        del ss['game']
+    if 'player' in ss:
+        del ss['player'], game_df, game_group, szn_df, szn_group, szn_comp, missing_feats
+def level_change():
     if 'game' in ss:
         del ss['game']
     if 'player' in ss:
@@ -2262,17 +2269,28 @@ def date_change():
 def game_change():
     if 'player' in ss:
         del ss['player'], game_df, game_group, szn_df, szn_group, szn_comp, missing_feats
-    
+
+statcast_levels = {
+    'MLB':1,
+    # 'AAA':11,
+    # 'Single-A':14,
+    # 'Minors':21,
+    # 'College':22,
+    # 'International':51
+}
 col1, col2, col3 = st.columns([0.25,0.5,0.25])
 with col1:
     st.date_input("Select a game date:", ss['date'], 
                   min_value=date(2023, 3, 17), max_value=today+timedelta(days=2),
                   key='date',on_change=date_change)
-    date_r = requests.get(f'https://statsapi.mlb.com/api/v1/schedule?sportId=1,21,51&date={ss['date']}')
+    date_r = requests.get(f'https://statsapi.mlb.com/api/v1/schedule?sportId={list(statcast_levels.values())}&date={ss['date']}')
     date_x = date_r.json()
     if date_x['totalGames']==0:
         print(f'No games on {ss['date']}')
     else:
+        if 'level' not in ss:
+            ss['level'] = 'MLB'
+        st.selectbox('Choose a level:',list(statcast_levels.keys()),key='level',on_change=level_change)
         games_today = []
         for game in range(len(date_x['dates'][0]['games'])):
             # if x['dates'][0]['games'][game]['gamedayType'] in ['E','P']:
