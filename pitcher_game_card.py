@@ -2,6 +2,7 @@ import streamlit as st
 from streamlit import session_state as ss
 
 from datetime import datetime, timedelta, UTC, date
+import datetime as _dt
 import pandas as pd
 import numpy as np
 import seaborn as sns
@@ -25,7 +26,9 @@ import xgboost as xgb
 from xgboost import XGBClassifier
 from io import BytesIO
 from pyfonts import set_default_font, load_google_font
-from typing import List
+
+from __future__ import annotations
+from typing import Dict, Iterable, List, Optional, Union
 
 from concurrent.futures import ThreadPoolExecutor, as_completed
 
@@ -321,6 +324,207 @@ def name_chunk(pitcher_id,game_id,ax):
     ax.axis('off')
     sns.despine()
     return f'Pitcher Performance: {x['gameDate']} {home_away} {opp_abbr}'
+
+SCHEDULE_URL = "https://statsapi.mlb.com/api/v1/schedule"
+SPORTS_URL = "https://statsapi.mlb.com/api/v1/sports"
+LIVE_FEED_URL = "https://statsapi.mlb.com/api/v1.1/game/{game_pk}/feed/live"
+
+# Trimmed live-feed payload -- only the keys needed to detect tracking data.
+# Keeps each probe at roughly 6-17 KB instead of several MB.
+_PROBE_FIELDS = (
+    "liveData,plays,allPlays,playEvents,pitchData,startSpeed,hitData,launchSpeed"
+)
+
+# Every sportId statsapi currently exposes (GET /api/v1/sports).
+DEFAULT_SPORT_IDS = (
+    1,     # Major League Baseball
+    11,    # Triple-A
+    12,    # Double-A
+    13,    # High-A
+    14,    # Single-A
+    16,    # Rookie
+    17,    # Winter Leagues
+    21,    # Minor League Baseball
+    22,    # College Baseball
+    23,    # Independent Leagues
+    31,    # Nippon Professional Baseball
+    32,    # Korean Baseball Organization
+    51,    # International Baseball
+    52,    # Olympic Baseball
+    61,    # Negro League Baseball
+    509,   # International Baseball (18U)
+    510,   # International Baseball (16U)
+    576,   # Women's Professional Softball
+    586,   # High School Baseball
+    6005,  # International Baseball (amateur)
+)
+
+# A game only has tracking data once it has actually been played.
+_PLAYED_STATES = frozenset({"Final", "Live"})
+
+DateLike = Union[str, _dt.date, _dt.datetime]
+
+
+def _normalize_date(date: DateLike) -> str:
+    if isinstance(date, (_dt.date, _dt.datetime)):
+        return date.strftime("%Y-%m-%d")
+    return str(date)
+
+
+def _sport_id_for(game: dict) -> Optional[int]:
+    """Resolve a game's sportId from its hydrated teams.
+
+    The schedule game object has no sportId of its own, so it comes from the
+    hydrated team. Home team wins; away is the fallback for the rare
+    cross-level matchup (e.g. a college club visiting an affiliated park).
+    """
+    teams = game.get("teams") or {}
+    for side in ("home", "away"):
+        team = (teams.get(side) or {}).get("team") or {}
+        sport_id = (team.get("sport") or {}).get("id")
+        if sport_id is not None:
+            return sport_id
+    return None
+
+
+def _has_statcast(
+    game_pk: int,
+    session: requests.Session,
+    timeout: float,
+    min_tracked_pitches: int,
+) -> bool:
+    """True if the game's feed carries Hawk-Eye pitch or batted-ball tracking."""
+    try:
+        response = session.get(
+            LIVE_FEED_URL.format(game_pk=game_pk),
+            params={"fields": _PROBE_FIELDS},
+            timeout=timeout,
+        )
+        response.raise_for_status()
+        plays = ((response.json().get("liveData") or {}).get("plays") or {}).get(
+            "allPlays"
+        ) or []
+    except (requests.RequestException, ValueError):
+        return False
+
+    tracked = 0
+    for play in plays:
+        for event in play.get("playEvents") or []:
+            pitch_data = event.get("pitchData") or {}
+            hit_data = event.get("hitData") or {}
+            if (
+                pitch_data.get("startSpeed") is not None
+                or hit_data.get("launchSpeed") is not None
+            ):
+                tracked += 1
+                if tracked >= min_tracked_pitches:
+                    return True
+    return False
+
+
+def fetch_sport_ids(
+    session: Optional[requests.Session] = None, timeout: float = 30
+) -> List[int]:
+    """Pull the live sportId list, in case MLB adds or retires one."""
+    client = session or requests
+    response = client.get(SPORTS_URL, timeout=timeout)
+    response.raise_for_status()
+    return [sport["id"] for sport in response.json().get("sports", [])]
+
+
+def get_game_pks(
+    date: DateLike,
+    sport_ids: Optional[Iterable[int]] = None,
+    statcast_only: bool = True,
+    min_tracked_pitches: int = 1,
+    max_workers: int = 12,
+    timeout: float = 30,
+    session: Optional[requests.Session] = None,
+) -> Dict[int, List[int]]:
+    """Return ``{sportId: [gamePk, ...]}`` for every game on ``date``.
+
+    Args:
+        date: ``"YYYY-MM-DD"`` string, ``date``, or ``datetime``.
+        sport_ids: sportIds to query. Defaults to ``DEFAULT_SPORT_IDS``.
+        statcast_only: Keep only games that actually carry tracking data.
+            Statcast coverage is per-ballpark, not per-level, so this is
+            confirmed per game rather than inferred from sportId.
+        min_tracked_pitches: Tracked events required to count as covered.
+            Levels separate cleanly (0 vs. hundreds), so 1 is enough; raise it
+            if you want to exclude games with only a partial feed.
+        max_workers: Thread count for the per-game checks.
+        timeout: Per-request timeout in seconds.
+        session: Reuse an existing session. One is created if omitted.
+
+    Returns:
+        sportIds and gamePks sorted ascending; sportIds with no surviving
+        games are omitted entirely.
+
+    Note:
+        With ``statcast_only=True`` a future date returns ``{}`` -- unplayed
+        games have no tracking data yet. Pass ``statcast_only=False`` to
+        schedule ahead.
+    """
+    game_date = _normalize_date(date)
+    ids = tuple(sport_ids) if sport_ids is not None else DEFAULT_SPORT_IDS
+
+    owns_session = session is None
+    if owns_session:
+        session = requests.Session()
+        # Size the pool to the worker count so the probes don't contend.
+        adapter = requests.adapters.HTTPAdapter(
+            pool_connections=max_workers, pool_maxsize=max_workers
+        )
+        session.mount("https://", adapter)
+
+    try:
+        response = session.get(
+            SCHEDULE_URL,
+            params={
+                "sportId": ",".join(str(i) for i in ids),
+                "date": game_date,
+                "hydrate": "team",  # the only way to learn each game's sportId
+            },
+            timeout=timeout,
+        )
+        response.raise_for_status()
+
+        # gamePk -> sportId, which also dedupes across sportId groupings.
+        candidates: Dict[int, int] = {}
+        for day in response.json().get("dates") or []:
+            for game in day.get("games") or []:
+                game_pk = game.get("gamePk")
+                sport_id = _sport_id_for(game)
+                if game_pk is None or sport_id is None:
+                    continue
+                if statcast_only:
+                    state = (game.get("status") or {}).get("abstractGameState")
+                    if state not in _PLAYED_STATES:
+                        continue  # skip postponed, cancelled, not yet played
+                candidates[game_pk] = sport_id
+
+        if statcast_only and candidates:
+            game_pks = list(candidates)
+            with ThreadPoolExecutor(max_workers=max_workers) as pool:
+                covered = pool.map(
+                    lambda pk: _has_statcast(
+                        pk, session, timeout, min_tracked_pitches
+                    ),
+                    game_pks,
+                )
+            candidates = {
+                pk: candidates[pk]
+                for pk, is_covered in zip(game_pks, covered)
+                if is_covered
+            }
+
+        grouped: Dict[int, List[int]] = {}
+        for game_pk, sport_id in candidates.items():
+            grouped.setdefault(sport_id, []).append(game_pk)
+        return {sport_id: sorted(pks) for sport_id, pks in sorted(grouped.items())}
+    finally:
+        if owns_session:
+            session.close()
 
 def load_logo():
     # logo_loc = 'https://github.com/Blandalytics/PLV_viz/blob/main/data/PL-text-wht.png?raw=true'
@@ -2271,31 +2475,36 @@ def game_change():
         del ss['player'], game_df, game_group, szn_df, szn_group, szn_comp, missing_feats
 
 statcast_levels = {
-    'MLB':1,
-    # 'AAA':11,
-    # 'Single-A':14,
-    # 'Minors':21,
-    # 'College':22,
-    # 'International':51
+    1:'MLB',
+    11:'AAA',
+    14:'Single-A',
+    21:'Minors',
+    22:'College',
+    51:'International'
 }
-level_text = ','.join([f'{x}' for x in list(statcast_levels.values())])
+inverted_levels = {v: k for k, v in statcast_levels.items()}
 col1, col2, col3 = st.columns([0.25,0.5,0.25])
 with col1:
     st.date_input("Select a game date:", ss['date'], 
                   min_value=date(2023, 3, 17), max_value=today+timedelta(days=2),
                   key='date',on_change=date_change)
+    
+    date_dict = get_game_pks(ss['date'])
+    if 'level' not in ss:
+        ss['level'] = 'MLB'
+    st.selectbox('Choose a level:',[statcast_levels[x] for x in list(date_dict.keys())],
+                 key='level',on_change=level_change)
+    level_text = inverted_levels[ss['level']]
     date_r = requests.get(f'https://statsapi.mlb.com/api/v1/schedule?sportIds={level_text}&date={ss['date']}')
     date_x = date_r.json()
     if date_x['totalGames']==0:
         print(f'No games on {ss['date']}')
     else:
-        if 'level' not in ss:
-            ss['level'] = 'MLB'
-        st.selectbox('Choose a level:',list(statcast_levels.keys()),key='level',on_change=level_change)
-        games_today = []
-        for game in range(len(date_x['dates'][0]['games'])):
-            # if x['dates'][0]['games'][game]['gamedayType'] in ['E','P']:
-            games_today += [date_x['dates'][0]['games'][game]['gamePk']]
+        games_today = date_dict[ss['level']]
+        # for game in range(len(date_x['dates'][0]['games'])):
+        #     # if x['dates'][0]['games'][game]['gamedayType'] in ['E','P']:
+        #     games_today += [date_x['dates'][0]['games'][game]['gamePk']]
+            
         game_list = generate_games(games_today)
     game_filter = st.checkbox(f"Filter by game?",value=True)
 
