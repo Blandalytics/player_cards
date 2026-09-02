@@ -2539,7 +2539,7 @@ if game_filter: # If filtering by games
         
     with col2:
         st.pills('Choose a game (all times EST):',list(game_list.keys()),default=ss['game'],
-                              key='game',on_change=game_change)
+                              key='game',on_change=game_change,wrap=True)
         game_id = game_list[ss['game']]
         game_id = int(game_id)
         game_r = requests.get(f'https://baseballsavant.mlb.com/gf?game_pk={game_id}')
