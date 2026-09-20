@@ -1681,8 +1681,8 @@ def load_data(pitcher_id,game_id,comp_year,szn_load):
                 .sort_values('isPitch',ascending=False)
                 .reset_index()
                 .assign(Type = lambda x: x['pitchType'].map(pitch_names),
-                        vRHH = lambda x: x['vRHH'].div(x['vRHH'].sum()).astype('float')*100,
-                        vLHH = lambda x: x['vLHH'].div(x['vLHH'].sum()).astype('float')*100,
+                        vRHH = lambda x: x['vRHH'].div(np.max([1,x['vRHH'].sum()])).astype('float')*100,
+                        vLHH = lambda x: x['vLHH'].div(np.max([1,x['vLHH'].sum()])).astype('float')*100,
                         usage = lambda x: x['isPitch'].div(x['isPitch'].sum())*100,
                         chase = lambda x: x['chase'].astype('float')*100,
                         zone = lambda x: x['zone']*100,
